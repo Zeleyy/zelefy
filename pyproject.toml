@@ -1,0 +1,13 @@
+[project]
+name = "zelefy-workspace"
+version = "0.1.0"
+description = "Zelefy microservices mono-repository"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "apps/*",
+    "packages/*",
+]

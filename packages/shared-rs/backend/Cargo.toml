@@ -1,0 +1,14 @@
+[package]
+name = "zelefy_backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+zelefy_common = { path = "../common", features = ["backend"] }
+
+axum = { workspace = true }
+sqlx = { workspace = true }
+utoipa = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+serde = { workspace = true }

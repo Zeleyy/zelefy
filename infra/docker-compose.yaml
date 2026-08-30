@@ -1,0 +1,39 @@
+services:
+    auth:
+        build:
+            context: ..
+            dockerfile: apps/auth/Dockerfile
+        ports:
+            - "${AUTH_PORT}:8001"
+        environment:
+            - DATABASE_URL=${AUTH_DB_URL}
+            - REDIS_URL=${AUTH_REDIS_URL}
+            - ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS}
+            - REFRESH_TOKEN_TTL_DAYS=${REFRESH_TOKEN_TTL_DAYS}
+        depends_on:
+            - auth_db
+            - redis_sessions
+
+    auth_db:
+        image: postgres:18-alpine
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${AUTH_DB_USER}
+            POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+            POSTGRES_DB: ${AUTH_DB}
+        ports:
+            - "${AUTH_DB_PORT}:5432"
+        volumes:
+            - auth_db_data:/var/lib/postgresql
+
+    redis_sessions:
+        image: redis:8-alpine
+        restart: unless-stopped
+        ports:
+            - "${AUTH_REDIS_PORT}:6379"
+        volumes:
+            - redis_sessions_data:/data
+
+volumes:
+    auth_db_data:
+    redis_sessions_data:

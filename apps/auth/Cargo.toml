@@ -1,0 +1,33 @@
+[package]
+name = "zelefy_auth"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+zelefy_common = { workspace = true }
+zelefy_backend = { workspace = true }
+
+serde = { workspace = true}
+serde_json = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+dotenvy = { workspace = true }
+
+sqlx = { workspace = true }
+axum = { workspace = true }
+utoipa = { workspace = true }
+
+thiserror = "2.0.20"
+time = "0.3.55"
+
+argon2 = { version = "0.5.3", features = ["std"] }
+hex = "0.4.3"
+sha2 = "0.11.0"
+rand = "0.10.2"
+
+ipnetwork = { version = "0.21.1", features = ["serde"] }
+redis = { version = "1.6.0", features = ["tokio-comp", "connection-manager"] }
+tokio = { version = "1.53.1", features = ["full"] }
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum", "reqwest", "vendored"] }
+axum-extra = { version = "0.12.6", features = ["cookie", "typed-header"] }

@@ -1,0 +1,86 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH updated_session AS (\n                UPDATE user_sessions\n                SET is_revoked = TRUE\n                WHERE refresh_token_hash = $1\n                    AND is_revoked = FALSE\n                    AND expires_at > NOW()\n                RETURNING user_id\n            )\n            SELECT \n                u.user_id,\n                u.subscription AS \"subscription: SubscriptionTier\",\n                u.role AS \"role: UserRole\",\n                u.is_blocked\n            FROM updated_session s\n            JOIN users u ON u.user_id = s.user_id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "subscription: SubscriptionTier",
+        "type_info": {
+          "Custom": {
+            "name": "subscription_tier",
+            "kind": {
+              "Enum": [
+                "free",
+                "pro_plus",
+                "pro_unlimited"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "subscription"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "role: UserRole",
+        "type_info": {
+          "Custom": {
+            "name": "user_role",
+            "kind": {
+              "Enum": [
+                "user",
+                "moderator",
+                "admin"
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "role"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "is_blocked",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "is_blocked"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "33a516d812b19e249b9c93141644f4019190b7c4a812f15c6fb9d95338df1a27"
+}
