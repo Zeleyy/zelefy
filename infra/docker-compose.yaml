@@ -1,15 +1,28 @@
 services:
+    gateway:
+        build:
+            context: ..
+            dockerfile: apps/gateway/Dockerfile
+        ports:
+            - "${GATEWAY_PORT}:8000"
+        environment:
+            - REDIS_URL=${AUTH_REDIS_URL}
+            - AUTH_SERVICE_URL=${AUTH_URL}
+        depends_on:
+            - redis_sessions
+
     auth:
         build:
             context: ..
             dockerfile: apps/auth/Dockerfile
         ports:
-            - "${AUTH_PORT}:8001"
+            - "${AUTH_PORT}:${AUTH_PORT}"
         environment:
             - DATABASE_URL=${AUTH_DB_URL}
             - REDIS_URL=${AUTH_REDIS_URL}
             - ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS}
             - REFRESH_TOKEN_TTL_DAYS=${REFRESH_TOKEN_TTL_DAYS}
+            - AUTH_PORT=${AUTH_PORT}
         depends_on:
             - auth_db
             - redis_sessions
