@@ -13,16 +13,16 @@ async fn main() {
     let state = AppState {
         db: db_pool,
         redis: redis_manager,
-        config,
+        config: config.clone(),
     };
 
     let app = Router::new()
         .merge(api::routes())
         .with_state(state);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8001));
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     println!("Сервер запущен на http://{}", addr);
-    println!("Swagger UI доступен по адресу: http://localhost:8001/docs");
+    println!("Swagger UI доступен по адресу: http://localhost:{}/docs", config.port);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();

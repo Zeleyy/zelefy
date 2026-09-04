@@ -17,26 +17,23 @@ COPY --from=planner /app/recipe.json recipe.json
 
 RUN apt-get update && apt-get install -y pkg-config libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
-ENV SQLX_OFFLINE=true
-
-RUN cargo chef cook --release --bin zelefy_auth --recipe-path recipe.json
+RUN cargo chef cook --release --bin zelefy_gateway --recipe-path recipe.json
 
 COPY Cargo.toml Cargo.lock ./
 COPY apps/ ./apps/
 COPY packages/ ./packages/
-COPY .sqlx/ ./.sqlx/
 
-RUN cargo build --release --bin zelefy_auth
+RUN cargo build --release --bin zelefy_gateway
 
 
-FROM debian:bookworm-slim AS runner
+FROM debian:trixie-slim AS runner
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/target/release/zelefy_auth /app/auth
+COPY --from=builder /app/target/release/zelefy_gateway /app/gateway
 
 EXPOSE 8000
 
-CMD ["./auth"]
+CMD ["./gateway"]

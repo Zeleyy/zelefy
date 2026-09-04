@@ -14,6 +14,8 @@ chrono = { workspace = true }
 
 dotenvy = { workspace = true }
 
+tokio = { workspace = true }
+
 sqlx = { workspace = true }
 axum = { workspace = true }
 utoipa = { workspace = true }
@@ -28,6 +30,5 @@ rand = "0.10.2"
 
 ipnetwork = { version = "0.21.1", features = ["serde"] }
 redis = { version = "1.6.0", features = ["tokio-comp", "connection-manager"] }
-tokio = { version = "1.53.1", features = ["full"] }
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum", "reqwest", "vendored"] }
 axum-extra = { version = "0.12.6", features = ["cookie", "typed-header"] }

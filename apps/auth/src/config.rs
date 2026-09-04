@@ -2,6 +2,7 @@ use std::env;
 
 #[derive(Debug, Clone)]
 pub struct Config {
+    pub port: u16,
     pub database_url: String,
     pub redis_url: String,
     pub access_token_ttl_seconds: u64,
@@ -11,6 +12,11 @@ pub struct Config {
 impl Config {
     pub fn from_env() -> Result<Self, String> {
         let _ = dotenvy::dotenv();
+
+        let port = env::var("AUTH_PORT")
+            .map_err(|_| "Переменная окружения AUTH_PORT не установлена")?
+            .parse::<u16>()
+            .map_err(|_| "AUTH_PORT должна быть положительным числом (u16)")?;
 
         let database_url = env::var("DATABASE_URL")
             .map_err(|_| "Переменная окружения DATABASE_URL не установлена")?;
@@ -29,6 +35,7 @@ impl Config {
             .map_err(|_| "REFRESH_TOKEN_TTL_DAYS должна быть числом (i64)")?;
 
         Ok(Self {
+            port,
             database_url,
             redis_url,
             access_token_ttl_seconds,
