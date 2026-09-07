@@ -4,10 +4,12 @@ services:
             context: ..
             dockerfile: apps/gateway/Dockerfile
         ports:
-            - "${GATEWAY_PORT}:8000"
+            - "${GATEWAY_PORT}:${GATEWAY_PORT}"
         environment:
+            - GATEWAY_PORT=${GATEWAY_PORT}
             - REDIS_URL=${AUTH_REDIS_URL}
             - AUTH_SERVICE_URL=${AUTH_URL}
+            - PROFILES_SERVICE_URL=${PROFILES_URL}
         depends_on:
             - redis_sessions
 
@@ -18,11 +20,11 @@ services:
         ports:
             - "${AUTH_PORT}:${AUTH_PORT}"
         environment:
+            - AUTH_PORT=${AUTH_PORT}
             - DATABASE_URL=${AUTH_DB_URL}
             - REDIS_URL=${AUTH_REDIS_URL}
             - ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS}
             - REFRESH_TOKEN_TTL_DAYS=${REFRESH_TOKEN_TTL_DAYS}
-            - AUTH_PORT=${AUTH_PORT}
         depends_on:
             - auth_db
             - redis_sessions
@@ -47,6 +49,32 @@ services:
         volumes:
             - redis_sessions_data:/data
 
+    profiles:
+        build:
+            context: ..
+            dockerfile: apps/profiles/Dockerfile
+        ports:
+            - "${PROFILES_PORT}:${PROFILES_PORT}"
+        environment:
+            - PROFILES_PORT=${PROFILES_PORT}
+            - DATABASE_URL=${PROFILES_DB_URL}
+        depends_on:
+            - profiles_db
+
+    profiles_db:
+        image: postgres:18-alpine
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${PROFILES_DB_USER}
+            POSTGRES_PASSWORD: ${PROFILES_DB_PASSWORD}
+            POSTGRES_DB: ${PROFILES_DB}
+        ports:
+            - "${PROFILES_DB_PORT}:5432"
+        volumes:
+            - profiles_db_data:/var/lib/postgresql
+
 volumes:
     auth_db_data:
     redis_sessions_data:
+
+    profiles_db_data:

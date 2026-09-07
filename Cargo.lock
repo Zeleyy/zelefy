@@ -3365,6 +3365,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "zelefy_profiles"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "dotenvy",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "utoipa",
+ "utoipa-swagger-ui",
+ "uuid",
+ "zelefy_backend",
+ "zelefy_common",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -37,6 +37,4 @@ RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/
 
 COPY --from=builder /app/target/release/zelefy_auth /app/auth
 
-EXPOSE 8000
-
 CMD ["./auth"]
