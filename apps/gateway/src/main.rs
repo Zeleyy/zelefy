@@ -27,7 +27,7 @@ async fn main() {
 
     let state = AppState {
         redis: redis_manager,
-        config,
+        config: config.clone(),
         http_client,
     };
 
@@ -41,7 +41,7 @@ async fn main() {
         .layer(TraceLayer::new_for_http())
         .with_state(state);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     tracing::info!("API Gateway running on http://{}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
@@ -105,6 +105,8 @@ async fn proxy_handler(
 
     let target_base_url = if path.contains("/auth/") {
         &state.config.auth_url
+    } else if path.contains("/profiles/") {
+        &state.config.profiles_url
     } else {
         &state.config.auth_url
     };

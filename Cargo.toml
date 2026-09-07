@@ -2,6 +2,7 @@
 members = [
     "apps/auth",
     "apps/gateway",
+    "apps/profiles",
     "apps/desktop/src-tauri",
     "apps/desktop/core",
     "packages/shared-rs/common",
@@ -22,6 +23,7 @@ tokio = { version = "1.53.1", features = ["full"] }
 
 axum = "0.8.9"
 utoipa = { version = "5.5.0", features = ["axum_extras", "chrono", "uuid"] }
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum", "reqwest", "vendored"] }
 
 sqlx = { version = "0.9.0", features = ["postgres", "uuid", "derive", "chrono", "ipnetwork", "runtime-tokio", "tls-rustls"] }
 
