@@ -1,11 +1,11 @@
-use axum::{Json, extract::State, http::{StatusCode}, response::IntoResponse};
+use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use axum_extra::{TypedHeader, extract::{CookieJar, cookie::{Cookie, SameSite}}, headers::{Authorization, authorization::Bearer}};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use zelefy_backend::api::errors::{ApiError, ErrorResponse};
 use zelefy_common::{TokenData, paths};
 
-use crate::{AppState, api::errors::{ApiError, ErrorResponse}, services::{self, login::LoginParams, logout::LogoutParams, logout_all::LogoutAllParams, refresh::RefreshParams, register::RegisterParams}};
-// use super::paths;
+use crate::{AppState, api::errors::AuthErrorCode, services::{self, login::LoginParams, logout::LogoutParams, logout_all::LogoutAllParams, refresh::RefreshParams, register::RegisterParams}};
 
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -40,13 +40,13 @@ pub async fn login(
     State(mut state): State<AppState>,
     Json(payload): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    if payload.email.is_empty() {
-        return Err(ApiError::BadRequest("Email не может быть пустым".into()));
-    }
+    // if payload.email.is_empty() {
+    //     return Err(ApiError::bad_request("Email не может быть пустым".into()));
+    // }
 
-    if payload.password.len() < 6 {
-        return Err(ApiError::BadRequest("Пароль должен содержать минимум 6 символов".into()));
-    }
+    // if payload.password.len() < 6 {
+    //     return Err(ApiError::BadRequest("Пароль должен содержать минимум 6 символов".into()));
+    // }
 
     let response = services::login(
         &state.db,
@@ -109,13 +109,13 @@ pub async fn register(
     State(mut state): State<AppState>,
     Json(payload): Json<RegisterRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    if payload.email.is_empty() {
-        return Err(ApiError::BadRequest("Email не может быть пустым".into()));
-    }
+    // if payload.email.is_empty() {
+    //     return Err(ApiError::BadRequest("Email не может быть пустым".into()));
+    // }
 
-    if payload.password.len() < 6 {
-        return Err(ApiError::BadRequest("Пароль должен содержать минимум 8 символов".into()));
-    }
+    // if payload.password.len() < 6 {
+    //     return Err(ApiError::BadRequest("Пароль должен содержать минимум 8 символов".into()));
+    // }
 
     let response = services::register(
         &state.db,
@@ -181,7 +181,7 @@ pub async fn refresh(
         .get("rt_sec")
         .map(|cookie| cookie.value().to_string())
         .or(payload.refresh_token)
-        .ok_or_else(|| ApiError::BadRequest("Refresh token не предоставлен".into()))?;
+        .ok_or_else(|| ApiError::bad_request(AuthErrorCode::TokenExpired.as_str(), "Refresh token не предоставлен"))?;
 
     let response = services::refresh(
         &state.db,
@@ -250,7 +250,7 @@ pub async fn logout(
         .get("rt_sec")
         .map(|cookie| cookie.value().to_string())
         .or(payload.refresh_token)
-        .ok_or_else(|| ApiError::BadRequest("Refresh token не предоставлен".into()))?;
+        .ok_or_else(|| ApiError::bad_request(AuthErrorCode::TokenExpired.as_str(), "Refresh token не предоставлен"))?;
 
     services::logout(
         &state.db,

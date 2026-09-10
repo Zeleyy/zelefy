@@ -1,0 +1,122 @@
+use axum::{Json, http::StatusCode, response::{IntoResponse, Response}};
+use serde::Serialize;
+use utoipa::ToSchema;
+
+#[derive(Debug)]
+pub struct BoxedError(pub String);
+
+impl std::fmt::Display for BoxedError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+impl std::error::Error for BoxedError {}
+
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct FieldError {
+    pub field: String,
+    pub code: &'static str,
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ErrorDetails {
+    Fields { items: Vec<FieldError> },
+
+    Meta { value: serde_json::Value },
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ErrorResponse {
+    pub code: &'static str,
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<ErrorDetails>,
+}
+
+#[derive(Debug)]
+pub struct ApiError {
+    pub status: StatusCode,
+    pub code: &'static str,
+    pub message: String,
+    pub details: Option<ErrorDetails>,
+    pub source: Option<Box<dyn std::error::Error + Send + Sync + 'static>>,
+}
+
+impl ApiError {
+    pub fn unauthorized(code: &'static str, message: impl Into<String>) -> Self {
+        Self::new(StatusCode::UNAUTHORIZED, code, message)
+    }
+
+    pub fn bad_request(code: &'static str, message: impl Into<String>) -> Self {
+        Self::new(StatusCode::BAD_REQUEST, code, message)
+    }
+
+    pub fn not_found(code: &'static str, message: impl Into<String>) -> Self {
+        Self::new(StatusCode::NOT_FOUND, code, message)
+    }
+
+    pub fn conflict(code: &'static str, message: impl Into<String>) -> Self {
+        Self::new(StatusCode::CONFLICT, code, message)
+    }
+
+    pub fn validation(fields: Vec<FieldError>) -> Self {
+        Self {
+            status: StatusCode::UNPROCESSABLE_ENTITY,
+            code: "VALIDATION_FAILED",
+            message: "Проверьте введённые данные".into(),
+            details: Some(ErrorDetails::Fields { items: fields }),
+            source: None,
+        }
+    }
+
+    pub fn internal(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            code: "INTERNAL_ERROR",
+            message: "Внутренняя ошибка сервера".into(),
+            details: None,
+            source: Some(Box::new(source)),
+        }
+    }
+
+    pub fn internal_msg(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            code: "INTERNAL_ERROR",
+            message: "Внутренняя ошибка сервера".into(),
+            details: None,
+            source: Some(Box::new(BoxedError(message.into()))),
+        }
+    }
+
+    pub fn new(status: StatusCode, code: &'static str, message: impl Into<String>) -> Self {
+        Self {
+            status,
+            code,
+            message: message.into(),
+            details: None,
+            source: None,
+        }
+    }
+
+    pub fn with_details(mut self, details: ErrorDetails) -> Self {
+        self.details = Some(details);
+        self
+    }
+}
+
+impl IntoResponse for ApiError {
+    fn into_response(self) -> Response {
+        let body = ErrorResponse {
+            code: self.code,
+            message: self.message,
+            details: self.details,
+        };
+
+        (self.status, Json(body)).into_response()
+    }
+}
