@@ -1,32 +1,37 @@
 use sqlx::{PgExecutor, QueryBuilder, types::Json};
 use uuid::Uuid;
+use zelefy_backend::sql::query_builder::push_opt_nullable;
 
-use crate::models::profiles::{CreateProfileDto, Profile, UpdateProfileDto};
+use crate::models::profiles::{CreateProfileDto, Profile, ProfileWithStats, UpdateProfileDto};
 
 pub async fn get_by_id<'e, E>(
     executor: E,
     user_id: Uuid,
-) -> Result<Option<Profile>, sqlx::Error>
+) -> Result<Option<ProfileWithStats>, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
     sqlx::query_as!(
-        Profile,
+        ProfileWithStats,
         r#"
             SELECT
-                user_id
-                , display_name
-                , permalink
-                , avatar_url
-                , banner_url
-                , bio
-                , location
-                , social_links
-                , is_verified
-                , created_at
-                , updated_at
-            FROM profiles
-            WHERE user_id = $1
+                p.user_id
+                , p.display_name
+                , p.permalink
+                , p.avatar_url
+                , p.banner_url
+                , p.bio
+                , p.location
+                , p.social_links
+                , p.is_verified
+                , p.created_at
+                , p.updated_at
+                , ps.followers_count
+                , ps.following_count
+                , ps.tracks_count
+            FROM profiles p
+            JOIN profile_stats ps ON ps.user_id = p.user_id
+            WHERE p.user_id = $1
         "#,
         user_id
     )
@@ -82,80 +87,39 @@ where
 pub async fn update<'e, E>(
     executor: E,
     user_id: Uuid,
-    params: UpdateProfileDto,
+    update: UpdateProfileDto,
 ) -> Result<Profile, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
+    if update.is_empty() {
+        return Err(sqlx::Error::Protocol(
+            "UpdateProfileDto contained no fields to update".into(),
+        ));
+    }
+
     let mut query_builder = QueryBuilder::new("UPDATE profiles SET ");
-    let mut separated = query_builder.separated(", ");
+    let mut sep = query_builder.separated(", ");
 
-    if let Some(display_name) = params.display_name {
-        separated.push("display_name = ");
-        separated.push_bind(display_name);
+    if let Some(display_name) = update.display_name {
+        sep.push("display_name = ").push_bind(display_name);
     }
 
-    if let Some(permalink) = params.permalink {
-        separated.push("permalink = ");
-        separated.push_bind(permalink);
+    if let Some(permalink) = update.permalink {
+        sep.push("permalink = ").push_bind(permalink);
     }
 
-    if let Some(avatar_url) = params.avatar_url {
-        match avatar_url {
-            Some(url) => {
-                separated.push("avatar_url = ");
-                separated.push_bind(url);
-            }
-            None => {
-                separated.push("avatar_url = NULL");
-            }
-        }
+    push_opt_nullable(&mut sep, "avatar_url", update.avatar_url);
+    push_opt_nullable(&mut sep, "banner_url", update.banner_url);
+    push_opt_nullable(&mut sep, "bio", update.bio);
+    push_opt_nullable(&mut sep, "location", update.location);
+
+    if let Some(social_links) = update.social_links {
+        sep.push("social_links = ").push_bind(Json(social_links));
     }
 
-    if let Some(banner_url) = params.banner_url {
-        match banner_url {
-            Some(url) => {
-                separated.push("banner_url = ");
-                separated.push_bind(url);
-            }
-            None => {
-                separated.push("banner_url = NULL");
-            }
-        }
-    }
-
-    if let Some(bio) = params.bio {
-        match bio {
-            Some(url) => {
-                separated.push("bio = ");
-                separated.push_bind(url);
-            }
-            None => {
-                separated.push("bio = NULL");
-            }
-        }
-    }
-
-    if let Some(location) = params.location {
-        match location {
-            Some(url) => {
-                separated.push("location = ");
-                separated.push_bind(url);
-            }
-            None => {
-                separated.push("location = NULL");
-            }
-        }
-    }
-
-    if let Some(social_links) = params.social_links {
-        separated.push("social_links = ");
-        separated.push_bind(Json(social_links));
-    }
-
-    if let Some(is_verified) = params.is_verified {
-        separated.push("is_verified = ");
-        separated.push_bind(is_verified);
+    if let Some(is_verified) = update.is_verified {
+        sep.push("is_verified = ").push_bind(is_verified);
     }
 
     query_builder.push(" WHERE user_id = ");

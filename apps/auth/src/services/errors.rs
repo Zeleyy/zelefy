@@ -1,7 +1,4 @@
-use thiserror::Error;
-
-
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum AuthServiceError {
     #[error("Invalid email or password")]
     InvalidCredentials,

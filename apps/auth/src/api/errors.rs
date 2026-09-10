@@ -1,70 +1,65 @@
-use axum::{Json, http::StatusCode, response::{IntoResponse, Response}};
-use serde::Serialize;
-use utoipa::ToSchema;
+use zelefy_backend::api::errors::ApiError;
 
 use crate::services::errors::AuthServiceError;
 
-#[derive(Debug, Serialize, ToSchema)]
-pub struct ErrorResponse {
-    pub message: String,
-}
+impl From<AuthServiceError> for ApiError {
+    fn from(err: AuthServiceError) -> Self {
+        use AuthErrorCode::*;
 
-#[derive(Debug)]
-pub enum ApiError {
-    Unauthorized(String),
-    BadRequest(String),
-    NotFound(String),
-    Conflict(String),
-    InternalServerError,
-}
-
-impl IntoResponse for ApiError {
-    fn into_response(self) -> Response {
-        let (status, message) = match self {
-            ApiError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg),
-            ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
-            ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
-            ApiError::Conflict(msg) => (StatusCode::CONFLICT, msg),
-            ApiError::InternalServerError => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Внутренняя ошибка сервера".to_string(),
-            ),
-        };
-
-        (status, Json(ErrorResponse { message })).into_response()
+        match err {
+            AuthServiceError::InvalidCredentials => {
+                ApiError::unauthorized(InvalidCredentials.as_str(), "Неверный email или пароль")
+            }
+            AuthServiceError::UserAlreadyExists => {
+                ApiError::conflict(EmailAlreadyExists.as_str(), "Пользователь с таким email уже существует")
+            }
+            AuthServiceError::UserNotFound => {
+                ApiError::not_found(UserNotFound.as_str(), "Пользователь не найден")
+            }
+            AuthServiceError::InvalidToken => {
+                ApiError::unauthorized(TokenExpired.as_str(), "Токен недействителен или истёк")
+            }
+            AuthServiceError::HashingError(e) => ApiError::internal_msg(e),
+            AuthServiceError::DatabaseError(e) => ApiError::internal(e),
+            AuthServiceError::CacheError(e) => ApiError::internal_msg(e),
+        }
     }
 }
 
-impl From<AuthServiceError> for ApiError {
-    fn from(err: AuthServiceError) -> Self {
-        match err {
-            AuthServiceError::InvalidCredentials => {
-                ApiError::Unauthorized("Неверный email или пароль".into())
-            }
+#[derive(Debug, Clone, Copy)]
+pub enum AuthErrorCode {
+    EmailAlreadyExists,
+    InvalidCredentials,
+    TokenExpired,
+    UserNotFound,
 
-            AuthServiceError::UserAlreadyExists => {
-                ApiError::Conflict("Пользователь с таким email уже существует".into())
-            }
+    MissingAuthHeader,
+    MalformedAuthHeader,
+    InvalidAccessToken,
+    SessionStoreError,
+    MissingUserRoleHeader,
+    InvalidUserRoleHeader,
+    MissingUserSubscriptionHeader,
+    InvalidUserSubscriptionHeader,
+    InvalidUserIdHeader,
+}
 
-            AuthServiceError::UserNotFound => {
-                ApiError::NotFound("Пользователь не найден".into())
-            }
-
-            AuthServiceError::InvalidToken => {
-                ApiError::Unauthorized("Токен недействителен или истек".into())
-            }
-
-            AuthServiceError::HashingError(_) => ApiError::InternalServerError,
-
-            AuthServiceError::DatabaseError(sqlx::Error::Database(db_err))
-                if db_err.is_unique_violation() =>
-            {
-                ApiError::Conflict("Пользователь с таким email уже существует".into())
-            }
-
-            AuthServiceError::DatabaseError(_) | AuthServiceError::CacheError(_) => {
-                ApiError::InternalServerError
-            }
+impl AuthErrorCode {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::EmailAlreadyExists => "EMAIL_ALREADY_EXISTS",
+            Self::InvalidCredentials => "INVALID_CREDENTIALS",
+            Self::TokenExpired => "TOKEN_EXPIRED",
+            Self::UserNotFound => "USER_NOT_FOUND",
+            Self::MissingAuthHeader => "MISSING_AUTH_HEADER",
+            Self::MalformedAuthHeader => "MALFORMED_AUTH_HEADER",
+            Self::InvalidAccessToken => "INVALID_ACCESS_TOKEN",
+            Self::SessionStoreError => "SESSION_STORE_ERROR",
+            Self::MissingUserRoleHeader => "MISSING_USER_ROLE_HEADER",
+            Self::InvalidUserRoleHeader => "INVALID_USER_ROLE_HEADER",
+            Self::MissingUserSubscriptionHeader => "MISSING_USER_SUBSCRIPTION_HEADER",
+            Self::InvalidUserSubscriptionHeader => "INVALID_USER_SUBSCRIPTION_HEADER",
+            Self::InvalidUserIdHeader => "INVALID_USER_ID_HEADER",
         }
     }
 }
