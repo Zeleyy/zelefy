@@ -1,5 +1,6 @@
 packages:
-    - "packages/*"
+    - "packages/shared-ts/*"
     - "apps/web"
+    - "apps/desktop"
 allowBuilds:
-  '@parcel/watcher': set this to true or false
+    "@parcel/watcher": true

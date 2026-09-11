@@ -1,0 +1,11 @@
+{
+    "name": "zelefy",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "build": "pnpm -r run build",
+        "dev:web": "pnpm --filter zelefy_web run dev",
+        "dev:desktop": "pnpm --filter zelefy_desktop run dev",
+        "lint": "pnpm -r run lint"
+    }
+}
