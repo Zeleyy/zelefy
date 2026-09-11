@@ -2,8 +2,10 @@
 members = [
     "apps/auth",
     "apps/gateway",
+    "apps/desktop/src-tauri",
+    "apps/desktop/core",
     "packages/shared-rs/common",
-    "packages/shared-rs/backend"
+    "packages/shared-rs/backend",
 ]
 resolver = "2"
 
