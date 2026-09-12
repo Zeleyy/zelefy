@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                user_id\n                , display_name\n                , permalink\n                , avatar_url\n                , banner_url\n                , bio\n                , location\n                , social_links\n                , is_verified\n                , created_at\n                , updated_at\n            FROM profiles\n            WHERE user_id = $1\n        ",
+  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.social_links\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            WHERE p.user_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -123,6 +123,39 @@
             "name": "updated_at"
           }
         }
+      },
+      {
+        "ordinal": 11,
+        "name": "followers_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "followers_count"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "following_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "following_count"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "tracks_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "tracks_count"
+          }
+        }
       }
     ],
     "parameters": {
@@ -141,8 +174,11 @@
       false,
       false,
       false,
+      false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "33451f0083c7dd2b13de0b12503732327116913248ae39d0abf4a46eacd48122"
+  "hash": "afaf74ad769bece796841ee730c685758491821eb8325ef5df3f1065dff7c640"
 }

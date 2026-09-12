@@ -73,8 +73,20 @@ services:
         volumes:
             - profiles_db_data:/var/lib/postgresql
 
+    s3_storage:
+        image: dxflrs/garage:v2.4.1
+        restart: unless-stopped
+        ports:
+            - "${S3_API_PORT}:3900"
+            - "${S3_WEB_PORT}:3902"
+        volumes:
+            - ./garage.toml:/etc/garage.toml
+            - s3_storage_meta:/var/lib/garage/meta
+            - s3_storage_data:/var/lib/garage/data
+
 volumes:
     auth_db_data:
     redis_sessions_data:
-
     profiles_db_data:
+    s3_storage_meta:
+    s3_storage_data:
