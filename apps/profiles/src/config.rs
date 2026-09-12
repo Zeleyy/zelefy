@@ -4,6 +4,10 @@ use std::env;
 pub struct Config {
     pub port: u16,
     pub database_url: String,
+    pub s3_url: String,
+    pub s3_region: String,
+    pub s3_access_key: String,
+    pub s3_secret_key: String,
 }
 
 impl Config {
@@ -18,9 +22,25 @@ impl Config {
         let database_url = env::var("DATABASE_URL")
             .map_err(|_| "Переменная окружения DATABASE_URL не установлена")?;
 
+        let s3_url = env::var("S3_URL")
+            .map_err(|_| "Переменная окружения S3_URL не установлена")?;
+
+        let s3_region = env::var("S3_REGION")
+            .map_err(|_| "Переменная окружения S3_REGION не установлена")?;
+
+        let s3_access_key = env::var("S3_ACCESS_KEY")
+            .map_err(|_| "Переменная окружения S3_ACCESS_KEY не установлена")?;
+
+        let s3_secret_key = env::var("S3_SECRET_KEY")
+            .map_err(|_| "Переменная окружения S3_SECRET_KEY не установлена")?;
+
         Ok(Self {
             port,
             database_url,
+            s3_url,
+            s3_region,
+            s3_access_key,
+            s3_secret_key,
         })
     }
 }

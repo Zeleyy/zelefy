@@ -1,17 +1,24 @@
 use axum::Router;
 use std::net::SocketAddr;
 
-use zelefy_profiles::{AppState, api, config::Config, db::connection::init_pool};
+use zelefy_profiles::{AppState, api, config::Config, db::connection::init_pool, storage::client::create_s3_client};
 
 #[tokio::main]
 async fn main() {
     let config = Config::from_env().expect("Ошибка загрузки конфигурации");
 
     let db_pool = init_pool(&config.database_url).await.expect("Ошибка подключения к базе данных");
+    let s3_client = create_s3_client(
+        &config.s3_url,
+        &config.s3_access_key,
+        &config.s3_secret_key,
+        &config.s3_region,
+    );
 
     let state = AppState {
         db: db_pool,
         config: config.clone(),
+        s3_client,
     };
 
     let app = Router::new()

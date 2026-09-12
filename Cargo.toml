@@ -26,6 +26,7 @@ utoipa = { version = "5.5.0", features = ["axum_extras", "chrono", "uuid"] }
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum", "reqwest", "vendored"] }
 
 sqlx = { version = "0.9.0", features = ["postgres", "uuid", "derive", "chrono", "ipnetwork", "runtime-tokio", "tls-rustls"] }
+aws-sdk-s3 = "1.146.1"
 
 zelefy_common = { path = "packages/shared-rs/common", features = ["backend"] }
 zelefy_backend = { path = "packages/shared-rs/backend" }
