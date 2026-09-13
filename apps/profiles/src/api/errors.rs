@@ -7,6 +7,15 @@ use crate::services::errors::ProfileServiceError;
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum ProfileErrorCode {
     UserNotFound,
+    MissingUserIdHeader,
+    InvalidCredentials,
+    InvalidAccessToken,
+
+    MissingUserRoleHeader,
+    InvalidUserRoleHeader,
+
+    MissingUserSubscriptionHeader,
+    InvalidUserSubscriptionHeader,
 }
 
 impl From<ProfileServiceError> for ApiError {

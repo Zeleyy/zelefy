@@ -6,6 +6,7 @@ use zelefy_common::paths;
 use crate::AppState;
 
 pub mod errors;
+pub mod extractors;
 pub mod v1;
 pub mod docs;
 
