@@ -1,0 +1,184 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.social_links\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            WHERE p.permalink = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "display_name",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "display_name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "permalink",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "permalink"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "avatar_url",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "avatar_url"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "banner_url",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "banner_url"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "bio",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "bio"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "location",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "location"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "social_links",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "social_links"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "is_verified",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "is_verified"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "profiles",
+            "name": "updated_at"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "followers_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "followers_count"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "following_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "following_count"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "tracks_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "tracks_count"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7f43f139ecdb03f030d0408cb627cc89254ab41ac23fb99ab64967af135098db"
+}

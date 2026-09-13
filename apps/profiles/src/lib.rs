@@ -7,6 +7,7 @@ pub mod config;
 pub mod models;
 pub mod db;
 pub mod storage;
+pub mod services;
 pub mod api;
 
 #[derive(Clone)]

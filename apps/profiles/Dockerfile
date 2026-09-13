@@ -36,7 +36,7 @@ COPY apps/profiles/.sqlx/ ./.sqlx/
 RUN cargo build --release --bin zelefy_profiles
 
 
-FROM debian:bookworm-slim AS runner
+FROM debian:trixie-slim AS runner
 
 WORKDIR /app
 

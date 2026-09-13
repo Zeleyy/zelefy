@@ -1,14 +1,17 @@
 use axum::Router;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
+use zelefy_common::paths;
 
 use crate::AppState;
 
+pub mod errors;
 pub mod v1;
 pub mod docs;
 
 pub fn routes() -> Router<AppState> {
-    let api_routes = Router::new();
+    let api_routes = Router::new()
+        .nest(paths::API_V1, v1::routes());
 
     Router::new()
         .merge(api_routes)

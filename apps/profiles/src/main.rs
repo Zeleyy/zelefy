@@ -1,7 +1,8 @@
 use axum::Router;
+use zelefy_backend::s3::create_s3_client;
 use std::net::SocketAddr;
 
-use zelefy_profiles::{AppState, api, config::Config, db::connection::init_pool, storage::client::create_s3_client};
+use zelefy_profiles::{AppState, api, config::Config, db::connection::init_pool};
 
 #[tokio::main]
 async fn main() {
