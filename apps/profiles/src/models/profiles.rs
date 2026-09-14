@@ -6,6 +6,8 @@ use sqlx::prelude::FromRow;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use crate::models::profile_stats::ProfileStats;
+
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct Profile {
     pub user_id: Uuid,
@@ -83,4 +85,36 @@ pub struct ProfileWithStats {
     pub followers_count: i64,
     pub following_count: i64,
     pub tracks_count: i64,
+}
+
+impl ProfileWithStats {
+    pub fn for_new_profile(profile: Profile) -> Self {
+        Self::from_parts(profile, ProfileStats::default())
+    }
+
+    pub fn from_parts(profile: Profile, stats: ProfileStats) -> Self {
+        Self {
+            user_id: profile.user_id,
+            display_name: profile.display_name,
+            permalink: profile.permalink,
+            avatar_url: profile.avatar_url,
+            banner_url: profile.banner_url,
+            bio: profile.bio,
+            location: profile.location,
+            social_links: profile.social_links,
+            is_verified: profile.is_verified,
+            created_at: profile.created_at,
+            updated_at: profile.updated_at,
+
+            followers_count: stats.followers_count,
+            following_count: stats.following_count,
+            tracks_count: stats.tracks_count,
+        }
+    }
+}
+
+impl From<Profile> for ProfileWithStats {
+    fn from(profile: Profile) -> Self {
+        Self::for_new_profile(profile)
+    }
 }

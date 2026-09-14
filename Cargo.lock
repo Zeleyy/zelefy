@@ -7363,6 +7363,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
+ "tracing",
  "utoipa",
  "uuid",
  "zelefy_common",

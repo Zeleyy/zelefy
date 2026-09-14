@@ -28,7 +28,12 @@
       {
         "ordinal": 2,
         "name": "permalink",
-        "type_info": "Varchar",
+        "type_info": {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        },
         "origin": {
           "Table": {
             "table": "profiles",
@@ -39,7 +44,7 @@
       {
         "ordinal": 3,
         "name": "avatar_url",
-        "type_info": "Varchar",
+        "type_info": "Text",
         "origin": {
           "Table": {
             "table": "profiles",
@@ -50,7 +55,7 @@
       {
         "ordinal": 4,
         "name": "banner_url",
-        "type_info": "Varchar",
+        "type_info": "Text",
         "origin": {
           "Table": {
             "table": "profiles",

@@ -1,19 +1,11 @@
 use std::collections::HashMap;
-
-use axum::{Json, body::Bytes, extract::{Multipart, Path, State}, response::IntoResponse};
+use axum::{Json, extract::{Multipart, Path, State}, response::IntoResponse};
 use serde::Deserialize;
 use utoipa::ToSchema;
-use zelefy_backend::api::errors::{ApiError, ErrorResponse};
+use zelefy_backend::api::{errors::{ApiError, ErrorResponse}, multipart::{ImageForm, extract_file}};
 use zelefy_common::{TokenData, paths};
 
-use crate::{AppState, models::profiles::{CreateProfileDto, ProfileWithStats}, services};
-
-#[derive(ToSchema)]
-pub struct ImageForm {
-    #[schema(value_type = String, format = Binary)]
-    pub file: String,
-}
-
+use crate::{AppState, models::profiles::{CreateProfileDto, ProfileWithStats}, services::{self, update::UpdateParams}};
 
 #[utoipa::path(
     get,
@@ -22,7 +14,7 @@ pub struct ImageForm {
         ("permalink" = String, Path, description = "User permalink")
     ),
     responses(
-        (status = 200, description = "", body = ProfileWithStats),
+        (status = 200, description = "Пользователь получен", body = ProfileWithStats),
         (status = 404, description = "Пользователь не найден", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
@@ -46,16 +38,22 @@ pub async fn get_by_permalink(
     post,
     path = paths::v1::profiles::PROFILE_FULL,
     responses(
-        (status = 200, description = "Успешное создание профиля"),
+        (status = 200, description = "Успешное создание профиля", body = ProfileWithStats),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
 )]
 pub async fn create(
-    State(_state): State<AppState>,
-    Json(_payload): Json<CreateProfileDto>,
+    State(state): State<AppState>,
+    Json(payload): Json<CreateProfileDto>,
 ) -> Result<impl IntoResponse, ApiError> {
-    Ok(())
+    let response = services::create(
+        &state.db,
+        payload
+    )
+    .await?;
+
+    Ok(Json(response))
 }
 
 
@@ -72,34 +70,38 @@ pub struct UpdateRequest {
     patch,
     path = paths::v1::profiles::PROFILE_FULL,
     responses(
-        (status = 200, description = "Успешное обновление данных профиля"),
+        (status = 200, description = "Успешное обновление данных профиля", body = ProfileWithStats),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
 )]
 pub async fn update(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     user: TokenData,
-    Json(_payload): Json<UpdateRequest>,
+    Json(payload): Json<UpdateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let _user_id = user.user_id;
+    let user_id = user.user_id;
 
-    Ok(())
-}
+    let response = services::update(
+        &state.db,
+        user_id,
+        UpdateParams {
+            display_name: payload.display_name,
+            permalink: payload.permalink,
+            bio: payload.bio,
+            location: payload.location,
+            social_links: payload.social_links,
+        },
+    ).await?;
 
-async fn extract_file(mut multipart: Multipart, field_name: &str) -> Result<Bytes, ApiError> {
-    while let Some(field) = multipart.next_field().await.map_err(|_| ApiError::internal_msg("Ошибка формы"))? {
-        if field.name() == Some(field_name) {
-            return field.bytes().await.map_err(|_| ApiError::internal_msg("Ошибка чтения файла"));
-        }
-    }
-    Err(ApiError::internal_msg("Файл не передан"))
+    Ok(Json(response))
 }
 
 #[utoipa::path(
     patch,
     path = paths::v1::profiles::PROFILE_AVATAR_FULL,
     request_body(
+        description = "файл изображения",
         content = inline(ImageForm),
         content_type = "multipart/form-data",
     ),
@@ -128,6 +130,7 @@ pub async fn update_avatar(
     patch,
     path = paths::v1::profiles::PROFILE_BANNER_FULL,
     request_body(
+        description = "файл изображения",
         content = inline(ImageForm),
         content_type = "multipart/form-data",
     ),

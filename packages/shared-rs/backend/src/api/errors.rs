@@ -111,6 +111,14 @@ impl ApiError {
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
+        tracing::error!(
+            status = self.status.as_u16(),
+            code = self.code,
+            message = %self.message,
+            source = ?self.source.as_deref(),
+            "request failed",
+        );
+
         let body = ErrorResponse {
             code: self.code,
             message: self.message,

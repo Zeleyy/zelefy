@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                user_id\n                , followers_count\n                , following_count\n                , tracks_count\n            FROM profile_stats\n            WHERE user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "followers_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "followers_count"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "following_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "following_count"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "tracks_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "profile_stats",
+            "name": "tracks_count"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "0cbdea195039f3866ad72db97dab9f252ac94ae1db7c631a841f39fdf5140507"
+}
