@@ -10,10 +10,10 @@ pub fn push_opt_nullable<'a, T>(
     match value {
         None => {}
         Some(None) => {
-            sep.push(column).push(" = NULL");
+            sep.push(column).push_unseparated(" = NULL");
         }
         Some(Some(v)) => {
-            sep.push(column).push(" = ").push_bind_unseparated(v);
+            sep.push(column).push_unseparated(" = ").push_bind_unseparated(v);
         }
     }
 }

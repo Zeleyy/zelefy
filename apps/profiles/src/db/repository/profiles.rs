@@ -137,11 +137,11 @@ where
     let mut sep = query_builder.separated(", ");
 
     if let Some(display_name) = update.display_name {
-        sep.push("display_name = ").push_bind(display_name);
+        sep.push("display_name = ").push_bind_unseparated(display_name);
     }
 
     if let Some(permalink) = update.permalink {
-        sep.push("permalink = ").push_bind(permalink);
+        sep.push("permalink = ").push_bind_unseparated(permalink);
     }
 
     push_opt_nullable(&mut sep, "avatar_url", update.avatar_url);
@@ -150,11 +150,11 @@ where
     push_opt_nullable(&mut sep, "location", update.location);
 
     if let Some(social_links) = update.social_links {
-        sep.push("social_links = ").push_bind(Json(social_links));
+        sep.push("social_links = ").push_bind_unseparated(Json(social_links));
     }
 
     if let Some(is_verified) = update.is_verified {
-        sep.push("is_verified = ").push_bind(is_verified);
+        sep.push("is_verified = ").push_bind_unseparated(is_verified);
     }
 
     query_builder.push(" WHERE user_id = ");
