@@ -2,10 +2,11 @@ use axum::Router;
 use std::net::SocketAddr;
 use zelefy_backend::{
     api::logs::{build_trace_layer, init_tracing},
+    db::init_pool,
     s3::create_s3_client,
 };
 
-use zelefy_profiles::{AppState, api, config::Config, db::connection::init_pool};
+use zelefy_profiles::{AppState, api, config::Config};
 
 #[tokio::main]
 async fn main() {
@@ -13,9 +14,11 @@ async fn main() {
 
     let config = Config::from_env().expect("Ошибка загрузки конфигурации");
 
-    let db_pool = init_pool(&config.database_url)
+    let migrator = sqlx::migrate!("./migrations");
+    let db_pool = init_pool(&config.database_url, Some(&migrator))
         .await
         .expect("Ошибка подключения к базе данных");
+
     let s3_client = create_s3_client(
         &config.s3_url,
         &config.s3_access_key,

@@ -8,8 +8,10 @@ use axum::{
     routing::{any, get},
 };
 use std::{net::SocketAddr, time::Duration};
-use tower_http::trace::TraceLayer;
-use zelefy_backend::{X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION};
+use zelefy_backend::{
+    X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
+    api::logs::{build_trace_layer, init_tracing},
+};
 use zelefy_gateway::{
     AppState,
     cache::{connection::init_redis, repository::get_session},
@@ -18,7 +20,7 @@ use zelefy_gateway::{
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    init_tracing();
 
     let config = Config::from_env().expect("Config error");
     let redis_manager = init_redis(&config.redis_url).await.expect("Redis error");
@@ -39,6 +41,8 @@ async fn main() {
 
     let public_routes = Router::new().route("/health", get(|| async { "OK" }));
 
+    let trace_layer = build_trace_layer();
+
     let app = Router::new()
         .merge(public_routes)
         .layer(middleware::from_fn_with_state(
@@ -46,7 +50,7 @@ async fn main() {
             auth_middleware,
         ))
         .fallback(any(proxy_handler))
-        .layer(TraceLayer::new_for_http())
+        .layer(trace_layer)
         .with_state(state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));

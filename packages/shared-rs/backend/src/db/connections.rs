@@ -1,14 +1,17 @@
 use sqlx::{PgPool, Postgres, migrate::MigrateDatabase, postgres::PgPoolOptions};
 use std::time::Duration;
 
-pub async fn init_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
+pub async fn init_pool(
+    database_url: &str,
+    migrator: Option<&sqlx::migrate::Migrator>,
+) -> Result<PgPool, sqlx::Error> {
     if !Postgres::database_exists(database_url)
         .await
         .unwrap_or(false)
     {
-        println!("Database does not exist. Creating...");
+        tracing::info!("Database does not exist. Creating...");
         Postgres::create_database(database_url).await?;
-        println!("Database created successfully.");
+        tracing::info!("Database created successfully.");
     }
 
     let pool = PgPoolOptions::new()
@@ -17,9 +20,11 @@ pub async fn init_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
         .connect(database_url)
         .await?;
 
-    println!("Running database migrations...");
-    sqlx::migrate!("./migrations").run(&pool).await?;
-    println!("Migrations applied successfully.");
+    if let Some(m) = migrator {
+        tracing::info!("Running database migrations...");
+        m.run(&pool).await?;
+        tracing::info!("Migrations applied successfully.");
+    }
 
     Ok(pool)
 }

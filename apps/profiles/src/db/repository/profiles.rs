@@ -1,6 +1,6 @@
 use sqlx::{PgExecutor, QueryBuilder, types::Json};
 use uuid::Uuid;
-use zelefy_backend::sql::query_builder::push_opt_nullable;
+use zelefy_backend::db::query_builder::push_opt_nullable;
 
 use crate::models::profiles::{CreateProfileDto, Profile, ProfileWithStats, UpdateProfileDto};
 

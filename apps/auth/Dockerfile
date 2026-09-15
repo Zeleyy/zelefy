@@ -36,7 +36,7 @@ COPY apps/auth/.sqlx/ ./.sqlx/
 RUN cargo build --release --bin zelefy_auth
 
 
-FROM debian:bookworm-slim AS runner
+FROM debian:trixie-slim AS runner
 
 WORKDIR /app
 
