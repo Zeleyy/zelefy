@@ -1,13 +1,19 @@
 use axum::{
-    Router, body::Body, extract::{Request, State}, http::{HeaderValue, StatusCode, header}, middleware::{self, Next}, response::{IntoResponse, Response}, routing::{any, get},
+    Router,
+    body::Body,
+    extract::{Request, State},
+    http::{HeaderValue, StatusCode, header},
+    middleware::{self, Next},
+    response::{IntoResponse, Response},
+    routing::{any, get},
 };
-use tower_http::trace::TraceLayer;
 use std::{net::SocketAddr, time::Duration};
+use tower_http::trace::TraceLayer;
 use zelefy_backend::{X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION};
 use zelefy_gateway::{
+    AppState,
     cache::{connection::init_redis, repository::get_session},
     config::Config,
-    AppState,
 };
 
 #[tokio::main]
@@ -16,7 +22,7 @@ async fn main() {
 
     let config = Config::from_env().expect("Config error");
     let redis_manager = init_redis(&config.redis_url).await.expect("Redis error");
-    
+
     let http_client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .pool_max_idle_per_host(100)
@@ -31,12 +37,14 @@ async fn main() {
         http_client,
     };
 
-    let public_routes = Router::new()
-        .route("/health", get(|| async { "OK" }));
+    let public_routes = Router::new().route("/health", get(|| async { "OK" }));
 
     let app = Router::new()
         .merge(public_routes)
-        .layer(middleware::from_fn_with_state(state.clone(), auth_middleware))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth_middleware,
+        ))
         .fallback(any(proxy_handler))
         .layer(TraceLayer::new_for_http())
         .with_state(state);
@@ -48,17 +56,13 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn auth_middleware(
-    State(state): State<AppState>,
-    mut req: Request,
-    next: Next,
-) -> Response {
+async fn auth_middleware(State(state): State<AppState>, mut req: Request, next: Next) -> Response {
     let path = req.uri().path();
 
-    let is_public = path == "/health" 
+    let is_public = path == "/health"
         || path.ends_with("/health")
-        || path.contains("/auth/login") 
-        || path.contains("/auth/register") 
+        || path.contains("/auth/login")
+        || path.contains("/auth/register")
         || path.contains("/auth/refresh");
 
     if is_public {
@@ -97,10 +101,7 @@ async fn auth_middleware(
     next.run(req).await
 }
 
-async fn proxy_handler(
-    State(state): State<AppState>,
-    mut req: Request,
-) -> Response {
+async fn proxy_handler(State(state): State<AppState>, mut req: Request) -> Response {
     let path = req.uri().path();
 
     let target_base_url = if path.contains("/auth/") {

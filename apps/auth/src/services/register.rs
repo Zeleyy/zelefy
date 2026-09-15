@@ -3,8 +3,16 @@ use redis::aio::ConnectionManager;
 use sqlx::PgPool;
 use zelefy_common::TokenData;
 
-use crate::{cache::repository::create_session, config::Config, core::security::{generate_opaque_token, hash_password, hash_sha256}, db::repository::{user_sessions::{self, CreateSessionParams}, users}, services::errors::AuthServiceError};
-
+use crate::{
+    cache::repository::create_session,
+    config::Config,
+    core::security::{generate_opaque_token, hash_password, hash_sha256},
+    db::repository::{
+        user_sessions::{self, CreateSessionParams},
+        users,
+    },
+    services::errors::AuthServiceError,
+};
 
 pub struct AuthTokens {
     pub access_token: String,
@@ -22,11 +30,10 @@ pub async fn register(
     config: &Config,
     params: RegisterParams<'_>,
 ) -> Result<AuthTokens, AuthServiceError> {
-    let password_hash = hash_password(params.password)
-        .map_err(AuthServiceError::HashingError)?;
-    
+    let password_hash = hash_password(params.password).map_err(AuthServiceError::HashingError)?;
+
     let mut tx = db.begin().await?;
-    
+
     let user = users::create(&mut *tx, params.email, &password_hash).await?;
 
     let access_token = generate_opaque_token("at_sec");
@@ -54,7 +61,7 @@ pub async fn register(
         redis,
         &access_token,
         &access_session,
-        config.access_token_ttl_seconds
+        config.access_token_ttl_seconds,
     )
     .await
     .map_err(|e| AuthServiceError::CacheError(e.to_string()))?;

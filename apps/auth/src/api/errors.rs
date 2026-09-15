@@ -10,9 +10,10 @@ impl From<AuthServiceError> for ApiError {
             AuthServiceError::InvalidCredentials => {
                 ApiError::unauthorized(InvalidCredentials.as_str(), "Неверный email или пароль")
             }
-            AuthServiceError::UserAlreadyExists => {
-                ApiError::conflict(EmailAlreadyExists.as_str(), "Пользователь с таким email уже существует")
-            }
+            AuthServiceError::UserAlreadyExists => ApiError::conflict(
+                EmailAlreadyExists.as_str(),
+                "Пользователь с таким email уже существует",
+            ),
             AuthServiceError::UserNotFound => {
                 ApiError::not_found(UserNotFound.as_str(), "Пользователь не найден")
             }

@@ -1,4 +1,7 @@
-use aws_sdk_s3::{Client, config::{Builder, Credentials, Region}};
+use aws_sdk_s3::{
+    Client,
+    config::{Builder, Credentials, Region},
+};
 
 pub fn create_s3_client(
     endpoint_url: impl Into<String>,
@@ -6,13 +9,7 @@ pub fn create_s3_client(
     secret_access_key: impl Into<String>,
     region: impl Into<String>,
 ) -> Client {
-    let credentials = Credentials::new(
-        access_key_id,
-        secret_access_key,
-        None,
-        None,
-        "Static"
-    );
+    let credentials = Credentials::new(access_key_id, secret_access_key, None, None, "Static");
 
     let config = Builder::new()
         .region(Region::new(region.into()))

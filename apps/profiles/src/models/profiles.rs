@@ -1,8 +1,8 @@
-use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::prelude::FromRow;
+use std::collections::HashMap;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -33,14 +33,13 @@ pub struct CreateProfileDto {
     pub display_name: String,
     pub permalink: String,
 
-    pub avatar_url: Option<String>,
     pub bio: Option<String>,
     pub location: Option<String>,
 
     pub social_links: HashMap<String, String>,
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Default, Deserialize, ToSchema)]
 pub struct UpdateProfileDto {
     pub display_name: Option<String>,
     pub permalink: Option<String>,

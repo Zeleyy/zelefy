@@ -5,19 +5,15 @@ use zelefy_common::paths;
 
 use crate::AppState;
 
+pub mod docs;
 pub mod errors;
 pub mod extractors;
 pub mod v1;
-pub mod docs;
 
 pub fn routes() -> Router<AppState> {
-    let api_routes = Router::new()
-        .nest(paths::API_V1, v1::routes());
+    let api_routes = Router::new().nest(paths::API_V1, v1::routes());
 
     Router::new()
         .merge(api_routes)
-        .merge(
-            SwaggerUi::new("/docs")
-                .url("/api-docs/openapi.json", docs::ApiDoc::openapi())
-        )
+        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", docs::ApiDoc::openapi()))
 }

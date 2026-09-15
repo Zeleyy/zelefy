@@ -3,7 +3,16 @@ use redis::aio::ConnectionManager;
 use sqlx::PgPool;
 use zelefy_common::TokenData;
 
-use crate::{cache::repository::create_session, config::Config, core::security::{generate_opaque_token, hash_sha256, verify_password}, db::repository::{user_sessions::{self, CreateSessionParams}, users}, services::errors::AuthServiceError};
+use crate::{
+    cache::repository::create_session,
+    config::Config,
+    core::security::{generate_opaque_token, hash_sha256, verify_password},
+    db::repository::{
+        user_sessions::{self, CreateSessionParams},
+        users,
+    },
+    services::errors::AuthServiceError,
+};
 
 pub struct AuthTokens {
     pub access_token: String,

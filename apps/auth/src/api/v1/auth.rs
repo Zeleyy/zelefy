@@ -1,12 +1,25 @@
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
-use axum_extra::{TypedHeader, extract::{CookieJar, cookie::{Cookie, SameSite}}, headers::{Authorization, authorization::Bearer}};
+use axum_extra::{
+    TypedHeader,
+    extract::{
+        CookieJar,
+        cookie::{Cookie, SameSite},
+    },
+    headers::{Authorization, authorization::Bearer},
+};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use zelefy_backend::api::errors::{ApiError, ErrorResponse};
 use zelefy_common::{TokenData, paths};
 
-use crate::{AppState, api::errors::AuthErrorCode, services::{self, login::LoginParams, logout::LogoutParams, logout_all::LogoutAllParams, refresh::RefreshParams, register::RegisterParams}};
-
+use crate::{
+    AppState,
+    api::errors::AuthErrorCode,
+    services::{
+        self, login::LoginParams, logout::LogoutParams, logout_all::LogoutAllParams,
+        refresh::RefreshParams, register::RegisterParams,
+    },
+};
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -55,7 +68,7 @@ pub async fn login(
         LoginParams {
             email: &payload.email,
             password: &payload.password,
-        }
+        },
     )
     .await?;
 
@@ -72,10 +85,9 @@ pub async fn login(
         Json(LoginResponse {
             access_token: response.access_token,
             refresh_token: response.refresh_token,
-        })
+        }),
     ))
 }
-
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -124,7 +136,7 @@ pub async fn register(
         RegisterParams {
             email: &payload.email,
             password: &payload.password,
-        }
+        },
     )
     .await?;
 
@@ -135,17 +147,15 @@ pub async fn register(
         .same_site(SameSite::Strict)
         .max_age(time::Duration::days(state.config.refresh_token_ttl_days))
         .build();
-    
+
     Ok((
         [(axum::http::header::SET_COOKIE, cookie.to_string())],
         Json(RegisterResponse {
             access_token: response.access_token,
-            refresh_token: response.refresh_token
-        })
+            refresh_token: response.refresh_token,
+        }),
     ))
 }
-
-
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -181,7 +191,12 @@ pub async fn refresh(
         .get("rt_sec")
         .map(|cookie| cookie.value().to_string())
         .or(payload.refresh_token)
-        .ok_or_else(|| ApiError::bad_request(AuthErrorCode::TokenExpired.as_str(), "Refresh token не предоставлен"))?;
+        .ok_or_else(|| {
+            ApiError::bad_request(
+                AuthErrorCode::TokenExpired.as_str(),
+                "Refresh token не предоставлен",
+            )
+        })?;
 
     let response = services::refresh(
         &state.db,
@@ -189,7 +204,7 @@ pub async fn refresh(
         &state.config,
         RefreshParams {
             refresh_token: &refresh_token,
-        }
+        },
     )
     .await?;
 
@@ -209,7 +224,6 @@ pub async fn refresh(
         }),
     ))
 }
-
 
 #[derive(Debug, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -250,7 +264,12 @@ pub async fn logout(
         .get("rt_sec")
         .map(|cookie| cookie.value().to_string())
         .or(payload.refresh_token)
-        .ok_or_else(|| ApiError::bad_request(AuthErrorCode::TokenExpired.as_str(), "Refresh token не предоставлен"))?;
+        .ok_or_else(|| {
+            ApiError::bad_request(
+                AuthErrorCode::TokenExpired.as_str(),
+                "Refresh token не предоставлен",
+            )
+        })?;
 
     services::logout(
         &state.db,
@@ -259,7 +278,7 @@ pub async fn logout(
             user_id,
             access_token: bearer.token(),
             refresh_token: &refresh_token,
-        }
+        },
     )
     .await?;
 
@@ -276,7 +295,6 @@ pub async fn logout(
         StatusCode::OK,
     ))
 }
-
 
 #[utoipa::path(
     post,
@@ -295,14 +313,7 @@ pub async fn logout_all(
 ) -> Result<impl IntoResponse, ApiError> {
     let user_id = user.user_id;
 
-    services::logout_all(
-        &state.db,
-        &mut state.redis,
-        LogoutAllParams {
-            user_id
-        }
-    )
-    .await?;
+    services::logout_all(&state.db, &mut state.redis, LogoutAllParams { user_id }).await?;
 
     let expired_cookie = Cookie::build(("rt_sec", ""))
         .path("/")

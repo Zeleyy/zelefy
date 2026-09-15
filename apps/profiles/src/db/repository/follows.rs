@@ -2,10 +2,7 @@ use sqlx::PgExecutor;
 
 use crate::models::follows::{CreateFollowDto, DeleteFollowDto, Follow};
 
-pub async fn create<'e, E>(
-    executor: E,
-    params: CreateFollowDto,
-) -> Result<Follow, sqlx::Error>
+pub async fn create<'e, E>(executor: E, params: CreateFollowDto) -> Result<Follow, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
@@ -26,10 +23,7 @@ where
     .await
 }
 
-pub async fn delete<'e, E>(
-    executor: E,
-    params: DeleteFollowDto,
-) -> Result<bool, sqlx::Error>
+pub async fn delete<'e, E>(executor: E, params: DeleteFollowDto) -> Result<bool, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {

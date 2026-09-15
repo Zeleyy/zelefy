@@ -1,8 +1,10 @@
-use utoipa::{Modify, OpenApi, openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme}};
 use super::v1::auth;
+use utoipa::{
+    Modify, OpenApi,
+    openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme},
+};
 
 pub struct SecurityAddon;
-
 
 impl Modify for SecurityAddon {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
@@ -17,7 +19,7 @@ impl Modify for SecurityAddon {
                 ),
             );
         }
-    }    
+    }
 }
 
 #[derive(OpenApi)]

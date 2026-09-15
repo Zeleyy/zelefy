@@ -1,11 +1,23 @@
-use std::collections::HashMap;
-use axum::{Json, extract::{Multipart, Path, State}, response::IntoResponse};
+use axum::{
+    Json,
+    extract::{Multipart, Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+};
 use serde::Deserialize;
+use std::collections::HashMap;
 use utoipa::ToSchema;
-use zelefy_backend::api::{errors::{ApiError, ErrorResponse}, multipart::{ImageForm, extract_file}};
+use zelefy_backend::api::{
+    errors::{ApiError, ErrorResponse},
+    multipart::{ImageForm, extract_file},
+};
 use zelefy_common::{TokenData, paths};
 
-use crate::{AppState, models::profiles::{CreateProfileDto, ProfileWithStats}, services::{self, update::UpdateParams}};
+use crate::{
+    AppState,
+    models::profiles::{CreateProfileDto, ProfileWithStats},
+    services::{self, update::UpdateParams},
+};
 
 #[utoipa::path(
     get,
@@ -24,21 +36,16 @@ pub async fn get_by_permalink(
     State(state): State<AppState>,
     Path(permalink): Path<String>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let response = services::get_by_permalink(
-        &state.db,
-        permalink,
-    )
-    .await?;
+    let response = services::get_by_permalink(&state.db, permalink).await?;
 
     Ok(Json(response))
 }
-
 
 #[utoipa::path(
     post,
     path = paths::v1::profiles::PROFILE_FULL,
     responses(
-        (status = 200, description = "Успешное создание профиля", body = ProfileWithStats),
+        (status = 201, description = "Профиль создан", body = ProfileWithStats),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
@@ -47,15 +54,10 @@ pub async fn create(
     State(state): State<AppState>,
     Json(payload): Json<CreateProfileDto>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let response = services::create(
-        &state.db,
-        payload
-    )
-    .await?;
+    let response = services::create(&state.db, payload).await?;
 
-    Ok(Json(response))
+    Ok((StatusCode::CREATED, Json(response)))
 }
-
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct UpdateRequest {
@@ -92,7 +94,8 @@ pub async fn update(
             location: payload.location,
             social_links: payload.social_links,
         },
-    ).await?;
+    )
+    .await?;
 
     Ok(Json(response))
 }
@@ -112,19 +115,26 @@ pub async fn update(
     tag = "Profile",
 )]
 pub async fn update_avatar(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     user: TokenData,
     multipart: Multipart,
 ) -> Result<impl IntoResponse, ApiError> {
-    let _user_id = user.user_id;
+    let user_id = user.user_id;
 
-    let bytes = extract_file(multipart, "file").await?;
+    let (bytes, content_type) = extract_file(multipart, "file").await?;
 
-    println!("Принят файл размером: {} байт", bytes.len());
+    let profile = services::update_avatar(
+        &state.db,
+        &state.s3_client,
+        &state.config,
+        user_id,
+        bytes,
+        &content_type,
+    )
+    .await?;
 
-    Ok(())
+    Ok(Json(profile))
 }
-
 
 #[utoipa::path(
     patch,
@@ -141,15 +151,23 @@ pub async fn update_avatar(
     tag = "Profile",
 )]
 pub async fn update_banner(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     user: TokenData,
     multipart: Multipart,
 ) -> Result<impl IntoResponse, ApiError> {
-    let _user_id = user.user_id;
+    let user_id = user.user_id;
 
-    let bytes = extract_file(multipart, "file").await?;
+    let (bytes, content_type) = extract_file(multipart, "file").await?;
 
-    println!("Принят файл размером: {} байт", bytes.len());
+    let profile = services::update_banner(
+        &state.db,
+        &state.s3_client,
+        &state.config,
+        user_id,
+        bytes,
+        &content_type,
+    )
+    .await?;
 
-    Ok(())
+    Ok(Json(profile))
 }

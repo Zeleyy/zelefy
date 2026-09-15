@@ -1,6 +1,9 @@
 use sqlx::PgPool;
 
-use crate::{db::repository::profiles, models::profiles::ProfileWithStats, services::errors::ProfileServiceError};
+use crate::{
+    db::repository::profiles, models::profiles::ProfileWithStats,
+    services::errors::ProfileServiceError,
+};
 
 pub async fn get_by_permalink(
     db: &PgPool,

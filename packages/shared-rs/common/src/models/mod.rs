@@ -1,5 +1,5 @@
-pub mod enums;
 pub mod auth;
+pub mod enums;
 
-pub use enums::*;
 pub use auth::*;
+pub use enums::*;

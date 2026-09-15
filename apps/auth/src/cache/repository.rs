@@ -23,15 +23,15 @@ pub async fn get_session(
     }
 }
 
-
 pub async fn create_session(
     redis: &mut ConnectionManager,
     session_key: &str,
     data: &TokenData,
     ttl_seconds: u64,
 ) -> Result<(), redis::RedisError> {
-    let json_data = serde_json::to_string(data)
-        .map_err(|e| redis::RedisError::from((redis::ErrorKind::Io, "Serialization error", e.to_string())))?;
+    let json_data = serde_json::to_string(data).map_err(|e| {
+        redis::RedisError::from((redis::ErrorKind::Io, "Serialization error", e.to_string()))
+    })?;
 
     let user_index_key = format!("user_sessions:{}", data.user_id);
 
@@ -44,7 +44,6 @@ pub async fn create_session(
     let _: () = pipe.query_async(redis).await?;
     Ok(())
 }
-
 
 pub async fn revoke_session(
     redis: &mut ConnectionManager,
@@ -60,7 +59,6 @@ pub async fn revoke_session(
 
     pipe.query_async(redis).await?
 }
-
 
 pub async fn revoke_all_user_sessions(
     redis: &mut ConnectionManager,

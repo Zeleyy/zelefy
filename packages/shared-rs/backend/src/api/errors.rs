@@ -1,4 +1,8 @@
-use axum::{Json, http::StatusCode, response::{IntoResponse, Response}};
+use axum::{
+    Json,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -12,7 +16,6 @@ impl std::fmt::Display for BoxedError {
 }
 
 impl std::error::Error for BoxedError {}
-
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct FieldError {

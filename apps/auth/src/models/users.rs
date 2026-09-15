@@ -1,24 +1,23 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::{FromRow};
+use sqlx::prelude::FromRow;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
 use zelefy_common::{SubscriptionTier, UserRole};
 
-
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
 pub struct User {
     pub user_id: Uuid,
     pub email: String,
-    
+
     #[serde(skip_serializing)]
     pub password_hash: String,
-    
+
     pub subscription: SubscriptionTier,
     pub role: UserRole,
     pub is_blocked: bool,
-    
+
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }

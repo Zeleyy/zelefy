@@ -3,11 +3,7 @@ use uuid::Uuid;
 use crate::models::users::User;
 use zelefy_common::{SubscriptionTier, UserRole};
 
-
-pub async fn get_by_id<'e, E>(
-    executor: E,
-    user_id: Uuid,
-) -> Result<Option<User>, sqlx::Error>
+pub async fn get_by_id<'e, E>(executor: E, user_id: Uuid) -> Result<Option<User>, sqlx::Error>
 where
     E: sqlx::PgExecutor<'e>,
 {
@@ -32,11 +28,7 @@ where
     .await
 }
 
-
-pub async fn get_by_email<'e, E>(
-    executor: E,
-    email: &str,
-) -> Result<Option<User>, sqlx::Error>
+pub async fn get_by_email<'e, E>(executor: E, email: &str) -> Result<Option<User>, sqlx::Error>
 where
     E: sqlx::PgExecutor<'e>,
 {
@@ -82,7 +74,6 @@ where
     .fetch_one(executor)
     .await
 }
-
 
 #[derive(Debug, Default)]
 pub struct UpdateUserParams<'a> {

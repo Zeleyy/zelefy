@@ -13,7 +13,9 @@ pub fn push_opt_nullable<'a, T>(
             sep.push(column).push_unseparated(" = NULL");
         }
         Some(Some(v)) => {
-            sep.push(column).push_unseparated(" = ").push_bind_unseparated(v);
+            sep.push(column)
+                .push_unseparated(" = ")
+                .push_bind_unseparated(v);
         }
     }
 }

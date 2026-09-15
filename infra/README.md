@@ -30,8 +30,8 @@
 
     ```shell
     # Создание бакетов
-    docker compose exec s3_storage /garage bucket create profiles-avatars
+    docker compose exec s3_storage /garage bucket create cdn
 
     # Привязка прав (RW) к API-ключу
-    docker compose exec s3_storage /garage bucket allow profiles-avatars --key app-key --read --write
+    docker compose exec s3_storage /garage bucket allow cdn --key app-key --read --write
     ```

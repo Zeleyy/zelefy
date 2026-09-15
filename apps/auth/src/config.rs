@@ -21,8 +21,8 @@ impl Config {
         let database_url = env::var("DATABASE_URL")
             .map_err(|_| "Переменная окружения DATABASE_URL не установлена")?;
 
-        let redis_url = env::var("REDIS_URL")
-            .map_err(|_| "Переменная окружения REDIS_URL не установлена")?;
+        let redis_url =
+            env::var("REDIS_URL").map_err(|_| "Переменная окружения REDIS_URL не установлена")?;
 
         let access_token_ttl_seconds = env::var("ACCESS_TOKEN_TTL_SECONDS")
             .map_err(|_| "Переменная окружения ACCESS_TOKEN_TTL_SECONDS не установлена")?

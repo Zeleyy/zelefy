@@ -74,10 +74,7 @@ where
     .await
 }
 
-pub async fn create<'e, E>(
-    executor: E,
-    params: CreateProfileDto,
-) -> Result<Profile, sqlx::Error>
+pub async fn create<'e, E>(executor: E, params: CreateProfileDto) -> Result<Profile, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
@@ -88,12 +85,11 @@ where
                 user_id
                 , display_name
                 , permalink
-                , avatar_url
                 , bio
                 , location
                 , social_links
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING
                 user_id
                 , display_name
@@ -110,7 +106,6 @@ where
         params.user_id,
         params.display_name,
         params.permalink,
-        params.avatar_url,
         params.bio,
         params.location,
         Json(params.social_links) as _
@@ -137,7 +132,8 @@ where
     let mut sep = query_builder.separated(", ");
 
     if let Some(display_name) = update.display_name {
-        sep.push("display_name = ").push_bind_unseparated(display_name);
+        sep.push("display_name = ")
+            .push_bind_unseparated(display_name);
     }
 
     if let Some(permalink) = update.permalink {
@@ -150,11 +146,13 @@ where
     push_opt_nullable(&mut sep, "location", update.location);
 
     if let Some(social_links) = update.social_links {
-        sep.push("social_links = ").push_bind_unseparated(Json(social_links));
+        sep.push("social_links = ")
+            .push_bind_unseparated(Json(social_links));
     }
 
     if let Some(is_verified) = update.is_verified {
-        sep.push("is_verified = ").push_bind_unseparated(is_verified);
+        sep.push("is_verified = ")
+            .push_bind_unseparated(is_verified);
     }
 
     query_builder.push(" WHERE user_id = ");

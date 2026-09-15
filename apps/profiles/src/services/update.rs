@@ -1,8 +1,12 @@
-use std::collections::HashMap;
 use sqlx::PgPool;
+use std::collections::HashMap;
 use uuid::Uuid;
 
-use crate::{db::repository::{profiles, stats}, models::profiles::{ProfileWithStats, UpdateProfileDto}, services::errors::ProfileServiceError};
+use crate::{
+    db::repository::{profiles, stats},
+    models::profiles::{ProfileWithStats, UpdateProfileDto},
+    services::errors::ProfileServiceError,
+};
 
 pub struct UpdateParams {
     pub display_name: Option<String>,
@@ -32,15 +36,11 @@ pub async fn update(
             avatar_url: None,
             banner_url: None,
             is_verified: None,
-        }
+        },
     )
     .await?;
 
-    let stats = stats::get_by_id(
-        &mut *tx,
-        user_id
-    )
-    .await?;
+    let stats = stats::get_by_id(&mut *tx, user_id).await?;
 
     tx.commit().await?;
 

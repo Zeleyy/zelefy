@@ -3,11 +3,8 @@ use uuid::Uuid;
 
 use crate::models::profile_stats::ProfileStats;
 
-pub async fn get_by_id<'e, E>(
-    executor: E,
-    user_id: Uuid,
-) -> Result<ProfileStats, sqlx::Error>
-where 
+pub async fn get_by_id<'e, E>(executor: E, user_id: Uuid) -> Result<ProfileStats, sqlx::Error>
+where
     E: PgExecutor<'e>,
 {
     sqlx::query_as!(

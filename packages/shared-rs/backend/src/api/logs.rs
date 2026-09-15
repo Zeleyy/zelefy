@@ -1,7 +1,7 @@
-use std::time::Duration;
 use axum::{body::Body, http::Request, response::Response};
+use std::time::Duration;
 use tower_http::trace::{DefaultOnFailure, TraceLayer};
-use tracing::{field, Level, Span};
+use tracing::{Level, Span, field};
 use tracing_subscriber::fmt::format::FmtSpan;
 
 pub fn init_tracing() {

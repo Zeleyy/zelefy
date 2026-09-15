@@ -1,6 +1,10 @@
 use sqlx::PgPool;
 
-use crate::{db::repository::profiles, models::profiles::{CreateProfileDto, ProfileWithStats}, services::errors::ProfileServiceError};
+use crate::{
+    db::repository::profiles,
+    models::profiles::{CreateProfileDto, ProfileWithStats},
+    services::errors::ProfileServiceError,
+};
 
 pub async fn create(
     db: &PgPool,

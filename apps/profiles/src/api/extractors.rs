@@ -6,7 +6,6 @@ use zelefy_common::TokenData;
 
 use crate::{AppState, api::errors::ProfileErrorCode};
 
-
 fn parse_header_enum<T: DeserializeOwned>(
     parts: &axum::http::request::Parts,
     header: &HeaderName,
@@ -36,15 +35,19 @@ impl FromRequestParts<AppState> for TokenData {
         let user_id_str = parts
             .headers
             .get(&X_USER_ID)
-            .ok_or_else(|| ApiError::unauthorized(
-                ProfileErrorCode::MissingUserIdHeader.as_ref(),
-                "Заголовок X-User-Id отсутствует",
-            ))?
+            .ok_or_else(|| {
+                ApiError::unauthorized(
+                    ProfileErrorCode::MissingUserIdHeader.as_ref(),
+                    "Заголовок X-User-Id отсутствует",
+                )
+            })?
             .to_str()
-            .map_err(|_| ApiError::unauthorized(
-                ProfileErrorCode::InvalidCredentials.as_ref(),
-                "Некорректный заголовок X-User-Id",
-            ))?;
+            .map_err(|_| {
+                ApiError::unauthorized(
+                    ProfileErrorCode::InvalidCredentials.as_ref(),
+                    "Некорректный заголовок X-User-Id",
+                )
+            })?;
 
         let user_id = Uuid::parse_str(user_id_str).map_err(|_| {
             ApiError::bad_request(
@@ -61,7 +64,9 @@ impl FromRequestParts<AppState> for TokenData {
             ProfileErrorCode::InvalidUserRoleHeader.as_ref(),
             "Неизвестная роль пользователя",
         )
-        .map_err(|e| ApiError::internal_msg(format!("gateway headers incomplete: {}", e.message)))?;
+        .map_err(|e| {
+            ApiError::internal_msg(format!("gateway headers incomplete: {}", e.message))
+        })?;
 
         let subscription = parse_header_enum(
             parts,
@@ -71,8 +76,14 @@ impl FromRequestParts<AppState> for TokenData {
             ProfileErrorCode::InvalidUserSubscriptionHeader.as_ref(),
             "Неизвестная подписка пользователя",
         )
-        .map_err(|e| ApiError::internal_msg(format!("gateway headers incomplete: {}", e.message)))?;
+        .map_err(|e| {
+            ApiError::internal_msg(format!("gateway headers incomplete: {}", e.message))
+        })?;
 
-        Ok(TokenData { user_id, role, subscription })
+        Ok(TokenData {
+            user_id,
+            role,
+            subscription,
+        })
     }
 }

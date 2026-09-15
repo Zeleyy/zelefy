@@ -9,16 +9,16 @@ use uuid::Uuid;
 pub struct UserSession {
     pub session_id: Uuid,
     pub user_id: Uuid,
-    
+
     pub refresh_token_hash: String,
 
     pub device_info: Option<String>,
     #[schema(
-        value_type = Option<String>, 
+        value_type = Option<String>,
         example = "192.168.1.1 or 2001:db8::1",
     )]
     pub ip_address: Option<IpNetwork>,
-    
+
     pub is_revoked: bool,
     pub expires_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,

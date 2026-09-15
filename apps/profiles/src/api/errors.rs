@@ -27,6 +27,7 @@ impl From<ProfileServiceError> for ApiError {
                 ApiError::not_found(UserNotFound.as_ref(), "Пользователь не найден")
             }
             ProfileServiceError::DatabaseError(e) => ApiError::internal(e),
+            ProfileServiceError::S3UploadError(e) => ApiError::internal(e),
         }
     }
 }

@@ -45,7 +45,6 @@ where
     .await
 }
 
-
 pub struct RevokedSessionUser {
     pub user_id: Uuid,
     pub subscription: SubscriptionTier,
@@ -85,7 +84,6 @@ where
     .await
 }
 
-
 pub async fn revoke_by_hash<'e, E>(
     executor: E,
     refresh_token_hash: &str,
@@ -103,15 +101,11 @@ where
     )
     .execute(executor)
     .await?;
-    
+
     Ok(result.rows_affected() > 0)
 }
 
-
-pub async fn revoke_all_for_user<'e, E>(
-    executor: E,
-    user_id: Uuid,
-) -> Result<u64, sqlx::Error>
+pub async fn revoke_all_for_user<'e, E>(executor: E, user_id: Uuid) -> Result<u64, sqlx::Error>
 where
     E: sqlx::PgExecutor<'e>,
 {

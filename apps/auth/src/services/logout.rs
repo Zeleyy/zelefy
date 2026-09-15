@@ -2,7 +2,10 @@ use redis::aio::ConnectionManager;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::{cache::repository::revoke_session, core::security::hash_sha256, db::repository::user_sessions, services::errors::AuthServiceError};
+use crate::{
+    cache::repository::revoke_session, core::security::hash_sha256, db::repository::user_sessions,
+    services::errors::AuthServiceError,
+};
 
 pub struct LogoutParams<'a> {
     pub user_id: Uuid,

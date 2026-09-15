@@ -1,5 +1,8 @@
-use utoipa::{Modify, OpenApi, openapi::security::{ApiKey, ApiKeyValue, SecurityScheme}};
 use super::v1::profiles;
+use utoipa::{
+    Modify, OpenApi,
+    openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
+};
 
 #[derive(OpenApi)]
 #[openapi(
