@@ -1,6 +1,6 @@
-use std::env;
+use serde::Deserialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     pub port: u16,
     pub database_url: String,
@@ -13,33 +13,7 @@ impl Config {
     pub fn from_env() -> Result<Self, String> {
         let _ = dotenvy::dotenv();
 
-        let port = env::var("AUTH_PORT")
-            .map_err(|_| "Переменная окружения AUTH_PORT не установлена")?
-            .parse::<u16>()
-            .map_err(|_| "AUTH_PORT должна быть положительным числом (u16)")?;
-
-        let database_url = env::var("DATABASE_URL")
-            .map_err(|_| "Переменная окружения DATABASE_URL не установлена")?;
-
-        let redis_url =
-            env::var("REDIS_URL").map_err(|_| "Переменная окружения REDIS_URL не установлена")?;
-
-        let access_token_ttl_seconds = env::var("ACCESS_TOKEN_TTL_SECONDS")
-            .map_err(|_| "Переменная окружения ACCESS_TOKEN_TTL_SECONDS не установлена")?
-            .parse::<u64>()
-            .map_err(|_| "ACCESS_TOKEN_TTL_SECONDS должна быть положительным числом (u64)")?;
-
-        let refresh_token_ttl_days = env::var("REFRESH_TOKEN_TTL_DAYS")
-            .map_err(|_| "Переменная окружения REFRESH_TOKEN_TTL_DAYS не установлена")?
-            .parse::<i64>()
-            .map_err(|_| "REFRESH_TOKEN_TTL_DAYS должна быть числом (i64)")?;
-
-        Ok(Self {
-            port,
-            database_url,
-            redis_url,
-            access_token_ttl_seconds,
-            refresh_token_ttl_days,
-        })
+        envy::from_env::<Config>()
+            .map_err(|err| format!("Ошибка загрузки конфигурации из env: {err}"))
     }
 }

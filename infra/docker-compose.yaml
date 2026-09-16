@@ -6,10 +6,10 @@ services:
         ports:
             - "${GATEWAY_PORT}:${GATEWAY_PORT}"
         environment:
-            - GATEWAY_PORT=${GATEWAY_PORT}
+            - PORT=${GATEWAY_PORT}
             - REDIS_URL=${AUTH_REDIS_URL}
-            - AUTH_SERVICE_URL=${AUTH_URL}
-            - PROFILES_SERVICE_URL=${PROFILES_URL}
+            - AUTH_URL=${AUTH_URL}
+            - PROFILES_URL=${PROFILES_URL}
         depends_on:
             - redis_sessions
 
@@ -20,7 +20,7 @@ services:
         ports:
             - "${AUTH_PORT}:${AUTH_PORT}"
         environment:
-            - AUTH_PORT=${AUTH_PORT}
+            - PORT=${AUTH_PORT}
             - DATABASE_URL=${AUTH_DB_URL}
             - REDIS_URL=${AUTH_REDIS_URL}
             - ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS}
@@ -56,7 +56,7 @@ services:
         ports:
             - "${PROFILES_PORT}:${PROFILES_PORT}"
         environment:
-            - PROFILES_PORT=${PROFILES_PORT}
+            - PORT=${PROFILES_PORT}
             - DATABASE_URL=${PROFILES_DB_URL}
             - S3_URL=${S3_URL}
             - S3_BUCKET=${S3_BUCKET}

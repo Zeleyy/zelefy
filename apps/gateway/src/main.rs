@@ -11,12 +11,10 @@ use std::{net::SocketAddr, time::Duration};
 use zelefy_backend::{
     X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
     api::logs::{build_trace_layer, init_tracing},
+    cache::init_redis,
 };
-use zelefy_gateway::{
-    AppState,
-    cache::{connection::init_redis, repository::get_session},
-    config::Config,
-};
+
+use zelefy_gateway::{AppState, cache::repository::get_session, config::Config};
 
 #[tokio::main]
 async fn main() {

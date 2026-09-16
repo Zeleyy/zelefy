@@ -2,10 +2,11 @@ use axum::Router;
 use std::net::SocketAddr;
 use zelefy_backend::{
     api::logs::{build_trace_layer, init_tracing},
+    cache::init_redis,
     db::init_pool,
 };
 
-use zelefy_auth::{AppState, api, cache::connection::init_redis, config::Config};
+use zelefy_auth::{AppState, api, config::Config};
 
 #[tokio::main]
 async fn main() {

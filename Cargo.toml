@@ -21,6 +21,7 @@ thiserror = "2.0.20"
 strum = { version = "0.28.0", features = ["derive"] }
 
 dotenvy = "0.15.7"
+envy = "0.4.2"
 
 tokio = { version = "1.53.1", features = ["full"] }
 
@@ -32,6 +33,7 @@ utoipa = { version = "5.5.0", features = ["axum_extras", "chrono", "uuid"] }
 utoipa-swagger-ui = { version = "9.0.2", features = ["axum", "reqwest", "vendored"] }
 
 sqlx = { version = "0.9.0", features = ["postgres", "uuid", "derive", "chrono", "ipnetwork", "runtime-tokio", "tls-rustls"] }
+redis = { version = "1.6.0", features = ["tokio-comp", "connection-manager"] }
 aws-sdk-s3 = { version = "1.146.1", features = ["behavior-version-latest"]}
 
 zelefy_common = { path = "packages/shared-rs/common", features = ["backend"] }
