@@ -1,10 +1,10 @@
 use chrono::{Duration, Utc};
 use redis::aio::ConnectionManager;
 use sqlx::PgPool;
+use zelefy_backend::cache::repository::sessions;
 use zelefy_common::TokenData;
 
 use crate::{
-    cache::repository::create_session,
     config::Config,
     core::security::{generate_opaque_token, hash_sha256, verify_password},
     db::repository::{
@@ -64,7 +64,7 @@ pub async fn login(
 
     user_sessions::create(&mut *tx, refresh_session).await?;
 
-    create_session(
+    sessions::create(
         redis,
         &access_token,
         &access_session,

@@ -4,7 +4,6 @@ use sqlx::PgPool;
 use crate::config::Config;
 
 pub mod api;
-pub mod cache;
 pub mod config;
 pub mod core;
 pub mod db;

@@ -2,28 +2,16 @@ use redis::{AsyncCommands, aio::ConnectionManager};
 use uuid::Uuid;
 use zelefy_common::TokenData;
 
-pub async fn get_session(
+use crate::cache::ops::get_json;
+
+pub async fn get(
     redis: &mut ConnectionManager,
     session_key: &str,
 ) -> Result<Option<TokenData>, redis::RedisError> {
-    let json_data: Option<String> = redis.get(session_key).await?;
-
-    match json_data {
-        Some(json) => {
-            let data: TokenData = serde_json::from_str(&json).map_err(|e| {
-                redis::RedisError::from((
-                    redis::ErrorKind::Io,
-                    "Deserialization error",
-                    e.to_string(),
-                ))
-            })?;
-            Ok(Some(data))
-        }
-        None => Ok(None),
-    }
+    get_json(redis, session_key).await
 }
 
-pub async fn create_session(
+pub async fn create(
     redis: &mut ConnectionManager,
     session_key: &str,
     data: &TokenData,
@@ -45,7 +33,7 @@ pub async fn create_session(
     Ok(())
 }
 
-pub async fn revoke_session(
+pub async fn revoke(
     redis: &mut ConnectionManager,
     user_id: Uuid,
     session_key: &str,
@@ -60,7 +48,7 @@ pub async fn revoke_session(
     pipe.query_async(redis).await?
 }
 
-pub async fn revoke_all_user_sessions(
+pub async fn revoke_all(
     redis: &mut ConnectionManager,
     user_id: Uuid,
 ) -> Result<(), redis::RedisError> {

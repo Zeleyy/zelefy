@@ -1,11 +1,9 @@
 use redis::aio::ConnectionManager;
 use sqlx::PgPool;
 use uuid::Uuid;
+use zelefy_backend::cache::repository::sessions;
 
-use crate::{
-    cache::repository::revoke_all_user_sessions, db::repository::user_sessions,
-    services::errors::AuthServiceError,
-};
+use crate::{db::repository::user_sessions, services::errors::AuthServiceError};
 
 pub struct LogoutAllParams {
     pub user_id: Uuid,
@@ -20,7 +18,7 @@ pub async fn logout_all(
 
     user_sessions::revoke_all_for_user(&mut *tx, params.user_id).await?;
 
-    revoke_all_user_sessions(redis, params.user_id)
+    sessions::revoke_all(redis, params.user_id)
         .await
         .map_err(|e| AuthServiceError::CacheError(e.to_string()))?;
 

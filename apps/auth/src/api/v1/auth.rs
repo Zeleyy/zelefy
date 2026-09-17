@@ -53,14 +53,6 @@ pub async fn login(
     State(mut state): State<AppState>,
     Json(payload): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    // if payload.email.is_empty() {
-    //     return Err(ApiError::bad_request("Email не может быть пустым".into()));
-    // }
-
-    // if payload.password.len() < 6 {
-    //     return Err(ApiError::BadRequest("Пароль должен содержать минимум 6 символов".into()));
-    // }
-
     let response = services::login(
         &state.db,
         &mut state.redis,
@@ -193,7 +185,7 @@ pub async fn refresh(
         .or(payload.refresh_token)
         .ok_or_else(|| {
             ApiError::bad_request(
-                AuthErrorCode::TokenExpired.as_str(),
+                AuthErrorCode::TokenExpired.as_ref(),
                 "Refresh token не предоставлен",
             )
         })?;
@@ -266,7 +258,7 @@ pub async fn logout(
         .or(payload.refresh_token)
         .ok_or_else(|| {
             ApiError::bad_request(
-                AuthErrorCode::TokenExpired.as_str(),
+                AuthErrorCode::TokenExpired.as_ref(),
                 "Refresh token не предоставлен",
             )
         })?;

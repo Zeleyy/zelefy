@@ -1,15 +1,14 @@
 use redis::{AsyncCommands, aio::ConnectionManager};
-use zelefy_common::TokenData;
+use serde::de::DeserializeOwned;
 
-pub async fn get_session(
+pub async fn get_json<T: DeserializeOwned>(
     redis: &mut ConnectionManager,
-    session_key: &str,
-) -> Result<Option<TokenData>, redis::RedisError> {
-    let json_data: Option<String> = redis.get(session_key).await?;
-
+    key: &str,
+) -> Result<Option<T>, redis::RedisError> {
+    let json_data: Option<String> = redis.get(key).await?;
     match json_data {
         Some(json) => {
-            let data: TokenData = serde_json::from_str(&json).map_err(|e| {
+            let data: T = serde_json::from_str(&json).map_err(|e| {
                 redis::RedisError::from((
                     redis::ErrorKind::Io,
                     "Deserialization error",

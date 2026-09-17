@@ -3,7 +3,6 @@ use reqwest::Client;
 
 use crate::config::Config;
 
-pub mod cache;
 pub mod config;
 
 #[derive(Clone)]

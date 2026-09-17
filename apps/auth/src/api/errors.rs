@@ -1,3 +1,4 @@
+use strum::AsRefStr;
 use zelefy_backend::api::errors::ApiError;
 
 use crate::services::errors::AuthServiceError;
@@ -8,17 +9,17 @@ impl From<AuthServiceError> for ApiError {
 
         match err {
             AuthServiceError::InvalidCredentials => {
-                ApiError::unauthorized(InvalidCredentials.as_str(), "Неверный email или пароль")
+                ApiError::unauthorized(InvalidCredentials.as_ref(), "Неверный email или пароль")
             }
             AuthServiceError::UserAlreadyExists => ApiError::conflict(
-                EmailAlreadyExists.as_str(),
+                EmailAlreadyExists.as_ref(),
                 "Пользователь с таким email уже существует",
             ),
             AuthServiceError::UserNotFound => {
-                ApiError::not_found(UserNotFound.as_str(), "Пользователь не найден")
+                ApiError::not_found(UserNotFound.as_ref(), "Пользователь не найден")
             }
             AuthServiceError::InvalidToken => {
-                ApiError::unauthorized(TokenExpired.as_str(), "Токен недействителен или истёк")
+                ApiError::unauthorized(TokenExpired.as_ref(), "Токен недействителен или истёк")
             }
             AuthServiceError::HashingError(e) => ApiError::internal_msg(e),
             AuthServiceError::DatabaseError(e) => ApiError::internal(e),
@@ -27,7 +28,8 @@ impl From<AuthServiceError> for ApiError {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, AsRefStr)]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum AuthErrorCode {
     EmailAlreadyExists,
     InvalidCredentials,
@@ -38,29 +40,10 @@ pub enum AuthErrorCode {
     MalformedAuthHeader,
     InvalidAccessToken,
     SessionStoreError,
+    MissingUserIdHeader,
+    InvalidUserIdHeader,
     MissingUserRoleHeader,
     InvalidUserRoleHeader,
     MissingUserSubscriptionHeader,
     InvalidUserSubscriptionHeader,
-    InvalidUserIdHeader,
-}
-
-impl AuthErrorCode {
-    pub const fn as_str(self) -> &'static str {
-        match self {
-            Self::EmailAlreadyExists => "EMAIL_ALREADY_EXISTS",
-            Self::InvalidCredentials => "INVALID_CREDENTIALS",
-            Self::TokenExpired => "TOKEN_EXPIRED",
-            Self::UserNotFound => "USER_NOT_FOUND",
-            Self::MissingAuthHeader => "MISSING_AUTH_HEADER",
-            Self::MalformedAuthHeader => "MALFORMED_AUTH_HEADER",
-            Self::InvalidAccessToken => "INVALID_ACCESS_TOKEN",
-            Self::SessionStoreError => "SESSION_STORE_ERROR",
-            Self::MissingUserRoleHeader => "MISSING_USER_ROLE_HEADER",
-            Self::InvalidUserRoleHeader => "INVALID_USER_ROLE_HEADER",
-            Self::MissingUserSubscriptionHeader => "MISSING_USER_SUBSCRIPTION_HEADER",
-            Self::InvalidUserSubscriptionHeader => "INVALID_USER_SUBSCRIPTION_HEADER",
-            Self::InvalidUserIdHeader => "INVALID_USER_ID_HEADER",
-        }
-    }
 }

@@ -1,10 +1,10 @@
 use redis::aio::ConnectionManager;
 use sqlx::PgPool;
 use uuid::Uuid;
+use zelefy_backend::cache::repository::sessions;
 
 use crate::{
-    cache::repository::revoke_session, core::security::hash_sha256, db::repository::user_sessions,
-    services::errors::AuthServiceError,
+    core::security::hash_sha256, db::repository::user_sessions, services::errors::AuthServiceError,
 };
 
 pub struct LogoutParams<'a> {
@@ -28,7 +28,7 @@ pub async fn logout(
         return Err(AuthServiceError::InvalidToken);
     }
 
-    revoke_session(redis, params.user_id, params.access_token)
+    sessions::revoke(redis, params.user_id, params.access_token)
         .await
         .map_err(|e| AuthServiceError::CacheError(e.to_string()))?;
 

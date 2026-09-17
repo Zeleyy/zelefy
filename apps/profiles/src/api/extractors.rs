@@ -1,29 +1,11 @@
-use axum::{extract::FromRequestParts, http::HeaderName};
-use serde::de::DeserializeOwned;
+use axum::extract::FromRequestParts;
 use uuid::Uuid;
-use zelefy_backend::{X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION, api::errors::ApiError};
+use zelefy_backend::{
+    X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION, api::errors::ApiError, parse_header_enum,
+};
 use zelefy_common::TokenData;
 
 use crate::{AppState, api::errors::ProfileErrorCode};
-
-fn parse_header_enum<T: DeserializeOwned>(
-    parts: &axum::http::request::Parts,
-    header: &HeaderName,
-    missing_code: &'static str,
-    missing_msg: &'static str,
-    invalid_code: &'static str,
-    invalid_msg: &'static str,
-) -> Result<T, ApiError> {
-    let value_str = parts
-        .headers
-        .get(header)
-        .ok_or_else(|| ApiError::bad_request(missing_code, missing_msg))?
-        .to_str()
-        .map_err(|_| ApiError::bad_request(invalid_code, invalid_msg))?;
-
-    serde_json::from_slice::<T>(format_args!("\"{value_str}\"").to_string().as_bytes())
-        .map_err(|_| ApiError::bad_request(invalid_code, invalid_msg))
-}
 
 impl FromRequestParts<AppState> for TokenData {
     type Rejection = ApiError;

@@ -11,10 +11,10 @@ use std::{net::SocketAddr, time::Duration};
 use zelefy_backend::{
     X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
     api::logs::{build_trace_layer, init_tracing},
-    cache::init_redis,
+    cache::{init_redis, repository::sessions},
 };
 
-use zelefy_gateway::{AppState, cache::repository::get_session, config::Config};
+use zelefy_gateway::{AppState, config::Config};
 
 #[tokio::main]
 async fn main() {
@@ -80,7 +80,7 @@ async fn auth_middleware(State(state): State<AppState>, mut req: Request, next: 
     };
 
     let mut redis_conn = state.redis.clone();
-    let session = match get_session(&mut redis_conn, access_token).await {
+    let session = match sessions::get(&mut redis_conn, access_token).await {
         Ok(Some(sess)) => sess,
         _ => return StatusCode::UNAUTHORIZED.into_response(),
     };
