@@ -1,0 +1,22 @@
+[data-theme="light"] {
+    --bg-primary: var(--neutral-50);
+    --bg-secondary: var(--neutral-100);
+    --bg-surface: #ffffff;
+    --bg-surface-hover: var(--neutral-100);
+
+    --accent-primary: var(--orange-600);
+    --accent-primary-hover: var(--orange-700);
+    --accent-secondary: var(--cyan-600);
+    --accent-secondary-hover: var(--cyan-700);
+
+    --text-primary: var(--neutral-900);
+    --text-secondary: var(--neutral-500);
+    --text-muted: var(--neutral-400);
+    --text-on-accent: #ffffff;
+
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-strong: var(--neutral-300);
+
+    --state-error: var(--error-500);
+    --state-error-bg: var(--error-100);
+}

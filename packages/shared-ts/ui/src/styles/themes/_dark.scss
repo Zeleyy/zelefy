@@ -1,0 +1,23 @@
+:root,
+[data-theme="dark"] {
+    --bg-primary: var(--neutral-900);
+    --bg-secondary: var(--neutral-800);
+    --bg-surface: var(--neutral-700);
+    --bg-surface-hover: var(--neutral-600);
+
+    --accent-primary: var(--orange-600);
+    --accent-primary-hover: var(--orange-500);
+    --accent-secondary: var(--cyan-500);
+    --accent-secondary-hover: var(--cyan-400);
+
+    --text-primary: var(--neutral-50);
+    --text-secondary: var(--neutral-300);
+    --text-muted: var(--neutral-400);
+    --text-on-accent: #ffffff;
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: var(--neutral-500);
+
+    --state-error: var(--error-500);
+    --state-error-bg: var(--error-900);
+}

@@ -1,3 +1,7 @@
+@use "@zelefy/ui/styles" as *;
+
+@use "reset.scss";
+
 .logo.vite:hover {
     filter: drop-shadow(0 0 2em #747bff);
 }
@@ -10,9 +14,6 @@
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;
-
-    color: #0f0f0f;
-    background-color: #f6f6f6;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
