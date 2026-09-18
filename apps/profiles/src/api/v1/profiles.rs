@@ -52,9 +52,12 @@ pub async fn get_by_permalink(
 )]
 pub async fn create(
     State(state): State<AppState>,
+    user: TokenData,
     Json(payload): Json<CreateProfileDto>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let response = services::create(&state.db, payload).await?;
+    let user_id = user.user_id;
+
+    let response = services::create(&state.db, user_id, payload).await?;
 
     Ok((StatusCode::CREATED, Json(response)))
 }

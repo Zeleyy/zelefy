@@ -29,7 +29,6 @@ pub struct Profile {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct CreateProfileDto {
-    pub user_id: Uuid,
     pub display_name: String,
     pub permalink: String,
 

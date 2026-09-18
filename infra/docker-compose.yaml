@@ -7,6 +7,7 @@ services:
             - "${GATEWAY_PORT}:${GATEWAY_PORT}"
         environment:
             - PORT=${GATEWAY_PORT}
+            - URL=${GATEWAY_PUBLIC_URL}
             - REDIS_URL=${AUTH_REDIS_URL}
             - AUTH_URL=${AUTH_URL}
             - PROFILES_URL=${PROFILES_URL}

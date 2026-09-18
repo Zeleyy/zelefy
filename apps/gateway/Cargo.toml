@@ -7,7 +7,6 @@ edition = "2024"
 zelefy_common = { workspace = true }
 zelefy_backend = { workspace = true }
 
-axum = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }
@@ -18,8 +17,10 @@ envy = { workspace = true }
 
 tokio = { workspace = true }
 
+axum = { workspace = true }
+
 redis = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-tower-http = { version = "0.7.1", features = ["trace", "request-id", "util"] }
-reqwest = { version = "0.13.4", features = ["json", "stream"] }
+hyper = { version = "1.11.1", features = ["full"] }
+hyper-util = { version = "0.1.20", features = ["full", "client-legacy"] }

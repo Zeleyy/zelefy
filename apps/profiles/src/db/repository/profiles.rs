@@ -74,7 +74,11 @@ where
     .await
 }
 
-pub async fn create<'e, E>(executor: E, params: CreateProfileDto) -> Result<Profile, sqlx::Error>
+pub async fn create<'e, E>(
+    executor: E,
+    user_id: Uuid,
+    params: CreateProfileDto,
+) -> Result<Profile, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
@@ -103,7 +107,7 @@ where
                 , created_at
                 , updated_at
         "#,
-        params.user_id,
+        user_id,
         params.display_name,
         params.permalink,
         params.bio,

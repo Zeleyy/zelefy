@@ -3,6 +3,7 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     pub port: u16,
+    pub url: String,
     pub redis_url: String,
     pub auth_url: String,
     pub profiles_url: String,

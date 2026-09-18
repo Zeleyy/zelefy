@@ -1,20 +1,12 @@
-use axum::{
-    Router,
-    body::Body,
-    extract::{Request, State},
-    http::{HeaderValue, StatusCode, header},
-    middleware::{self, Next},
-    response::{IntoResponse, Response},
-    routing::{any, get},
-};
-use std::{net::SocketAddr, time::Duration};
+use hyper_util::{client::legacy::Client, rt::TokioExecutor};
+use std::net::SocketAddr;
+use tokio::signal;
 use zelefy_backend::{
-    X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
     api::logs::{build_trace_layer, init_tracing},
-    cache::{init_redis, repository::sessions},
+    cache::init_redis,
 };
 
-use zelefy_gateway::{AppState, config::Config};
+use zelefy_gateway::{AppState, config::Config, routes::routes};
 
 #[tokio::main]
 async fn main() {
@@ -23,13 +15,9 @@ async fn main() {
     let config = Config::from_env().expect("Config error");
     let redis_manager = init_redis(&config.redis_url).await.expect("Redis error");
 
-    let http_client = reqwest::Client::builder()
-        .redirect(reqwest::redirect::Policy::none())
+    let http_client = Client::builder(TokioExecutor::new())
         .pool_max_idle_per_host(100)
-        .connect_timeout(Duration::from_secs(5))
-        .timeout(Duration::from_secs(30))
-        .build()
-        .expect("Failed to create reqwest client");
+        .build_http();
 
     let state = AppState {
         redis: redis_manager,
@@ -37,120 +25,41 @@ async fn main() {
         http_client,
     };
 
-    let public_routes = Router::new().route("/health", get(|| async { "OK" }));
-
-    let trace_layer = build_trace_layer();
-
-    let app = Router::new()
-        .merge(public_routes)
-        .layer(middleware::from_fn_with_state(
-            state.clone(),
-            auth_middleware,
-        ))
-        .fallback(any(proxy_handler))
-        .layer(trace_layer)
-        .with_state(state);
+    let app = routes(state).layer(build_trace_layer());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
-    tracing::info!("API Gateway running on http://{}", addr);
+    tracing::info!("API Gateway running on {}", config.url);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .unwrap();
 }
 
-async fn auth_middleware(State(state): State<AppState>, mut req: Request, next: Next) -> Response {
-    let path = req.uri().path();
-
-    let is_public = path == "/health"
-        || path.ends_with("/health")
-        || path.contains("/auth/login")
-        || path.contains("/auth/register")
-        || path.contains("/auth/refresh");
-
-    if is_public {
-        return next.run(req).await;
-    }
-
-    let access_token = match req.headers().get(header::AUTHORIZATION) {
-        Some(h) => match h.to_str() {
-            Ok(s) if s.starts_with("Bearer ") => &s[7..],
-            _ => return StatusCode::UNAUTHORIZED.into_response(),
-        },
-        None => return StatusCode::UNAUTHORIZED.into_response(),
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
     };
 
-    let mut redis_conn = state.redis.clone();
-    let session = match sessions::get(&mut redis_conn, access_token).await {
-        Ok(Some(sess)) => sess,
-        _ => return StatusCode::UNAUTHORIZED.into_response(),
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
     };
 
-    let headers = req.headers_mut();
-    if let Ok(val) = HeaderValue::from_str(&session.user_id.to_string()) {
-        headers.insert(&X_USER_ID, val);
-    }
-    if let Ok(role_str) = serde_json::to_string(&session.role) {
-        if let Ok(val) = HeaderValue::from_str(role_str.trim_matches('"')) {
-            headers.insert(&X_USER_ROLE, val);
-        }
-    }
-    if let Ok(sub_str) = serde_json::to_string(&session.subscription) {
-        if let Ok(val) = HeaderValue::from_str(sub_str.trim_matches('"')) {
-            headers.insert(&X_USER_SUBSCRIPTION, val);
-        }
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
     }
 
-    next.run(req).await
-}
-
-async fn proxy_handler(State(state): State<AppState>, mut req: Request) -> Response {
-    let path = req.uri().path();
-
-    let target_base_url = if path.contains("/auth/") {
-        &state.config.auth_url
-    } else if path.contains("/profiles/") {
-        &state.config.profiles_url
-    } else {
-        &state.config.auth_url
-    };
-
-    let path_and_query = match req.uri().query() {
-        Some(query) => format!("{}?{}", path, query),
-        None => path.to_string(),
-    };
-
-    let target_url = format!("{}{}", target_base_url, path_and_query);
-
-    req.headers_mut().remove(header::HOST);
-
-    let (parts, body) = req.into_parts();
-
-    let body_stream = body.into_data_stream();
-    let reqwest_body = reqwest::Body::wrap_stream(body_stream);
-
-    let upstream_req = state
-        .http_client
-        .request(parts.method, &target_url)
-        .headers(parts.headers)
-        .body(reqwest_body);
-
-    match upstream_req.send().await {
-        Ok(res) => {
-            let mut response_builder = Response::builder().status(res.status());
-            if let Some(headers) = response_builder.headers_mut() {
-                *headers = res.headers().clone();
-            }
-
-            let res_stream = res.bytes_stream();
-            let axum_body = Body::from_stream(res_stream);
-
-            response_builder
-                .body(axum_body)
-                .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response())
-        }
-        Err(err) => {
-            tracing::error!("Proxy error to {}: {:?}", target_url, err);
-            StatusCode::BAD_GATEWAY.into_response()
-        }
-    }
+    tracing::info!("Shutdown signal received, starting graceful shutdown...");
 }
