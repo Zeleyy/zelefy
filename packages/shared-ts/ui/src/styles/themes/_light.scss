@@ -1,13 +1,13 @@
 [data-theme="light"] {
     --bg-primary: var(--neutral-50);
     --bg-secondary: var(--neutral-100);
-    --bg-surface: #ffffff;
-    --bg-surface-hover: var(--neutral-100);
+    --bg-surface: var(--neutral-200);
+    --bg-surface-hover: var(--neutral-200);
 
-    --accent-primary: var(--orange-600);
-    --accent-primary-hover: var(--orange-700);
-    --accent-secondary: var(--cyan-600);
-    --accent-secondary-hover: var(--cyan-700);
+    --primary: var(--orange-600);
+    --primary-hover: var(--orange-700);
+    --accent: var(--cyan-600);
+    --accent-hover: var(--cyan-700);
 
     --text-primary: var(--neutral-900);
     --text-secondary: var(--neutral-500);
@@ -19,4 +19,15 @@
 
     --state-error: var(--error-500);
     --state-error-bg: var(--error-100);
+
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.3);
+
+    --danger: var(--red-400);
+    --danger-hover: var(--red-500);
+    --danger-active: var(--red-600);
+
+    --error-bg-subtle: var(--red-50);
+    --error-border: var(--red-200);
 }

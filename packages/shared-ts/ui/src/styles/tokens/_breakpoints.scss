@@ -1,0 +1,49 @@
+@use "sass:map";
+
+$breakpoints: (
+    "phone-small": 320px,
+    "phone-medium": 360px,
+    "phone-large": 412px,
+    "tablet-small": 600px,
+    "tablet-medium": 768px,
+    "tablet-large": 1024px,
+    "laptop-small": 1280px,
+    "laptop-medium": 1366px,
+    "laptop-large": 1600px,
+    "desktop": 1920px,
+    "desktop-2k": 2560px,
+);
+
+$breakpoint-phone-small: map.get($breakpoints, "phone-small");
+$breakpoint-phone-medium: map.get($breakpoints, "phone-medium");
+$breakpoint-phone-large: map.get($breakpoints, "phone-large");
+$breakpoint-tablet-small: map.get($breakpoints, "tablet-small");
+$breakpoint-tablet-medium: map.get($breakpoints, "tablet-medium");
+$breakpoint-tablet-large: map.get($breakpoints, "tablet-large");
+$breakpoint-laptop-small: map.get($breakpoints, "laptop-small");
+$breakpoint-laptop-medium: map.get($breakpoints, "laptop-medium");
+$breakpoint-laptop-large: map.get($breakpoints, "laptop-large");
+$breakpoint-desktop: map.get($breakpoints, "desktop");
+$breakpoint-desktop-2k: map.get($breakpoints, "desktop-2k");
+
+@mixin respond-to($name) {
+    @if map.has-key($breakpoints, $name) {
+        $value: map.get($breakpoints, $name);
+        @media (min-width: $value) {
+            @content;
+        }
+    } @else {
+        @error "Неизвестный брейкпоинт `#{$name}`. Доступные ключи: #{map.keys($breakpoints)}";
+    }
+}
+
+@mixin respond-below($name) {
+    @if map.has-key($breakpoints, $name) {
+        $value: map.get($breakpoints, $name);
+        @media (max-width: $value) {
+            @content;
+        }
+    } @else {
+        @error "Неизвестный брейкпоинт `#{$name}`. Доступные ключи: #{map.keys($breakpoints)}";
+    }
+}

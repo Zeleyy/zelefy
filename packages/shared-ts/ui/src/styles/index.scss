@@ -1,6 +1,7 @@
-@use "./tokens/colors";
-@use "./tokens/typography";
-@use "./tokens/spacing";
+@forward "./tokens/colors";
+@forward "./tokens/typography";
+@forward "./tokens/spacing";
+@forward "./tokens/breakpoints";
 
-@use "./themes/dark";
-@use "./themes/light";
+@forward "./themes/dark";
+@forward "./themes/light";

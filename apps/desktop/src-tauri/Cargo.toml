@@ -16,3 +16,4 @@ tauri-plugin-opener = "2"
 
 serde = { workspace = true }
 serde_json = { workspace = true }
+tauri-plugin-store = "2"

@@ -5,10 +5,10 @@
     --bg-surface: var(--neutral-700);
     --bg-surface-hover: var(--neutral-600);
 
-    --accent-primary: var(--orange-600);
-    --accent-primary-hover: var(--orange-500);
-    --accent-secondary: var(--cyan-500);
-    --accent-secondary-hover: var(--cyan-400);
+    --primary: var(--orange-600);
+    --primary-hover: var(--orange-700);
+    --accent: var(--cyan-500);
+    --accent-hover: var(--cyan-400);
 
     --text-primary: var(--neutral-50);
     --text-secondary: var(--neutral-300);
@@ -20,4 +20,15 @@
 
     --state-error: var(--error-500);
     --state-error-bg: var(--error-900);
+
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
+
+    --danger: var(--red-300);
+    --danger-hover: var(--red-200);
+    --danger-active: var(--red-100);
+
+    --error-bg-subtle: var(--red-950);
+    --error-border: var(--red-600);
 }

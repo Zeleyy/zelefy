@@ -1,0 +1,47 @@
+.titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-sm);
+    user-select: none;
+
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--bg-secondary);
+
+    border-bottom: 1px solid var(--border-strong);
+
+    z-index: 10001;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    position: relative;
+
+    img,
+    span {
+        pointer-events: none;
+        user-select: none;
+    }
+
+    &__ {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+    }
+}
+
+.searchWrapper {
+    flex: 1;
+    max-width: 600px;
+}
+
+.divider {
+    width: 1px;
+    height: 16px;
+    background-color: var(--border-subtle);
+}
