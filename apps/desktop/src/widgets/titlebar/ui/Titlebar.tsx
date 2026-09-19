@@ -16,8 +16,12 @@ import {
 } from "@zelefy/ui";
 import { useThemeStore } from "@/shared/lib/hooks";
 import { useBlurOnOutsideClick } from "../hooks";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const Titlebar = () => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
     const appWindow = getCurrentWindow();
     const currentTheme = useThemeStore((state) => state.theme);
     const toggleTheme = useThemeStore((state) => state.toggleTheme);
@@ -31,36 +35,49 @@ export const Titlebar = () => {
             onMouseDown={handleTitlebarMouseDown}
         >
             <Flex gap="xs" data-tauri-drag-region>
-                <div className={styles.logo} data-tauri-drag-region>
-                    <div className={styles.logo__} data-tauri-drag-region />
-                    <ZelefyLogo width={22} height={22} data-tauri-drag-region />
-                    <span data-tauri-drag-region>Zelefy Desktop</span>
+                <div className={styles.brand} data-tauri-drag-region>
+                    <div className={styles.brand__overlay} data-tauri-drag-region />
+                    <ZelefyLogo width={22} height={22} />
+                    <span>Zelefy Desktop</span>
                 </div>
 
                 <Flex gap="2xs" data-tauri-drag-region>
-                    <Button variant="ghost" aria-label="Back" square>
+                    <Button
+                        variant="ghost"
+                        aria-label={t("titlebar.back")}
+                        onClick={() => navigate(-1)}
+                        square
+                    >
                         <ChevronLeftIcon width={17} height={17} />
                     </Button>
 
-                    <Button variant="ghost" aria-label="Forward" square>
+                    <Button
+                        variant="ghost"
+                        aria-label={t("titlebar.forward")}
+                        onClick={() => navigate(1)}
+                        square
+                    >
                         <ChevronRightIcon width={17} height={17} />
                     </Button>
                 </Flex>
             </Flex>
 
             <div className={styles.searchWrapper} data-tauri-drag-region>
-                <Input placeholder="Поиск..." leftIcon={<SearchIcon width={17} height={17} />} />
+                <Input
+                    placeholder={t("titlebar.searchPlaceholder")}
+                    leftIcon={<SearchIcon width={17} height={17} />}
+                />
             </div>
 
-            <Flex gap="2xs" align="center" className={styles.controls} data-tauri-drag-region>
+            <Flex gap="2xs" align="center" data-tauri-drag-region>
                 <Button
                     variant="ghost"
                     square
                     onClick={toggleTheme}
                     aria-label={
                         currentTheme === "dark"
-                            ? "Переключить на светлую тему"
-                            : "Переключить на тёмную тему"
+                            ? t("titlebar.theme.switchToLight")
+                            : t("titlebar.theme.switchToDark")
                     }
                 >
                     {currentTheme === "dark" ? (
@@ -75,27 +92,29 @@ export const Titlebar = () => {
                 <Button
                     variant="ghost"
                     onClick={() => appWindow.minimize()}
-                    aria-label="Minimize"
+                    aria-label={t("titlebar.minimize")}
                     square
                 >
                     <MinimizeIcon width={15} height={15} />
                 </Button>
+
                 <Button
                     variant="ghost"
                     onClick={() => appWindow.toggleMaximize()}
-                    aria-label="Maximize"
+                    aria-label={t("titlebar.maximize")}
                     square
                 >
                     <MaximizeIcon width={12} height={12} />
                 </Button>
+
                 <Button
                     variant="ghost"
                     onClick={() => appWindow.close()}
                     colorScheme={{
                         colorHover: "white",
-                        bgColorHover: "var(--error-500)",
+                        bgColorHover: "var(--danger)",
                     }}
-                    aria-label="Close"
+                    aria-label={t("titlebar.close")}
                     square
                 >
                     <CloseIcon width={15} height={15} />

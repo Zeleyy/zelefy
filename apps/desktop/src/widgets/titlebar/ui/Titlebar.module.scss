@@ -7,28 +7,27 @@
 
     padding: var(--spacing-xs) var(--spacing-sm);
     background-color: var(--bg-secondary);
-
     border-bottom: 1px solid var(--border-strong);
 
     z-index: 10001;
 }
 
-.logo {
+.brand {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
-    position: relative;
 
-    img,
+    svg,
     span {
         pointer-events: none;
         user-select: none;
     }
 
-    &__ {
+    &__overlay {
         position: absolute;
         inset: 0;
         z-index: 2;

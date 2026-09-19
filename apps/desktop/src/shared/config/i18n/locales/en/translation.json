@@ -1,0 +1,14 @@
+{
+    "titlebar": {
+        "back": "Back",
+        "forward": "Forward",
+        "searchPlaceholder": "Search...",
+        "minimize": "Minimize",
+        "maximize": "Maximize",
+        "close": "Close",
+        "theme": {
+            "switchToLight": "Switch to light theme",
+            "switchToDark": "Switch to dark theme"
+        }
+    }
+}

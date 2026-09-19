@@ -1,0 +1,14 @@
+{
+    "titlebar": {
+        "back": "Назад",
+        "forward": "Вперёд",
+        "searchPlaceholder": "Поиск...",
+        "minimize": "Свернуть",
+        "maximize": "Развернуть",
+        "close": "Закрыть",
+        "theme": {
+            "switchToLight": "Переключить на светлую тему",
+            "switchToDark": "Переключить на тёмную тему"
+        }
+    }
+}
