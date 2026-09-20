@@ -60,19 +60,26 @@ export const useSettingsStore = create<SettingsState>()(
                 isSidebarMinified: state.isSidebarMinified,
             }),
             storage: createJSONStorage(() => tauriStorage),
-            onRehydrateStorage: () => async (state) => {
+            onRehydrateStorage: () => (state) => {
                 if (!state) return;
 
                 if (!state.theme) {
-                    const sysTheme = await getCurrentWindow().theme();
-
-                    const initialTheme = sysTheme === "dark" ? "dark" : "light";
-                    state.setTheme(initialTheme);
+                    getCurrentWindow()
+                        .theme()
+                        .then((sysTheme) => {
+                            const initialTheme: Theme = sysTheme === "dark" ? "dark" : "light";
+                            state.setTheme(initialTheme);
+                        })
+                        .catch(() => {
+                            state.setTheme("dark");
+                        })
+                        .finally(() => {
+                            state.setHasHydrated(true);
+                        });
                 } else {
                     document.documentElement.setAttribute("data-theme", state.theme);
+                    state.setHasHydrated(true);
                 }
-
-                state.setHasHydrated(true);
             },
         },
     ),
