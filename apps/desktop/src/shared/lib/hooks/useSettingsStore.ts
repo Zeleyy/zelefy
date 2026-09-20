@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { storage } from "@/shared/lib/storage";
+import { tauriStorage } from "@/shared/lib/storage";
 
 export type Theme = "dark" | "light";
 export type ColorScheme = "orange" | "green" | "purple" | "blue";
@@ -20,8 +20,13 @@ interface SettingsState {
     setHasHydrated: (state: boolean) => void;
 }
 
+type PersistedSettings = Pick<
+    SettingsState,
+    "theme" | "colorScheme" | "language" | "isSidebarMinified"
+>;
+
 export const useSettingsStore = create<SettingsState>()(
-    persist(
+    persist<SettingsState, [], [], PersistedSettings>(
         (set, get) => ({
             theme: "dark",
             colorScheme: "orange",
@@ -35,7 +40,6 @@ export const useSettingsStore = create<SettingsState>()(
             },
             setTheme: (theme) => {
                 document.documentElement.setAttribute("data-theme", theme);
-
                 set({ theme });
             },
             setColorScheme: (colorScheme) => {
@@ -47,25 +51,14 @@ export const useSettingsStore = create<SettingsState>()(
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
         {
-            name: "app-settings",
+            name: "settings",
             partialize: (state) => ({
                 theme: state.theme,
                 colorScheme: state.colorScheme,
                 language: state.language,
                 isSidebarMinified: state.isSidebarMinified,
             }),
-            storage: createJSONStorage(() => ({
-                getItem: async (name) => {
-                    const value = await storage.get<string>(name);
-                    return value ?? null;
-                },
-                setItem: async (name, value) => {
-                    await storage.set(name, value);
-                },
-                removeItem: async (name) => {
-                    await storage.delete(name);
-                },
-            })),
+            storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);
             },
