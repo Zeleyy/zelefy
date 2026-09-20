@@ -26,7 +26,7 @@
     /* Varianty */
     &--primary {
         background-color: var(--primary);
-        color: var(--text-on-accent);
+        color: var(--text-on-primary);
 
         &:hover:not(:disabled) {
             background-color: var(--primary-hover);

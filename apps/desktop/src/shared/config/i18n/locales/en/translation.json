@@ -1,4 +1,9 @@
 {
+    "language": {
+        "current": "English",
+        "ru": "Русский",
+        "en": "English"
+    },
     "titlebar": {
         "back": "Back",
         "forward": "Forward",
@@ -10,5 +15,14 @@
             "switchToLight": "Switch to light theme",
             "switchToDark": "Switch to dark theme"
         }
+    },
+    "sidebar": {
+        "home": "Home",
+        "search": "Search",
+        "library": "Library",
+        "offline": "Offline",
+        "settings": "Settings",
+        "collapse": "Collapse",
+        "expand": "Expand"
     }
 }

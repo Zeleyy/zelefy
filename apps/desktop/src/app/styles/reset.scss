@@ -16,6 +16,11 @@ body,
     overflow: hidden;
 }
 
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
 body {
     font-family:
         system-ui,

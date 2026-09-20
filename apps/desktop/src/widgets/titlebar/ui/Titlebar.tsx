@@ -1,5 +1,7 @@
 import styles from "./Titlebar.module.scss";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
     Button,
     ChevronLeftIcon,
@@ -14,17 +16,15 @@ import {
     SunIcon,
     ZelefyLogo,
 } from "@zelefy/ui";
-import { useThemeStore } from "@/shared/lib/hooks";
+import { useSettingsStore } from "@/shared/lib/hooks";
 import { useBlurOnOutsideClick } from "../hooks";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 export const Titlebar = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const appWindow = getCurrentWindow();
-    const currentTheme = useThemeStore((state) => state.theme);
-    const toggleTheme = useThemeStore((state) => state.toggleTheme);
+    const currentTheme = useSettingsStore((state) => state.theme);
+    const toggleTheme = useSettingsStore((state) => state.toggleTheme);
 
     const handleTitlebarMouseDown = useBlurOnOutsideClick();
 

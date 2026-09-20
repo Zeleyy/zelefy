@@ -1,1 +1,1 @@
-export { useThemeStore } from "./useThemeStore";
+export { useSettingsStore } from "./useSettingsStore";

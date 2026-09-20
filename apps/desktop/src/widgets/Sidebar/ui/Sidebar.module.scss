@@ -1,0 +1,50 @@
+.sidebar {
+    padding: var(--spacing-xs);
+    border-right: 1px solid var(--border-subtle);
+    width: 196px;
+    transition: width var(--transition-normal, 0.2s ease);
+
+    &--minify {
+        width: 57px;
+
+        .navButton {
+            gap: 0;
+
+            span {
+                visibility: hidden;
+                width: 0;
+            }
+        }
+    }
+}
+
+.navButton {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--spacing-xs);
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast, 0.15s ease);
+
+    > svg,
+    > img {
+        flex-shrink: 0;
+    }
+
+    &--active {
+        color: var(--text-on-primary);
+        background-color: var(--primary);
+        font-weight: var(--font-weight-medium);
+
+        &:hover {
+            color: var(--text-on-primary) !important;
+            background-color: var(--primary) !important;
+        }
+    }
+}
+
+.avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}

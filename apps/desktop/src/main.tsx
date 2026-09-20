@@ -1,7 +1,6 @@
 import "./app/styles/index.scss";
 import { createRoot } from "react-dom/client";
-import { storage } from "./shared/lib/storage";
-import { useThemeStore, type ColorScheme, type Theme } from "./shared/lib/hooks/useThemeStore";
+import { useSettingsStore } from "./shared/lib/hooks/useSettingsStore";
 import { QueryProvider } from "./app/providers";
 import App from "./app/App";
 import i18n from "./shared/config/i18n";
@@ -10,17 +9,25 @@ const root = createRoot(document.getElementById("root") as HTMLElement);
 
 const init = async () => {
     try {
-        const [savedTheme, savedScheme, initialLanguage] = await Promise.all([
-            storage.get<Theme>("theme").then((res) => res || "dark"),
-            storage.get<ColorScheme>("colorScheme").then((res) => res || "orange"),
-            storage.get<string>("language").then((res) => res || "ru"),
-        ]);
+        await new Promise<void>((resolve) => {
+            if (useSettingsStore.getState()._hasHydrated) {
+                resolve();
+                return;
+            }
 
-        await i18n.changeLanguage(initialLanguage);
+            const unsub = useSettingsStore.subscribe((state) => {
+                if (state._hasHydrated) {
+                    unsub();
+                    resolve();
+                }
+            });
+        });
 
-        const themeStore = useThemeStore.getState();
-        themeStore.setTheme(savedTheme);
-        themeStore.setColorScheme(savedScheme);
+        const { theme, colorScheme, language } = useSettingsStore.getState();
+
+        await i18n.changeLanguage(language);
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.setAttribute("data-color-scheme", colorScheme);
 
         root.render(
             <QueryProvider>

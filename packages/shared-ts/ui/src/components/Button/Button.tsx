@@ -52,7 +52,7 @@ const ButtonInner = <T extends ElementType = "button">(
 ) => {
     const Component = as || "button";
 
-    const classNames = clsx(
+    const baseClassNames = clsx(
         styles.button,
         styles[`button--${variant}`],
         styles[`button--${size}`],
@@ -62,8 +62,13 @@ const ButtonInner = <T extends ElementType = "button">(
             [styles["button--square"]]: square,
             [styles["button--no-padding"]]: noPadding,
         },
-        className,
+        typeof className === "string" ? className : undefined,
     );
+
+    const classNames =
+        typeof className === "function"
+            ? (renderProps: any) => clsx(baseClassNames, className(renderProps))
+            : baseClassNames;
 
     const customStyle = colorScheme
         ? ({
@@ -78,7 +83,7 @@ const ButtonInner = <T extends ElementType = "button">(
     return (
         <Component
             ref={ref}
-            className={classNames}
+            className={classNames as any}
             style={customStyle}
             disabled={Component === "button" ? disabled : undefined}
             aria-disabled={Component !== "button" && disabled ? true : undefined}

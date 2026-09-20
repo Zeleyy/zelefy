@@ -1,4 +1,9 @@
 {
+    "language": {
+        "current": "Русский",
+        "ru": "Русский",
+        "en": "English"
+    },
     "titlebar": {
         "back": "Назад",
         "forward": "Вперёд",
@@ -10,5 +15,14 @@
             "switchToLight": "Переключить на светлую тему",
             "switchToDark": "Переключить на тёмную тему"
         }
+    },
+    "sidebar": {
+        "home": "Главная",
+        "search": "Поиск",
+        "library": "Библиотека",
+        "offline": "Оффлайн",
+        "settings": "Настройки",
+        "collapse": "Свернуть",
+        "expand": "Развернуть"
     }
 }
