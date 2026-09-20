@@ -1,18 +1,28 @@
 import i18n from "i18next";
 import resourcesToBackend from "i18next-resources-to-backend";
-import Backend from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
-import I18nextBrowserLanguageDetector from "i18next-browser-languagedetector";
+import { locale } from "@tauri-apps/plugin-os";
 
-i18n.use(Backend)
-    .use(resourcesToBackend((language: string) => import(`./locales/${language}/translation.json`)))
-    .use(I18nextBrowserLanguageDetector)
-    .use(initReactI18next)
-    .init({
-        fallbackLng: "en",
-        interpolation: {
-            escapeValue: false,
-        },
-    });
+const initI18n = async () => {
+    const systemLocale = await locale();
+    const currentLanguage = systemLocale ? systemLocale.split("-")[0] : "en";
+
+    await i18n
+        .use(
+            resourcesToBackend(
+                (language: string) => import(`./locales/${language}/translation.json`),
+            ),
+        )
+        .use(initReactI18next)
+        .init({
+            lng: currentLanguage,
+            fallbackLng: "en",
+            interpolation: {
+                escapeValue: false,
+            },
+        });
+};
+
+initI18n();
 
 export default i18n;

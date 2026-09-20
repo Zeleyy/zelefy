@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { tauriStorage } from "@/shared/lib/storage";
 
 export type Theme = "dark" | "light";
@@ -28,7 +29,7 @@ type PersistedSettings = Pick<
 export const useSettingsStore = create<SettingsState>()(
     persist<SettingsState, [], [], PersistedSettings>(
         (set, get) => ({
-            theme: "dark",
+            theme: null as unknown as Theme,
             colorScheme: "orange",
             language: "ru",
             isSidebarMinified: false,
@@ -59,8 +60,19 @@ export const useSettingsStore = create<SettingsState>()(
                 isSidebarMinified: state.isSidebarMinified,
             }),
             storage: createJSONStorage(() => tauriStorage),
-            onRehydrateStorage: () => (state) => {
-                state?.setHasHydrated(true);
+            onRehydrateStorage: () => async (state) => {
+                if (!state) return;
+
+                if (!state.theme) {
+                    const sysTheme = await getCurrentWindow().theme();
+
+                    const initialTheme = sysTheme === "dark" ? "dark" : "light";
+                    state.setTheme(initialTheme);
+                } else {
+                    document.documentElement.setAttribute("data-theme", state.theme);
+                }
+
+                state.setHasHydrated(true);
             },
         },
     ),
