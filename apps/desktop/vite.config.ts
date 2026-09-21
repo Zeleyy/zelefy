@@ -44,6 +44,7 @@ export default defineConfig(() => ({
         cssMinify: true,
         cssCodeSplit: true,
         chunkSizeWarningLimit: 1000,
+        sourcemap: false,
 
         rolldownOptions: {
             output: {
@@ -52,7 +53,17 @@ export default defineConfig(() => ({
                     groups: [
                         {
                             name: "vendor-react",
-                            test: /node_modules[\\/](react|react-dom)[\\/]/,
+                            test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+                            priority: 40,
+                        },
+                        {
+                            name: "vendor-tauri",
+                            test: /node_modules[\\/]@tauri-apps[\\/]/,
+                            priority: 30,
+                        },
+                        {
+                            name: "vendor-i18n",
+                            test: /node_modules[\\/](i18next|react-i18next|i18next-resources-to-backend)[\\/]/,
                             priority: 20,
                         },
                         {

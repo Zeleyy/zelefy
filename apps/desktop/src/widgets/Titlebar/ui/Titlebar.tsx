@@ -64,6 +64,8 @@ export const Titlebar = () => {
 
             <div className={styles.searchWrapper} data-tauri-drag-region>
                 <Input
+                    id="titlebar-search"
+                    name="search"
                     placeholder={t("titlebar.searchPlaceholder")}
                     leftIcon={<SearchIcon width={17} height={17} />}
                 />

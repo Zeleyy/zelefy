@@ -3,7 +3,7 @@ import resourcesToBackend from "i18next-resources-to-backend";
 import { initReactI18next } from "react-i18next";
 import { locale } from "@tauri-apps/plugin-os";
 
-const initI18n = async () => {
+export const initI18n = async () => {
     const systemLocale = await locale();
     const currentLanguage = systemLocale ? systemLocale.split("-")[0] : "en";
 
@@ -22,7 +22,5 @@ const initI18n = async () => {
             },
         });
 };
-
-initI18n();
 
 export default i18n;

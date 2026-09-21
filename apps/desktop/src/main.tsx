@@ -2,14 +2,16 @@ import "./app/styles/index.scss";
 import { createRoot } from "react-dom/client";
 import { useSettingsStore } from "./shared/lib/hooks/useSettingsStore";
 import { QueryProvider } from "./app/providers";
+import i18n, { initI18n } from "./shared/config/i18n";
 import App from "./app/App";
-import i18n from "./shared/config/i18n";
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 
 const init = async () => {
     try {
-        await new Promise<void>((resolve) => {
+        const i18nPromise = initI18n();
+
+        const hydrationPromise = new Promise<void>((resolve) => {
             if (useSettingsStore.getState()._hasHydrated) {
                 resolve();
                 return;
@@ -23,9 +25,14 @@ const init = async () => {
             });
         });
 
+        await Promise.all([i18nPromise, hydrationPromise]);
+
         const { theme, colorScheme, language } = useSettingsStore.getState();
 
-        await i18n.changeLanguage(language);
+        if (language) {
+            await i18n.changeLanguage(language);
+        }
+
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.setAttribute("data-color-scheme", colorScheme);
 
