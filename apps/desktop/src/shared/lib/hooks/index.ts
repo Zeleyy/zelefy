@@ -1,1 +1,1 @@
-export { useSettingsStore } from "./useSettingsStore";
+export { useSettingsStore, type Theme } from "./useSettingsStore";

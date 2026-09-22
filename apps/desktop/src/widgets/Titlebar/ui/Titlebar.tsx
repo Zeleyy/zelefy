@@ -25,6 +25,9 @@ export const Titlebar = () => {
     const appWindow = getCurrentWindow();
     const currentTheme = useSettingsStore((state) => state.theme);
     const toggleTheme = useSettingsStore((state) => state.toggleTheme);
+    const currentIdx = (window.history.state?.idx as number) ?? 0;
+    const canGoBack = currentIdx > 0;
+    const canGoForward = currentIdx < window.history.length - 1;
 
     const handleTitlebarMouseDown = useBlurOnOutsideClick();
 
@@ -46,6 +49,7 @@ export const Titlebar = () => {
                         variant="ghost"
                         aria-label={t("titlebar.back")}
                         onClick={() => navigate(-1)}
+                        disabled={!canGoBack}
                         square
                     >
                         <ChevronLeftIcon width={17} height={17} />
@@ -55,6 +59,7 @@ export const Titlebar = () => {
                         variant="ghost"
                         aria-label={t("titlebar.forward")}
                         onClick={() => navigate(1)}
+                        disabled={!canGoForward}
                         square
                     >
                         <ChevronRightIcon width={17} height={17} />

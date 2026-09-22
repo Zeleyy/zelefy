@@ -1,15 +1,15 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { tauriStorage } from "@/shared/lib/storage";
+import i18n from "@/shared/config/i18n";
 
 export type Theme = "dark" | "light";
 export type ColorScheme = "orange" | "green" | "purple" | "blue";
 
 interface SettingsState {
-    theme: Theme;
+    theme?: Theme;
     colorScheme: ColorScheme;
-    language: string;
+    language?: string;
     isSidebarMinified: boolean;
     _hasHydrated: boolean;
 
@@ -29,9 +29,9 @@ type PersistedSettings = Pick<
 export const useSettingsStore = create<SettingsState>()(
     persist<SettingsState, [], [], PersistedSettings>(
         (set, get) => ({
-            theme: null as unknown as Theme,
+            theme: undefined,
             colorScheme: "orange",
-            language: "ru",
+            language: undefined,
             isSidebarMinified: false,
             _hasHydrated: false,
 
@@ -47,7 +47,10 @@ export const useSettingsStore = create<SettingsState>()(
                 document.documentElement.setAttribute("data-color-scheme", colorScheme);
                 set({ colorScheme });
             },
-            setLanguage: (language) => set({ language }),
+            setLanguage: (language) => {
+                i18n.changeLanguage(language);
+                set({ language });
+            },
             toggleSidebar: () => set((state) => ({ isSidebarMinified: !state.isSidebarMinified })),
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
@@ -61,25 +64,7 @@ export const useSettingsStore = create<SettingsState>()(
             }),
             storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {
-                if (!state) return;
-
-                if (!state.theme) {
-                    getCurrentWindow()
-                        .theme()
-                        .then((sysTheme) => {
-                            const initialTheme: Theme = sysTheme === "dark" ? "dark" : "light";
-                            state.setTheme(initialTheme);
-                        })
-                        .catch(() => {
-                            state.setTheme("dark");
-                        })
-                        .finally(() => {
-                            state.setHasHydrated(true);
-                        });
-                } else {
-                    document.documentElement.setAttribute("data-theme", state.theme);
-                    state.setHasHydrated(true);
-                }
+                state?.setHasHydrated(true);
             },
         },
     ),

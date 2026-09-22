@@ -68,6 +68,42 @@
         gap: var(--spacing-xl);
     }
 
+    &--card-sm {
+        max-width: 200px;
+    }
+    &--card-md {
+        max-width: 300px;
+    }
+    &--card-lg {
+        max-width: 400px;
+    }
+    &--form-sm {
+        max-width: 600px;
+    }
+    &--form-md {
+        max-width: 700px;
+    }
+    &--form-lg {
+        max-width: 800px;
+    }
+    &--page-sm {
+        max-width: 1000px;
+    }
+    &--page-md {
+        max-width: 1200px;
+    }
+    &--page-lg {
+        max-width: 1600px;
+    }
+    &--full {
+        max-width: none;
+    }
+
+    &--container {
+        margin: 0 auto;
+        padding: 0 var(--spacing-md);
+    }
+
     &--mt-xs {
         margin-top: var(--spacing-xs);
     }

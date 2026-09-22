@@ -14,7 +14,6 @@ export const Sidebar = () => {
 
     const handleChangeLanguage = () => {
         const nextLang = i18n.language === "ru" ? "en" : "ru";
-        i18n.changeLanguage(nextLang);
         setLanguage(nextLang);
     };
 

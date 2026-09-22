@@ -24,5 +24,22 @@
         "settings": "Settings",
         "collapse": "Collapse",
         "expand": "Expand"
+    },
+    "settings": {
+        "updates": {
+            "title": "App Updates",
+            "currentVersion": "Current version",
+            "latestVersion": "Latest version",
+            "status": {
+                "idle": "Click the button to check for updates",
+                "checking": "Checking for updates...",
+                "available": "New update available!",
+                "notAvailable": "You are using the latest version"
+            },
+            "actions": {
+                "check": "Check for updates",
+                "install": "Install update"
+            }
+        }
     }
 }

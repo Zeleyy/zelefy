@@ -35,5 +35,11 @@
             "icons/icon.icns",
             "icons/icon.ico"
         ]
+    },
+    "plugins": {
+        "updater": {
+            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEyOEY0MDhGQUNGNDlEMTMKUldRVG5mU3NqMENQRW9LY3pXSmp2WGRNcFFId3k4b3Qwdmc5dG01aUlNamR3UFUrdERDbWFFSDgK",
+            "endpoints": ["https://github.com/Zeleyy/zelefy/releases/latest/download/latest.json"]
+        }
     }
 }
