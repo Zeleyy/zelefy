@@ -11,6 +11,7 @@ import clsx from "clsx";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
 export type ButtonSize = "small" | "medium" | "large";
+export type ButtonRadius = "xs" | "sm" | "md" | "lg" | "xl" | "full";
 
 interface ColorScheme {
     color?: string;
@@ -27,6 +28,7 @@ interface BaseButtonProps {
     disabled?: boolean;
     square?: boolean;
     noPadding?: boolean;
+    radius?: ButtonRadius;
 }
 
 export type ButtonProps<T extends ElementType = "button"> = BaseButtonProps & {
@@ -46,6 +48,7 @@ const ButtonInner = <T extends ElementType = "button">(
         noPadding = false,
         as,
         style,
+        radius = "md",
         ...rest
     }: ButtonProps<T>,
     ref: React.ForwardedRef<any>,
@@ -56,6 +59,7 @@ const ButtonInner = <T extends ElementType = "button">(
         styles.button,
         styles[`button--${variant}`],
         styles[`button--${size}`],
+        styles[`button--radius-${radius}`],
         {
             [styles["button--full-width"]]: fullWidth,
             [styles["button--disabled"]]: disabled,

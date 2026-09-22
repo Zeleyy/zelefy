@@ -2,6 +2,7 @@ import styles from "./MainLayout.module.scss";
 import { Outlet } from "react-router-dom";
 import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
+import { PlayerBar } from "@/widgets/PlayerBar";
 
 export const MainLayout = () => {
     return (
@@ -11,9 +12,13 @@ export const MainLayout = () => {
             <div className={styles.body}>
                 <Sidebar />
 
-                <main className={styles.main}>
-                    <Outlet />
-                </main>
+                <div className={styles.contentWrapper}>
+                    <main className={styles.main}>
+                        <Outlet />
+                    </main>
+
+                    <PlayerBar />
+                </div>
             </div>
         </>
     );

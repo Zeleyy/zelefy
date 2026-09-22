@@ -11,6 +11,9 @@ interface SettingsState {
     colorScheme: ColorScheme;
     language?: string;
     isSidebarMinified: boolean;
+    isMuted: boolean;
+    volume: number;
+
     _hasHydrated: boolean;
 
     setTheme: (theme: Theme) => void;
@@ -18,6 +21,9 @@ interface SettingsState {
     setColorScheme: (scheme: ColorScheme) => void;
     setLanguage: (lang: string) => void;
     toggleSidebar: () => void;
+    setIsMuted: (isMuted: boolean) => void;
+    setVolume: (volume: number) => void;
+
     setHasHydrated: (state: boolean) => void;
 }
 
@@ -33,6 +39,9 @@ export const useSettingsStore = create<SettingsState>()(
             colorScheme: "orange",
             language: undefined,
             isSidebarMinified: false,
+            isMuted: false,
+            volume: 50,
+
             _hasHydrated: false,
 
             toggleTheme: () => {
@@ -52,6 +61,10 @@ export const useSettingsStore = create<SettingsState>()(
                 set({ language });
             },
             toggleSidebar: () => set((state) => ({ isSidebarMinified: !state.isSidebarMinified })),
+
+            setIsMuted: (state) => set({ isMuted: state }),
+            setVolume: (state) => set({ volume: state }),
+
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
         {
@@ -61,6 +74,8 @@ export const useSettingsStore = create<SettingsState>()(
                 colorScheme: state.colorScheme,
                 language: state.language,
                 isSidebarMinified: state.isSidebarMinified,
+                isMuted: state.isMuted,
+                volume: state.volume,
             }),
             storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {

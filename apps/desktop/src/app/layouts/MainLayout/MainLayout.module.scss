@@ -5,6 +5,14 @@
     overflow: hidden;
 }
 
+.contentWrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
 .main {
     flex: 1;
     display: flex;
