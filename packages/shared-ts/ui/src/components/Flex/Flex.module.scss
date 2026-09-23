@@ -49,6 +49,9 @@
         flex-wrap: wrap-reverse;
     }
 
+    &--gap-3xs {
+        gap: var(--spacing-3xs);
+    }
     &--gap-2xs {
         gap: var(--spacing-2xs);
     }

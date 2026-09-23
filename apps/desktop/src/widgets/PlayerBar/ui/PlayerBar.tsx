@@ -1,7 +1,9 @@
+import styles from "./PlayerBar.module.scss";
 import {
     AudioSettings,
     Button,
     EqualizerIcon,
+    Flex,
     HeartIcon,
     HighVolumeIcon,
     LowVolumeIcon,
@@ -14,12 +16,13 @@ import {
     SkipNextIcon,
     SkipPrevIcon,
 } from "@zelefy/ui";
-import styles from "./PlayerBar.module.scss";
-import { useState } from "react";
-import { useSettingsStore } from "@/shared/lib/hooks";
+import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
 
 export const PlayerBar = () => {
-    const [isPlaying, setIsPlaying] = useState(false);
+    const isPlaying = usePlayerStore((state) => state.isPlaying);
+    const togglePlay = usePlayerStore((state) => state.togglePlay);
+    // const currentTime = usePlayerStore((state) => state.currentTime);
+    // const duration = usePlayerStore((state) => state.duration);
 
     const isMuted = useSettingsStore((state) => state.isMuted);
     const volume = useSettingsStore((state) => state.volume);
@@ -29,9 +32,9 @@ export const PlayerBar = () => {
     return (
         <div className={styles.wrapper}>
             <div className={styles.container}>
-                <div className={styles.content}>
+                <Flex direction="column" gap="md">
                     <div className={styles.mainControls}>
-                        <div className={styles.trackInfo}>
+                        <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
                             <img
                                 src="https://avatars.githubusercontent.com/u/192537945?s=400&u=193d7630edda49abaa85c6014c8018b0f0963ae7&v=4"
                                 alt="track cover"
@@ -48,12 +51,17 @@ export const PlayerBar = () => {
                             <Button variant="ghost" radius="full" square>
                                 <HeartIcon width={16} height={16} />
                             </Button>
-                        </div>
+                        </Flex>
 
-                        <div className={styles.divider}></div>
+                        <div className={styles.divider} />
 
-                        <div className={styles.playbackButtons}>
-                            <Button variant="ghost" radius="full" square>
+                        <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
+                            <Button
+                                variant="ghost"
+                                radius="full"
+                                square
+                                className={styles.optionalControl}
+                            >
                                 <ShuffleIcon width={16} height={16} />
                             </Button>
 
@@ -61,12 +69,7 @@ export const PlayerBar = () => {
                                 <SkipPrevIcon width={20} height={20} />
                             </Button>
 
-                            <Button
-                                radius="full"
-                                size="large"
-                                square
-                                onClick={() => setIsPlaying(!isPlaying)}
-                            >
+                            <Button radius="full" size="large" square onClick={togglePlay}>
                                 {isPlaying ? (
                                     <PlayIcon width={20} height={20} />
                                 ) : (
@@ -78,19 +81,34 @@ export const PlayerBar = () => {
                                 <SkipNextIcon width={20} height={20} />
                             </Button>
 
-                            <Button variant="ghost" radius="full" square>
+                            <Button
+                                variant="ghost"
+                                radius="full"
+                                square
+                                className={styles.optionalControl}
+                            >
                                 <RepeatIcon width={16} height={16} />
                             </Button>
-                        </div>
+                        </Flex>
 
                         <div className={styles.divider}></div>
 
-                        <div className={styles.volumeControls}>
-                            <Button variant="ghost" radius="full" square>
+                        <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
+                            <Button
+                                variant="ghost"
+                                radius="full"
+                                square
+                                className={styles.secondaryControl}
+                            >
                                 <AudioSettings width={16} height={16} />
                             </Button>
 
-                            <Button variant="ghost" radius="full" square>
+                            <Button
+                                variant="ghost"
+                                radius="full"
+                                square
+                                className={styles.tertiaryControl}
+                            >
                                 <EqualizerIcon width={16} height={16} />
                             </Button>
 
@@ -116,14 +134,14 @@ export const PlayerBar = () => {
                                     <HighVolumeIcon width={16} height={16} />
                                 )}
                             </Button>
-                        </div>
+                        </Flex>
                     </div>
 
                     <div className={styles.progressSection}>
-                        <div className={styles.timeInfo}>
+                        <Flex justify="space-between">
                             <p>1:45</p>
                             <span>3:24</span>
-                        </div>
+                        </Flex>
 
                         <span className={styles.progressBar}>
                             <span className={styles.progressBackground}>
@@ -137,7 +155,7 @@ export const PlayerBar = () => {
                             </span>
                         </span>
                     </div>
-                </div>
+                </Flex>
             </div>
         </div>
     );

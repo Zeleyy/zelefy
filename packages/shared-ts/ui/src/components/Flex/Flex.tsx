@@ -13,7 +13,7 @@ type FlexDirection = "row" | "column";
 type FlexJustify = "start" | "center" | "space-between" | "flex-end";
 type FlexAlign = "stretch" | "center" | "flex-start" | "baseline" | "flex-end";
 type FlexWrap = "nowrap" | "wrap" | "wrap-reverse";
-type FlexGap = "2xs" | "xs" | "sm" | "md" | "lg" | "xl";
+type FlexGap = "3xs" | "2xs" | "xs" | "sm" | "md" | "lg" | "xl";
 type FlexSize =
     | "card-sm"
     | "card-md"

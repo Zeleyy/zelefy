@@ -5,11 +5,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-xs);
 
     display: flex;
     align-items: center;
     justify-content: center;
+
+    container-type: inline-size;
 }
 
 .container {
@@ -17,25 +19,18 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-xs) var(--spacing-md);
     width: max-content;
-    max-width: calc(100% - var(--spacing-xl));
-}
-
-.content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
+    max-width: 100%;
 }
 
 .mainControls {
     display: flex;
     gap: var(--radius-lg);
     align-items: center;
+    justify-content: space-between;
 }
 
-.trackInfo {
-    display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
+.shrinkPrevent {
+    flex-shrink: 0;
 }
 
 .divider {
@@ -52,6 +47,7 @@
 .meta {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     max-width: 150px;
     @include text-body-sm;
 
@@ -64,27 +60,50 @@
     overflow: hidden;
 }
 
-.playbackButtons {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3xs);
+.tertiaryControl {
+    @container (max-width: 700px) {
+        display: none !important;
+    }
 }
 
-.volumeControls {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3xs);
+.secondaryControl {
+    @container (max-width: 600px) {
+        display: none !important;
+    }
 }
 
+.optionalControl {
+    @container (max-width: 550px) {
+        display: none !important;
+    }
+}
+
+@container (max-width: 700px) {
+    .container {
+        padding: var(--spacing-xs);
+    }
+    .meta {
+        max-width: 110px;
+    }
+}
+
+@container (max-width: 650px) {
+    .mainControls {
+        gap: var(--spacing-xs);
+    }
+}
+
+@container (max-width: 600px) {
+    .divider {
+        display: none;
+    }
+}
+
+// Progress Bar
 .progressSection {
     display: flex;
     flex-direction: column;
     position: relative;
-}
-
-.timeInfo {
-    display: flex;
-    justify-content: space-between;
 }
 
 .progressBar {

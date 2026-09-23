@@ -16,7 +16,7 @@ import {
     SunIcon,
     ZelefyLogo,
 } from "@zelefy/ui";
-import { useSettingsStore } from "@/shared/lib/hooks";
+import { useSettingsStore } from "@/shared/lib/stores";
 import { useBlurOnOutsideClick } from "../hooks";
 
 export const Titlebar = () => {

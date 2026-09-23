@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
 import { Button, CollapseIcon, ExpandIcon, Flex, LanguageIcon, SettingsIcon } from "@zelefy/ui";
-import { useSettingsStore } from "@/shared/lib/hooks";
+import { useSettingsStore } from "@/shared/lib/stores";
 import { navItems } from "../config";
 
 export const Sidebar = () => {
