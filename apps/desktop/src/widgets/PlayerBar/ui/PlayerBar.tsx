@@ -1,33 +1,52 @@
 import styles from "./PlayerBar.module.scss";
+import { useState } from "react";
 import {
     AudioSettings,
     Button,
     EqualizerIcon,
     Flex,
     HeartIcon,
-    HighVolumeIcon,
-    LowVolumeIcon,
-    MuteIcon,
     PauseIcon,
     PlayIcon,
+    ProgressBar,
     QueueIcon,
     RepeatIcon,
     ShuffleIcon,
     SkipNextIcon,
     SkipPrevIcon,
+    VolumeControl,
 } from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
 
-export const PlayerBar = () => {
-    const isPlaying = usePlayerStore((state) => state.isPlaying);
-    const togglePlay = usePlayerStore((state) => state.togglePlay);
-    // const currentTime = usePlayerStore((state) => state.currentTime);
-    // const duration = usePlayerStore((state) => state.duration);
+const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+};
 
+export const PlayerBar = () => {
     const isMuted = useSettingsStore((state) => state.isMuted);
     const volume = useSettingsStore((state) => state.volume);
+    const setVolume = useSettingsStore((state) => state.setVolume);
     const setIsMuted = useSettingsStore((state) => state.setIsMuted);
-    // const setVolume = useSettingsStore().setVolume;
+
+    const isPlaying = usePlayerStore((state) => state.isPlaying);
+    const togglePlay = usePlayerStore((state) => state.togglePlay);
+
+    const currentTime = usePlayerStore((state) => state.currentTime);
+    const duration = usePlayerStore((state) => state.duration);
+    const seek = usePlayerStore((state) => state.seek);
+
+    const [dragTime, setDragTime] = useState<number | null>(null);
+
+    const displayTime = dragTime ?? currentTime;
+
+    const handleSeekCommit = (newTime: number) => {
+        if (seek) {
+            seek(newTime);
+        }
+        setDragTime(null);
+    };
 
     return (
         <div className={styles.wrapper}>
@@ -116,44 +135,32 @@ export const PlayerBar = () => {
                                 <QueueIcon width={16} height={16} />
                             </Button>
 
-                            <Button
-                                variant="ghost"
-                                radius="full"
-                                square
-                                colorScheme={{
-                                    color: isMuted ? "var(--danger)" : undefined,
-                                    colorHover: isMuted ? "var(--danger)" : undefined,
+                            <VolumeControl
+                                volume={volume}
+                                isMuted={isMuted}
+                                onChange={(newVolume) => {
+                                    setVolume(newVolume);
+                                    if (isMuted && newVolume > 0) {
+                                        setIsMuted(false);
+                                    }
                                 }}
-                                onClick={() => setIsMuted(!isMuted)}
-                            >
-                                {isMuted ? (
-                                    <MuteIcon width={16} height={16} />
-                                ) : volume < 50 ? (
-                                    <LowVolumeIcon width={16} height={16} />
-                                ) : (
-                                    <HighVolumeIcon width={16} height={16} />
-                                )}
-                            </Button>
+                                onToggleMute={() => setIsMuted(!isMuted)}
+                            />
                         </Flex>
                     </div>
 
                     <div className={styles.progressSection}>
                         <Flex justify="space-between">
-                            <p>1:45</p>
-                            <span>3:24</span>
+                            <p>{formatTime(displayTime)}</p>
+                            <span>{formatTime(duration)}</span>
                         </Flex>
 
-                        <span className={styles.progressBar}>
-                            <span className={styles.progressBackground}>
-                                <span
-                                    className={styles.progressFill}
-                                    style={{ right: "30%" }}
-                                ></span>
-                            </span>
-                            <span className={styles.thumbWrapper} style={{ right: "30%" }}>
-                                <span className={styles.thumb}></span>
-                            </span>
-                        </span>
+                        <ProgressBar
+                            time={displayTime}
+                            duration={duration}
+                            onChange={setDragTime}
+                            onChangeEnd={handleSeekCommit}
+                        />
                     </div>
                 </Flex>
             </div>

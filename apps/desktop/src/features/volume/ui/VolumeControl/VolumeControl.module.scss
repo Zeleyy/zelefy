@@ -1,0 +1,32 @@
+.volumeWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover .popover,
+    &:focus-within .popover {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.popover {
+    position: absolute;
+    bottom: 100%;
+
+    width: 32px;
+    height: 120px;
+    padding: var(--spacing-sm);
+
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease,
+        visibility 0.15s;
+}
