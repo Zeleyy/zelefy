@@ -80,9 +80,9 @@ pub struct ProfileWithStats {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 
-    pub followers_count: i64,
-    pub following_count: i64,
-    pub tracks_count: i64,
+    pub followers_count: i32,
+    pub following_count: i32,
+    pub tracks_count: i32,
 }
 
 impl ProfileWithStats {
