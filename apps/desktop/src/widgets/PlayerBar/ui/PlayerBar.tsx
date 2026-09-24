@@ -90,9 +90,9 @@ export const PlayerBar = () => {
 
                             <Button radius="full" size="large" square onClick={togglePlay}>
                                 {isPlaying ? (
-                                    <PlayIcon width={20} height={20} />
-                                ) : (
                                     <PauseIcon width={20} height={20} />
+                                ) : (
+                                    <PlayIcon width={20} height={20} />
                                 )}
                             </Button>
 
