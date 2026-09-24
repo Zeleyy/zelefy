@@ -1,5 +1,3 @@
-export { Button } from "./Button";
-export { Flex } from "./Flex";
-export { Input } from "./Input";
+export { Button, Flex, Image, Input } from "./primitives";
 export { SpinnerLoader } from "./loading";
-export { ProgressBar, VolumeControl } from "./media";
+export { ProgressBar, VolumeControl, Cover, Avatar } from "./media";

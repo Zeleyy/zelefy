@@ -1,0 +1,47 @@
+.avatar {
+    position: relative;
+    border-radius: var(--radius-full);
+    user-select: none;
+
+    &--xs {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+    }
+    &--sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    &--md {
+        width: 48px;
+        height: 48px;
+        font-size: 16px;
+    }
+    &--lg {
+        width: 96px;
+        height: 96px;
+        font-size: 32px;
+    }
+    &--xl {
+        width: 128px;
+        height: 128px;
+        font-size: 44px;
+    }
+}
+
+.gradientFallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.initials {
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

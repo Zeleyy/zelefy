@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
     AudioSettings,
     Button,
+    Cover,
     EqualizerIcon,
     Flex,
     HeartIcon,
@@ -54,12 +55,10 @@ export const PlayerBar = () => {
                 <Flex direction="column" gap="md">
                     <div className={styles.mainControls}>
                         <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
-                            <img
+                            <Cover
                                 src="https://avatars.githubusercontent.com/u/192537945?s=400&u=193d7630edda49abaa85c6014c8018b0f0963ae7&v=4"
                                 alt="track cover"
-                                width={48}
-                                height={48}
-                                className={styles.cover}
+                                size="sm"
                             />
                             <div className={styles.meta}>
                                 <span className={styles.title}>

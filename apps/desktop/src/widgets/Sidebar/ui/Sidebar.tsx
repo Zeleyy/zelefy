@@ -2,7 +2,15 @@ import styles from "./Sidebar.module.scss";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
-import { Button, CollapseIcon, ExpandIcon, Flex, LanguageIcon, SettingsIcon } from "@zelefy/ui";
+import {
+    Avatar,
+    Button,
+    CollapseIcon,
+    ExpandIcon,
+    Flex,
+    LanguageIcon,
+    SettingsIcon,
+} from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";
 import { navItems } from "../config";
 
@@ -98,12 +106,10 @@ export const Sidebar = () => {
                     title={isMinified ? "Zelefy" : undefined}
                     aria-label={"Zelefy"}
                 >
-                    <img
+                    <Avatar
                         src="https://avatars.githubusercontent.com/u/192537945?s=400&u=193d7630edda49abaa85c6014c8018b0f0963ae7&v=4"
-                        alt="Avatar"
-                        width={22}
-                        height={22}
-                        className={styles.avatar}
+                        size="xs"
+                        name="Zelefy"
                     />
                     <span>Zelefy</span>
                 </Button>

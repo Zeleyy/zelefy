@@ -1,0 +1,1 @@
+export { getGradientByString } from "./getGradientByString";

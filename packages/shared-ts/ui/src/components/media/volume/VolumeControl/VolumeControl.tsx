@@ -1,6 +1,6 @@
 import styles from "./VolumeControl.module.scss";
-import { Flex } from "../../../Flex";
-import { Button } from "../../../Button";
+import { Flex } from "../../../primitives/Flex";
+import { Button } from "../../../primitives/Button";
 import { ProgressBar } from "../../progress";
 import { HighVolumeIcon, LowVolumeIcon, MuteIcon } from "../../../../icons";
 
