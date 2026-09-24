@@ -1,7 +1,7 @@
 import styles from "./Cover.module.scss";
 import clsx from "clsx";
 import { Button, Image } from "../../primitives";
-import { PlayIcon } from "../../../icons";
+import { PauseIcon, PlayIcon } from "../../../icons";
 
 export type CoverSize = "sm" | "md" | "lg" | "xl";
 
@@ -10,6 +10,7 @@ interface CoverProps {
     size?: CoverSize;
     alt?: string;
     showPlayOverlay?: boolean;
+    isPlaying?: boolean;
     onPlayClick?: () => void;
 }
 
@@ -18,6 +19,7 @@ export const Cover = ({
     size = "md",
     alt = "Track cover",
     showPlayOverlay = false,
+    isPlaying = false,
     onPlayClick,
 }: CoverProps) => {
     return (
@@ -27,19 +29,27 @@ export const Cover = ({
             aspectRatio="1/1"
             alt={alt}
         >
-            {showPlayOverlay && (
-                <div className={styles.overlay}>
+            {isPlaying || showPlayOverlay ? (
+                <div
+                    className={clsx(styles.overlay, {
+                        [styles["overlay--visible"]]: isPlaying,
+                    })}
+                >
                     <Button
                         variant="primary"
                         radius="full"
                         square
                         onClick={onPlayClick}
-                        aria-label="Play track"
+                        aria-label={isPlaying ? "Pause track" : "Play track"}
                     >
-                        <PlayIcon width={24} height={24} />
+                        {isPlaying ? (
+                            <PauseIcon width={24} height={24} />
+                        ) : (
+                            <PlayIcon width={24} height={24} />
+                        )}
                     </Button>
                 </div>
-            )}
+            ) : null}
         </Image>
     );
 };
