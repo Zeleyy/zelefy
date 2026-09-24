@@ -3,6 +3,7 @@ members = [
     "apps/auth",
     "apps/gateway",
     "apps/profiles",
+    "apps/tracks",
     "apps/desktop/src-tauri",
     "apps/desktop/core",
     "packages/shared-rs/common",
