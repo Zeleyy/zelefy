@@ -1,6 +1,6 @@
 ## Хранилище (S3 / Garage)
 
-Первичная инициализация выполняется **один раз** после старта контейнеров (`docker compose up -d`):
+Первичная инициализация выполняется **один раз** после старта контейнеров (`docker compose up --build -d`):
 
 1. **Инициализация узла**
 
@@ -34,4 +34,9 @@
 
     # Привязка прав (RW) к API-ключу
     docker compose exec s3_storage /garage bucket allow cdn --key app-key --read --write
+    ```
+
+6. **Включение веб-доступа к бакету**
+    ```shell
+    docker compose exec s3_storage /garage bucket website --allow cdn
     ```

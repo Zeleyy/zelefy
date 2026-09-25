@@ -15,3 +15,8 @@ api_bind_addr = "[::]:3900"
 bind_addr = "[::]:3902"
 root_domain = ".localhost"
 index = "index.html"
+
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+metrics_token = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"

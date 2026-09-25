@@ -8,12 +8,12 @@ FROM chef AS planner
 COPY Cargo.toml Cargo.lock ./
 COPY packages/shared-rs/ ./packages/shared-rs/
 
-COPY apps/auth/ ./apps/auth/
+COPY apps/tracks/ ./apps/tracks/
 
-RUN mkdir -p apps/profiles/src apps/gateway/src apps/tracks/src apps/desktop/src-tauri/src apps/desktop/core/src && \
-    echo 'fn main() {}' > apps/profiles/src/main.rs && echo '[package]\nname = "zelefy_profiles"\nversion = "0.1.0"' > apps/profiles/Cargo.toml && \
+RUN mkdir -p apps/auth/src apps/gateway/src apps/profiles/src apps/desktop/src-tauri/src apps/desktop/core/src && \
+    echo 'fn main() {}' > apps/auth/src/main.rs && echo '[package]\nname = "zelefy_auth"\nversion = "0.1.0"' > apps/auth/Cargo.toml && \
     echo 'fn main() {}' > apps/gateway/src/main.rs && echo '[package]\nname = "zelefy_gateway"\nversion = "0.1.0"' > apps/gateway/Cargo.toml && \
-    echo 'fn main() {}' > apps/tracks/src/main.rs && echo '[package]\nname = "zelefy_tracks"\nversion = "0.1.0"' > apps/tracks/Cargo.toml && \
+    echo 'fn main() {}' > apps/profiles/src/main.rs && echo '[package]\nname = "zelefy_profiles"\nversion = "0.1.0"' > apps/profiles/Cargo.toml && \
     echo 'fn main() {}' > apps/desktop/src-tauri/src/main.rs && echo '[package]\nname = "zelefy_desktop_tauri"\nversion = "0.1.0"' > apps/desktop/src-tauri/Cargo.toml && \
     echo 'fn main() {}' > apps/desktop/core/src/main.rs && echo '[package]\nname = "core"\nversion = "0.1.0"' > apps/desktop/core/Cargo.toml
 
@@ -27,14 +27,14 @@ RUN apt-get update && apt-get install -y pkg-config libssl-dev ca-certificates &
 
 ENV SQLX_OFFLINE=true
 
-RUN cargo chef cook --release --bin zelefy_auth --recipe-path recipe.json
+RUN cargo chef cook --release --bin zelefy_tracks --recipe-path recipe.json
 
 COPY Cargo.toml Cargo.lock ./
-COPY apps/auth/ ./apps/auth/
+COPY apps/tracks/ ./apps/tracks/
 COPY packages/shared-rs/ ./packages/shared-rs/
-COPY apps/auth/.sqlx/ ./.sqlx/
+COPY apps/tracks/.sqlx/ ./.sqlx/
 
-RUN cargo build --release --bin zelefy_auth
+RUN cargo build --release --bin zelefy_tracks
 
 
 FROM debian:trixie-slim AS runner
@@ -43,6 +43,6 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/target/release/zelefy_auth /app/auth
+COPY --from=builder /app/target/release/zelefy_tracks /app/tracks
 
-CMD ["./auth"]
+CMD ["./tracks"]
