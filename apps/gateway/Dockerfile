@@ -10,9 +10,10 @@ COPY packages/shared-rs/ ./packages/shared-rs/
 
 COPY apps/gateway/ ./apps/gateway/
 
-RUN mkdir -p apps/profiles/src apps/auth/src apps/desktop/src-tauri/src apps/desktop/core/src && \
+RUN mkdir -p apps/profiles/src apps/auth/src apps/tracks/src apps/desktop/src-tauri/src apps/desktop/core/src && \
     echo 'fn main() {}' > apps/profiles/src/main.rs && echo '[package]\nname = "zelefy_profiles"\nversion = "0.1.0"' > apps/profiles/Cargo.toml && \
     echo 'fn main() {}' > apps/auth/src/main.rs && echo '[package]\nname = "zelefy_auth"\nversion = "0.1.0"' > apps/auth/Cargo.toml && \
+    echo 'fn main() {}' > apps/tracks/src/main.rs && echo '[package]\nname = "zelefy_tracks"\nversion = "0.1.0"' > apps/tracks/Cargo.toml && \
     echo 'fn main() {}' > apps/desktop/src-tauri/src/main.rs && echo '[package]\nname = "zelefy_desktop_tauri"\nversion = "0.1.0"' > apps/desktop/src-tauri/Cargo.toml && \
     echo 'fn main() {}' > apps/desktop/core/src/main.rs && echo '[package]\nname = "core"\nversion = "0.1.0"' > apps/desktop/core/Cargo.toml
 
