@@ -2,7 +2,7 @@ use axum::extract::Multipart;
 use bytes::Bytes;
 use utoipa::ToSchema;
 
-use crate::api::errors::ApiError;
+use crate::api::error::ApiError;
 
 #[derive(ToSchema)]
 pub struct ImageForm {

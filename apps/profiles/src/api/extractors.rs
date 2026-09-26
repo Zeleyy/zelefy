@@ -1,11 +1,13 @@
 use axum::extract::FromRequestParts;
 use uuid::Uuid;
 use zelefy_backend::{
-    X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION, api::errors::ApiError, parse_header_enum,
+    X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
+    api::error::{ApiError, AuthContextError},
+    parse_header_enum,
 };
 use zelefy_common::TokenData;
 
-use crate::{AppState, api::errors::ProfileErrorCode};
+use crate::AppState;
 
 impl FromRequestParts<AppState> for TokenData {
     type Rejection = ApiError;
@@ -17,34 +19,18 @@ impl FromRequestParts<AppState> for TokenData {
         let user_id_str = parts
             .headers
             .get(&X_USER_ID)
-            .ok_or_else(|| {
-                ApiError::unauthorized(
-                    ProfileErrorCode::MissingUserIdHeader.as_ref(),
-                    "Заголовок X-User-Id отсутствует",
-                )
-            })?
+            .ok_or(AuthContextError::MissingUserIdHeader)?
             .to_str()
-            .map_err(|_| {
-                ApiError::unauthorized(
-                    ProfileErrorCode::InvalidCredentials.as_ref(),
-                    "Некорректный заголовок X-User-Id",
-                )
-            })?;
+            .map_err(|_| AuthContextError::InvalidUserIdHeader)?;
 
-        let user_id = Uuid::parse_str(user_id_str).map_err(|_| {
-            ApiError::bad_request(
-                ProfileErrorCode::InvalidAccessToken.as_ref(),
-                "Некорректный формат UUID",
-            )
-        })?;
+        let user_id =
+            Uuid::parse_str(user_id_str).map_err(|_| AuthContextError::InvalidAccessToken)?;
 
         let role = parse_header_enum(
             parts,
             &X_USER_ROLE,
-            ProfileErrorCode::MissingUserRoleHeader.as_ref(),
-            "Заголовок X-User-Role отсутствует",
-            ProfileErrorCode::InvalidUserRoleHeader.as_ref(),
-            "Неизвестная роль пользователя",
+            AuthContextError::MissingUserRoleHeader,
+            AuthContextError::InvalidUserRoleHeader,
         )
         .map_err(|e| {
             ApiError::internal_msg(format!("gateway headers incomplete: {}", e.message))
@@ -53,10 +39,8 @@ impl FromRequestParts<AppState> for TokenData {
         let subscription = parse_header_enum(
             parts,
             &X_USER_SUBSCRIPTION,
-            ProfileErrorCode::MissingUserSubscriptionHeader.as_ref(),
-            "Заголовок X-User-Subscription отсутствует",
-            ProfileErrorCode::InvalidUserSubscriptionHeader.as_ref(),
-            "Неизвестная подписка пользователя",
+            AuthContextError::MissingUserSubscriptionHeader,
+            AuthContextError::InvalidUserSubscriptionHeader,
         )
         .map_err(|e| {
             ApiError::internal_msg(format!("gateway headers incomplete: {}", e.message))
