@@ -1,0 +1,60 @@
+FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
+WORKDIR /app
+
+
+FROM chef AS planner
+ARG APP_DIR
+
+COPY Cargo.toml Cargo.lock ./
+COPY packages/shared-rs/ ./packages/shared-rs/
+
+RUN mkdir -p apps/auth/src apps/gateway/src apps/profiles/src apps/tracks/src apps/desktop/src-tauri/src apps/desktop/core/src && \
+    printf 'fn main() {}' > apps/auth/src/main.rs && printf '[package]\nname = "zelefy_auth"\nversion = "0.1.0"\n' > apps/auth/Cargo.toml && \
+    printf 'fn main() {}' > apps/gateway/src/main.rs && printf '[package]\nname = "zelefy_gateway"\nversion = "0.1.0"\n' > apps/gateway/Cargo.toml && \
+    printf 'fn main() {}' > apps/profiles/src/main.rs && printf '[package]\nname = "zelefy_profiles"\nversion = "0.1.0"\n' > apps/profiles/Cargo.toml && \
+    printf 'fn main() {}' > apps/tracks/src/main.rs && printf '[package]\nname = "zelefy_tracks"\nversion = "0.1.0"\n' > apps/tracks/Cargo.toml && \
+    printf 'fn main() {}' > apps/desktop/src-tauri/src/main.rs && printf '[package]\nname = "zelefy_desktop_tauri"\nversion = "0.1.0"\n' > apps/desktop/src-tauri/Cargo.toml && \
+    printf 'fn main() {}' > apps/desktop/core/src/main.rs && printf '[package]\nname = "core"\nversion = "0.1.0"\n' > apps/desktop/core/Cargo.toml
+
+COPY apps/${APP_DIR}/ ./apps/${APP_DIR}/
+
+RUN cargo chef prepare --recipe-path recipe.json
+
+
+FROM chef AS builder
+ARG APP_DIR
+ARG BIN_NAME
+
+COPY --from=planner /app/recipe.json recipe.json
+
+RUN apt-get update && apt-get install -y pkg-config libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
+
+ENV SQLX_OFFLINE=true
+
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo chef cook --release --bin ${BIN_NAME} --recipe-path recipe.json
+
+COPY Cargo.toml Cargo.lock ./
+COPY apps/${APP_DIR}/ ./apps/${APP_DIR}/
+COPY packages/shared-rs/ ./packages/shared-rs/
+
+RUN if [ -d apps/${APP_DIR}/.sqlx ]; then cp -r apps/${APP_DIR}/.sqlx ./.sqlx; fi
+
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo build --release --bin ${BIN_NAME} && \
+    cp target/release/${BIN_NAME} /app/service
+
+
+FROM debian:trixie-slim AS runner
+
+RUN useradd -m -u 1001 appuser
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/service /app/service
+
+USER appuser
+CMD ["./service"]
