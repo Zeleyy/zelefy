@@ -2,7 +2,10 @@ services:
     gateway:
         build:
             context: ..
-            dockerfile: apps/gateway/Dockerfile
+            dockerfile: apps/Dockerfile.rust
+            args:
+                APP_DIR: gateway
+                BIN_NAME: zelefy_gateway
         ports:
             - "${GATEWAY_PORT}:${GATEWAY_PORT}"
         environment:
@@ -17,7 +20,10 @@ services:
     auth:
         build:
             context: ..
-            dockerfile: apps/auth/Dockerfile
+            dockerfile: apps/Dockerfile.rust
+            args:
+                APP_DIR: auth
+                BIN_NAME: zelefy_auth
         ports:
             - "${AUTH_PORT}:${AUTH_PORT}"
         environment:
@@ -53,7 +59,10 @@ services:
     profiles:
         build:
             context: ..
-            dockerfile: apps/profiles/Dockerfile
+            dockerfile: apps/Dockerfile.rust
+            args:
+                APP_DIR: profiles
+                BIN_NAME: zelefy_profiles
         ports:
             - "${PROFILES_PORT}:${PROFILES_PORT}"
         environment:
@@ -84,7 +93,10 @@ services:
     tracks:
         build:
             context: ..
-            dockerfile: apps/tracks/Dockerfile
+            dockerfile: apps/Dockerfile.rust
+            args:
+                APP_DIR: tracks
+                BIN_NAME: zelefy_tracks
         ports:
             - "${TRACKS_PORT}:${TRACKS_PORT}"
         environment:
