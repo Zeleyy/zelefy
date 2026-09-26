@@ -39,7 +39,12 @@
       {
         "ordinal": 3,
         "name": "permalink",
-        "type_info": "Varchar",
+        "type_info": {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        },
         "origin": {
           "Table": {
             "table": "tracks",

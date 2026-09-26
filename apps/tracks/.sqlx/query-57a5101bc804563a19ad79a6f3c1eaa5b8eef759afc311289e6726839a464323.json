@@ -39,7 +39,12 @@
       {
         "ordinal": 3,
         "name": "permalink",
-        "type_info": "Varchar",
+        "type_info": {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        },
         "origin": {
           "Table": {
             "table": "tracks",
@@ -162,7 +167,12 @@
       "Left": [
         "Uuid",
         "Varchar",
-        "Varchar",
+        {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        },
         "Text",
         "Text",
         "Int4",

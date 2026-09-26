@@ -9,15 +9,14 @@ use axum_extra::{
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use zelefy_backend::api::errors::{ApiError, ErrorResponse};
+use zelefy_backend::api::error::{ApiError, ErrorResponse};
 use zelefy_common::{TokenData, paths};
 
 use crate::{
     AppState,
-    api::errors::AuthErrorCode,
     services::{
-        self, login::LoginParams, logout::LogoutParams, logout_all::LogoutAllParams,
-        refresh::RefreshParams, register::RegisterParams,
+        self, errors::AuthServiceError, login::LoginParams, logout::LogoutParams,
+        logout_all::LogoutAllParams, refresh::RefreshParams, register::RegisterParams,
     },
 };
 
@@ -183,12 +182,7 @@ pub async fn refresh(
         .get("rt_sec")
         .map(|cookie| cookie.value().to_string())
         .or(payload.refresh_token)
-        .ok_or_else(|| {
-            ApiError::bad_request(
-                AuthErrorCode::TokenExpired.as_ref(),
-                "Refresh token не предоставлен",
-            )
-        })?;
+        .ok_or(AuthServiceError::MissingRefreshToken)?;
 
     let response = services::refresh(
         &state.db,
@@ -256,12 +250,7 @@ pub async fn logout(
         .get("rt_sec")
         .map(|cookie| cookie.value().to_string())
         .or(payload.refresh_token)
-        .ok_or_else(|| {
-            ApiError::bad_request(
-                AuthErrorCode::TokenExpired.as_ref(),
-                "Refresh token не предоставлен",
-            )
-        })?;
+        .ok_or(AuthServiceError::MissingRefreshToken)?;
 
     services::logout(
         &state.db,

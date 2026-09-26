@@ -8,7 +8,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use utoipa::ToSchema;
 use zelefy_backend::api::{
-    errors::{ApiError, ErrorResponse},
+    error::{ApiError, ErrorResponse},
     multipart::{ImageForm, extract_file},
 };
 use zelefy_common::{TokenData, paths};
