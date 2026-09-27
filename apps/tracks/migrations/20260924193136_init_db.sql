@@ -19,20 +19,28 @@ CREATE TABLE playlists (
 
 CREATE INDEX playlists_user_id_idx ON playlists (user_id);
 
+CREATE TYPE track_status AS ENUM ('processing', 'ready', 'failed', 'published');
 
 CREATE TABLE tracks (
     track_id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
-    title varchar(150) NOT NULL,
+
+    title varchar(150) NULL,
 	permalink citext NOT NULL,
-	audio_url text NOT NULL,
-	cover_url text NULL,
-	duration_seconds integer NOT NULL,
+	audio_url text NULL,
+    cover_url text NULL,
+    waveform_url text NULL,
+    duration_seconds integer NULL,
+
 	genre varchar(50) NULL,
 	description text NULL,
 	bpm integer NULL,
 	key_signature varchar(20) NULL,
 	is_private boolean DEFAULT false NOT NULL,
+
+    status track_status DEFAULT 'processing' NOT NULL,
+    processing_error text NULL,
+
 	created_at timestamptz DEFAULT now() NOT NULL,
 	updated_at timestamptz DEFAULT now() NOT NULL,
 
