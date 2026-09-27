@@ -8,14 +8,11 @@ zelefy_common = { path = "../common", features = ["backend"] }
 error-derive = { path = "../error-derive" }
 
 axum = { workspace = true }
-sqlx = { workspace = true }
-redis = { workspace = true }
 utoipa = { workspace = true }
 chrono = { workspace = true }
 uuid = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-aws-sdk-s3 = { workspace = true }
 bytes = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
@@ -23,3 +20,12 @@ tower-http = { workspace = true }
 tokio = { workspace = true }
 
 thiserror = {workspace = true }
+
+sqlx = { workspace = true, optional = true }
+redis = { workspace = true, optional = true }
+aws-sdk-s3 = { workspace = true, optional = true }
+
+[features]
+db = ["dep:sqlx"]
+redis = ["dep:redis"]
+s3 = ["dep:aws-sdk-s3"]

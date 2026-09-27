@@ -1,20 +1,21 @@
 use axum::extract::FromRequestParts;
 use uuid::Uuid;
-use zelefy_backend::{
-    X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
+
+use crate::{
+    TokenData, X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION,
     api::error::{ApiError, AuthContextError},
     parse_header_enum,
 };
-use zelefy_common::TokenData;
 
-use crate::AppState;
-
-impl FromRequestParts<AppState> for TokenData {
+impl<S> FromRequestParts<S> for TokenData
+where
+    S: Send + Sync,
+{
     type Rejection = ApiError;
 
     async fn from_request_parts(
         parts: &mut axum::http::request::Parts,
-        _state: &AppState,
+        _state: &S,
     ) -> Result<Self, Self::Rejection> {
         let user_id_str = parts
             .headers

@@ -122,15 +122,14 @@ pub async fn update<'e, E>(
     executor: E,
     user_id: Uuid,
     update: UpdateProfileDto,
-) -> Result<Profile, sqlx::Error>
+) -> Result<Option<Profile>, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
-    if update.is_empty() {
-        return Err(sqlx::Error::Protocol(
-            "UpdateProfileDto contained no fields to update".into(),
-        ));
-    }
+    debug_assert!(
+        !update.is_empty(),
+        "update() called with an empty UpdateProfileDto — check should happen in the service layer"
+    );
 
     let mut query_builder = QueryBuilder::new("UPDATE profiles SET ");
     let mut sep = query_builder.separated(", ");
@@ -164,5 +163,5 @@ where
     query_builder.push(" RETURNING *");
 
     let query = query_builder.build_query_as::<Profile>();
-    query.fetch_one(executor).await
+    query.fetch_optional(executor).await
 }

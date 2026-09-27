@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT \"position\" FROM playlist_tracks WHERE playlist_id = $1 AND track_id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "position",
+        "type_info": "Numeric",
+        "origin": {
+          "Table": {
+            "table": "playlist_tracks",
+            "name": "position"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "fd555b55ec5008c2fd60eb98741c2a8af0399f70fb49da15c8b09124d9e0ae33"
+}

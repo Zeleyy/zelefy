@@ -9,8 +9,11 @@ use axum_extra::{
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use zelefy_backend::api::error::{ApiError, ErrorResponse};
-use zelefy_common::{TokenData, paths};
+use zelefy_backend::{
+    TokenData,
+    api::error::{ApiError, ErrorResponse},
+};
+use zelefy_common::paths;
 
 use crate::{
     AppState,

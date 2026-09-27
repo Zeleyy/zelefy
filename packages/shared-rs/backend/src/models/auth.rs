@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-use crate::{SubscriptionTier, UserRole};
+use zelefy_common::{SubscriptionTier, UserRole};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TokenData {

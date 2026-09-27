@@ -1,8 +1,7 @@
 use chrono::{Duration, Utc};
 use redis::aio::ConnectionManager;
 use sqlx::PgPool;
-use zelefy_backend::cache::repository::sessions;
-use zelefy_common::TokenData;
+use zelefy_backend::{TokenData, cache::repository::sessions};
 
 use crate::{
     config::Config,

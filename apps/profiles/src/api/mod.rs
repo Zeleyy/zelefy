@@ -6,7 +6,6 @@ use zelefy_common::paths;
 use crate::AppState;
 
 pub mod docs;
-pub mod extractors;
 pub mod v1;
 
 pub fn routes() -> Router<AppState> {

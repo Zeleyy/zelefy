@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE playlist_tracks\n            SET \"position\" = $3\n            WHERE playlist_id = $1 AND track_id = $2\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Numeric"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "21b68501929fe215d87f206e6f7967caddc349fabf912ce5eb601fb02612d5df"
+}
