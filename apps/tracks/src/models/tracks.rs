@@ -1,82 +1,101 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::prelude::FromRow;
 use utoipa::ToSchema;
 use uuid::Uuid;
+use zelefy_common::TrackStatus;
 
 use crate::models::track_stats::TrackStats;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
+#[derive(Debug, Clone, FromRow)]
 pub struct Track {
     pub track_id: Uuid,
     pub user_id: Uuid,
-    pub title: String,
+
+    pub title: Option<String>,
     pub permalink: String,
-    pub audio_url: String,
+    pub audio_url: Option<String>,
     pub cover_url: Option<String>,
-    pub duration_seconds: i32,
+    pub waveform_url: Option<String>,
+    pub duration_seconds: Option<i32>,
+
     pub genre: Option<String>,
     pub description: Option<String>,
     pub bpm: Option<i32>,
     pub key_signature: Option<String>,
     pub is_private: bool,
+
+    pub status: TrackStatus,
+    pub processing_error: Option<String>,
+
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
-pub struct CreateTrackDto {
-    pub title: String,
+#[derive(Debug)]
+pub struct NewTrack {
     pub permalink: String,
-    pub audio_url: String,
-    pub cover_url: Option<String>,
-    pub duration_seconds: i32,
-    pub genre: Option<String>,
-    pub description: Option<String>,
-    pub bpm: Option<i32>,
-    pub key_signature: Option<String>,
-    pub is_private: bool,
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
-pub struct UpdateTrackDto {
-    pub title: Option<String>,
+#[derive(Debug, Default)]
+pub struct UpdateTrack {
+    pub title: Option<Option<String>>,
     pub permalink: Option<String>,
+
+    pub audio_url: Option<Option<String>>,
     pub cover_url: Option<Option<String>>,
+    pub waveform_url: Option<Option<String>>,
+    pub duration_seconds: Option<Option<i32>>,
+
     pub genre: Option<Option<String>>,
     pub description: Option<Option<String>>,
     pub bpm: Option<Option<i32>>,
     pub key_signature: Option<Option<String>>,
     pub is_private: Option<bool>,
+
+    pub status: Option<TrackStatus>,
+    pub processing_error: Option<Option<String>>,
 }
 
-impl UpdateTrackDto {
+impl UpdateTrack {
     pub fn is_empty(&self) -> bool {
         self.title.is_none()
             && self.permalink.is_none()
+            && self.audio_url.is_none()
             && self.cover_url.is_none()
+            && self.waveform_url.is_none()
+            && self.duration_seconds.is_none()
             && self.genre.is_none()
             && self.description.is_none()
             && self.bpm.is_none()
             && self.key_signature.is_none()
             && self.is_private.is_none()
+            && self.status.is_none()
+            && self.processing_error.is_none()
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
+#[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
 pub struct TrackWithStats {
     pub track_id: Uuid,
     pub user_id: Uuid,
-    pub title: String,
+
+    pub title: Option<String>,
     pub permalink: String,
-    pub audio_url: String,
+    pub audio_url: Option<String>,
     pub cover_url: Option<String>,
-    pub duration_seconds: i32,
+    pub waveform_url: Option<String>,
+    pub duration_seconds: Option<i32>,
+
     pub genre: Option<String>,
     pub description: Option<String>,
     pub bpm: Option<i32>,
     pub key_signature: Option<String>,
     pub is_private: bool,
+
+    pub status: TrackStatus,
+    pub processing_error: Option<String>,
+
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 
@@ -95,16 +114,23 @@ impl TrackWithStats {
         Self {
             track_id: track.track_id,
             user_id: track.user_id,
+
             title: track.title,
             permalink: track.permalink,
             audio_url: track.audio_url,
             cover_url: track.cover_url,
+            waveform_url: track.waveform_url,
             duration_seconds: track.duration_seconds,
+
             genre: track.genre,
             description: track.description,
             bpm: track.bpm,
             key_signature: track.key_signature,
             is_private: track.is_private,
+
+            status: track.status,
+            processing_error: track.processing_error,
+
             created_at: track.created_at,
             updated_at: track.updated_at,
 

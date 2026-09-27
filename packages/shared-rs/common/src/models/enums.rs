@@ -29,3 +29,17 @@ pub enum SubscriptionTier {
     ProPlus,
     ProUnlimited,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "backend", derive(Type, ToSchema))]
+#[cfg_attr(
+    feature = "backend",
+    sqlx(type_name = "track_status", rename_all = "snake_case")
+)]
+#[serde(rename_all = "snake_case")]
+pub enum TrackStatus {
+    Processing,
+    Ready,
+    Failed,
+    Published,
+}
