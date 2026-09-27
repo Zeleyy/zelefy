@@ -53,7 +53,9 @@ pub async fn update_banner(
         ..Default::default()
     };
 
-    let profile = profiles::update(&mut *tx, user_id, update).await?;
+    let profile = profiles::update(&mut *tx, user_id, update)
+        .await?
+        .ok_or(ProfileServiceError::UserNotFound)?;
     let stats = stats::get_by_id(&mut *tx, user_id).await?;
 
     if let Err(err) = tx.commit().await {

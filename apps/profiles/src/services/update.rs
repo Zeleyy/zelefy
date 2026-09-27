@@ -16,11 +16,25 @@ pub struct UpdateParams {
     pub social_links: Option<HashMap<String, String>>,
 }
 
+impl UpdateParams {
+    fn is_empty(&self) -> bool {
+        self.display_name.is_none()
+            && self.permalink.is_none()
+            && self.bio.is_none()
+            && self.location.is_none()
+            && self.social_links.is_none()
+    }
+}
+
 pub async fn update(
     db: &PgPool,
     user_id: Uuid,
     params: UpdateParams,
 ) -> Result<ProfileWithStats, ProfileServiceError> {
+    if params.is_empty() {
+        return Err(ProfileServiceError::EmptyUpdate);
+    }
+
     let mut tx = db.begin().await?;
 
     let profile = profiles::update(
@@ -38,7 +52,8 @@ pub async fn update(
             is_verified: None,
         },
     )
-    .await?;
+    .await?
+    .ok_or(ProfileServiceError::UserNotFound)?;
 
     let stats = stats::get_by_id(&mut *tx, user_id).await?;
 

@@ -2,6 +2,10 @@ use zelefy_backend::api::error::ApiErrorCode;
 
 #[derive(thiserror::Error, Debug, ApiErrorCode)]
 pub enum ProfileServiceError {
+    #[error("No fields to update")]
+    #[api_error(status = 400, code = "EMPTY_UPDATE")]
+    EmptyUpdate,
+
     #[error("User not found")]
     #[api_error(status = 404, code = "USER_NOT_FOUND")]
     UserNotFound,

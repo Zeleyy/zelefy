@@ -1,8 +1,7 @@
 use redis::{AsyncCommands, aio::ConnectionManager};
 use uuid::Uuid;
-use zelefy_common::TokenData;
 
-use crate::cache::ops::get_json;
+use crate::{TokenData, cache::ops::get_json};
 
 pub async fn get(
     redis: &mut ConnectionManager,

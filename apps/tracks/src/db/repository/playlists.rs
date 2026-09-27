@@ -137,15 +137,14 @@ pub async fn update<'e, E>(
     executor: E,
     playlist_id: Uuid,
     update: UpdatePlaylistDto,
-) -> Result<Playlist, sqlx::Error>
+) -> Result<Option<Playlist>, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
-    if update.is_empty() {
-        return Err(sqlx::Error::Protocol(
-            "UpdatePlaylistDto contained no fields to update".into(),
-        ));
-    }
+    debug_assert!(
+        !update.is_empty(),
+        "update() called with an empty UpdatePlaylistDto — check should happen in the service layer"
+    );
 
     let mut query_builder = QueryBuilder::new("UPDATE playlists SET ");
     let mut sep = query_builder.separated(", ");
@@ -170,7 +169,7 @@ where
     query_builder.push(" RETURNING * ");
 
     let query = query_builder.build_query_as::<Playlist>();
-    query.fetch_one(executor).await
+    query.fetch_optional(executor).await
 }
 
 pub async fn delete<'e, E>(executor: E, playlist_id: Uuid) -> Result<bool, sqlx::Error>
