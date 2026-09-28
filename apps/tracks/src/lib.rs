@@ -3,9 +3,11 @@ use sqlx::PgPool;
 
 use crate::config::Config;
 
+pub mod api;
 pub mod config;
 pub mod db;
 pub mod models;
+pub mod services;
 
 #[derive(Clone)]
 pub struct AppState {

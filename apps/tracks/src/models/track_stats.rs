@@ -1,9 +1,7 @@
-use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
-use utoipa::ToSchema;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, FromRow, ToSchema)]
+#[derive(Debug, Clone, Default, FromRow)]
 pub struct TrackStats {
     pub track_id: Uuid,
     pub plays_count: i64,

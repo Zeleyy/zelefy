@@ -2,7 +2,7 @@ use sqlx::{PgExecutor, QueryBuilder};
 use uuid::Uuid;
 use zelefy_backend::db::query_builder::push_opt_nullable;
 
-use crate::models::playlists::{CreatePlaylistDto, Playlist, UpdatePlaylistDto};
+use crate::models::playlists::{NewPlaylist, Playlist, UpdatePlaylist};
 
 pub async fn get_by_id<'e, E>(
     executor: E,
@@ -65,7 +65,7 @@ where
 pub async fn create<'e, E>(
     executor: E,
     user_id: Uuid,
-    params: CreatePlaylistDto,
+    params: NewPlaylist,
 ) -> Result<Playlist, sqlx::Error>
 where
     E: PgExecutor<'e>,
@@ -136,14 +136,14 @@ where
 pub async fn update<'e, E>(
     executor: E,
     playlist_id: Uuid,
-    update: UpdatePlaylistDto,
+    update: UpdatePlaylist,
 ) -> Result<Option<Playlist>, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
     debug_assert!(
         !update.is_empty(),
-        "update() called with an empty UpdatePlaylistDto — check should happen in the service layer"
+        "update() called with an empty UpdatePlaylist — check should happen in the service layer"
     );
 
     let mut query_builder = QueryBuilder::new("UPDATE playlists SET ");

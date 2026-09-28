@@ -1,10 +1,8 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
-use utoipa::ToSchema;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow, ToSchema)]
+#[derive(Debug, Clone, FromRow)]
 pub struct Playlist {
     pub playlist_id: Uuid,
     pub user_id: Uuid,
@@ -17,8 +15,8 @@ pub struct Playlist {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
-pub struct CreatePlaylistDto {
+#[derive(Debug)]
+pub struct NewPlaylist {
     pub title: String,
     pub permalink: String,
     pub description: Option<String>,
@@ -26,8 +24,8 @@ pub struct CreatePlaylistDto {
     pub cover_url: Option<String>,
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
-pub struct UpdatePlaylistDto {
+#[derive(Debug)]
+pub struct UpdatePlaylist {
     pub title: Option<String>,
     pub permalink: Option<String>,
     pub description: Option<Option<String>>,
@@ -35,7 +33,7 @@ pub struct UpdatePlaylistDto {
     pub cover_url: Option<Option<String>>,
 }
 
-impl UpdatePlaylistDto {
+impl UpdatePlaylist {
     pub fn is_empty(&self) -> bool {
         self.title.is_none()
             && self.permalink.is_none()
