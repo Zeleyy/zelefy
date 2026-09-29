@@ -7,32 +7,24 @@ use axum::{
 use hyper::{Uri, header};
 use std::str::FromStr;
 
-use crate::{AppState, config::Config};
-
-pub fn get_upstream_target<'a>(config: &'a Config, path: &str) -> Option<&'a str> {
-    if path.contains("/auth/") {
-        Some(&config.auth_url)
-    } else if path.contains("/profiles/") || path.contains("/me/profile") {
-        Some(&config.profiles_url)
-    } else {
-        None
-    }
-}
+use crate::AppState;
 
 pub async fn proxy_handler(State(state): State<AppState>, mut req: Request<Body>) -> Response {
     let path = req.uri().path();
-    let upstream_base = match get_upstream_target(&state.config, path) {
-        Some(base) => base,
+
+    let registry = state.registry.read().await;
+    let entry = match registry.find(path) {
+        Some(e) => e.clone(),
         None => return StatusCode::NOT_FOUND.into_response(),
     };
+    drop(registry);
 
     let path_and_query = req
         .uri()
         .path_and_query()
         .map(|pq| pq.as_str())
         .unwrap_or(path);
-
-    let target_uri_str = format!("{}{}", upstream_base, path_and_query);
+    let target_uri_str = format!("{}{}", entry.upstream_base, path_and_query);
 
     let target_uri = match Uri::from_str(&target_uri_str) {
         Ok(uri) => uri,

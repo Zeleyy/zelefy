@@ -8,11 +8,7 @@ use axum::{
 use hyper::header;
 use zelefy_backend::{X_USER_ID, X_USER_ROLE, X_USER_SUBSCRIPTION, cache::repository::sessions};
 
-use crate::{AppState, proxy::handler::get_upstream_target};
-
-pub fn is_public_path(path: &str) -> bool {
-    path == "/health" || path.contains("/public/")
-}
+use crate::AppState;
 
 pub async fn auth_middleware(
     State(state): State<AppState>,
@@ -21,12 +17,20 @@ pub async fn auth_middleware(
 ) -> Response {
     let path = req.uri().path();
 
-    if is_public_path(path) {
+    if path == "/health" {
         return next.run(req).await;
     }
 
-    if get_upstream_target(&state.config, path).is_none() {
-        return StatusCode::NOT_FOUND.into_response();
+    let requires_auth = {
+        let registry = state.registry.read().await;
+        match registry.find(path) {
+            Some(entry) => entry.requires_auth,
+            None => return StatusCode::NOT_FOUND.into_response(),
+        }
+    };
+
+    if !requires_auth {
+        return next.run(req).await;
     }
 
     let access_token = match req.headers().get(header::AUTHORIZATION) {

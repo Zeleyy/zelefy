@@ -2,7 +2,7 @@ use axum::body::Body;
 use hyper_util::client::legacy::{Client, connect::HttpConnector};
 use redis::aio::ConnectionManager;
 
-use crate::config::Config;
+use crate::{config::Config, routes::registry::SharedRegistry};
 
 pub mod config;
 pub mod middleware;
@@ -16,4 +16,5 @@ pub struct AppState {
     pub redis: ConnectionManager,
     pub config: Config,
     pub http_client: HttpClient,
+    pub registry: SharedRegistry,
 }

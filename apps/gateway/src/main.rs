@@ -1,12 +1,20 @@
 use hyper_util::{client::legacy::Client, rt::TokioExecutor};
-use std::net::SocketAddr;
-use tokio::signal;
+use std::{net::SocketAddr, sync::Arc};
+use tokio::{signal, sync::RwLock};
 use zelefy_backend::{
     api::logs::{build_trace_layer, init_tracing},
     cache::init_redis,
 };
 
-use zelefy_gateway::{AppState, config::Config, routes::routes};
+use zelefy_gateway::{
+    AppState,
+    config::Config,
+    routes::{
+        discovery::discover_all,
+        registry::{RouteRegistry, SharedRegistry},
+        routes,
+    },
+};
 
 #[tokio::main]
 async fn main() {
@@ -19,11 +27,29 @@ async fn main() {
         .pool_max_idle_per_host(100)
         .build_http();
 
+    let registry: SharedRegistry = Arc::new(RwLock::new(RouteRegistry::default()));
+
     let state = AppState {
         redis: redis_manager,
         config: config.clone(),
         http_client,
+        registry: registry.clone(),
     };
+
+    discover_all(&state.http_client, registry.clone(), &config).await;
+
+    {
+        let http_client = state.http_client.clone();
+        let registry = registry.clone();
+        let config = config.clone();
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
+            loop {
+                interval.tick().await;
+                discover_all(&http_client, registry.clone(), &config).await;
+            }
+        });
+    }
 
     let app = routes(state).layer(build_trace_layer());
 
