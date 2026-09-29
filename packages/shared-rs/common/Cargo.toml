@@ -11,6 +11,7 @@ serde = { workspace = true }
 
 sqlx = { workspace = true, optional = true }
 utoipa = { workspace = true, optional = true }
+const_format = { workspace = true }
 
 
 [features]

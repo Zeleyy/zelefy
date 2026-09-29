@@ -20,6 +20,7 @@ uuid = { version = "1.25.0", features = ["serde", "v4"] }
 chrono = { version = "0.4.45", features = ["serde"] }
 bytes = "1.12.1"
 thiserror = "2.0.20"
+const_format = "0.2.36"
 
 dotenvy = "0.15.7"
 envy = "0.4.2"

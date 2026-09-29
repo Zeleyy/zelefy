@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 zelefy_common = { workspace = true }
-zelefy_backend = { workspace = true }
+zelefy_backend = { workspace = true, features = ["redis"] }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -18,9 +18,12 @@ envy = { workspace = true }
 tokio = { workspace = true }
 
 axum = { workspace = true }
+utoipa = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
 
 redis = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 hyper = { version = "1.11.1", features = ["full"] }
 hyper-util = { version = "0.1.20", features = ["full", "client-legacy"] }
+http-body-util = "0.1.5"
