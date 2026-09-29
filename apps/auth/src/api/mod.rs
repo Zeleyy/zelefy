@@ -13,8 +13,5 @@ pub fn routes() -> Router<AppState> {
 
     Router::new()
         .merge(api_routes)
-        .merge(SwaggerUi::new("/docs").url(
-            "/api/v1/public/auth/api-docs/openapi.json",
-            docs::ApiDoc::openapi(),
-        ))
+        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", docs::ApiDoc::openapi()))
 }
