@@ -49,7 +49,8 @@ pub struct LoginResponse {
         (status = 401, description = "Неверные учётные данные", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
-    tag = "Auth"
+    security(),
+    tag = "Public"
 )]
 pub async fn login(
     State(mut state): State<AppState>,
@@ -109,20 +110,13 @@ pub struct RegisterResponse {
         (status = 409, description = "Пользователь уже существует", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
-    tag = "Auth"
+    security(),
+    tag = "Public"
 )]
 pub async fn register(
     State(mut state): State<AppState>,
     Json(payload): Json<RegisterRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    // if payload.email.is_empty() {
-    //     return Err(ApiError::BadRequest("Email не может быть пустым".into()));
-    // }
-
-    // if payload.password.len() < 6 {
-    //     return Err(ApiError::BadRequest("Пароль должен содержать минимум 8 символов".into()));
-    // }
-
     let response = services::register(
         &state.db,
         &mut state.cache,
@@ -174,7 +168,8 @@ pub struct RefreshResponse {
         (status = 401, description = "Неверные учётные данные", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
-    tag = "Auth"
+    security(),
+    tag = "Public"
 )]
 pub async fn refresh(
     State(mut state): State<AppState>,
