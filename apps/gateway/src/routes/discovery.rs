@@ -36,7 +36,13 @@ pub async fn discover_service(
         .into_iter()
         .map(|(path, methods)| {
             let requires_auth = methods.values().any(|m| m.security.is_some());
-            let full_path = format!("/api/v1{}", path);
+
+            let full_path = if path.starts_with("/api/v1") {
+                path
+            } else {
+                format!("/api/v1{}", path)
+            };
+
             (
                 full_path,
                 RouteEntry {

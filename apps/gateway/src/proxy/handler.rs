@@ -15,16 +15,29 @@ pub async fn proxy_handler(State(state): State<AppState>, mut req: Request<Body>
     let registry = state.registry.read().await;
     let entry = match registry.find(path) {
         Some(e) => e.clone(),
-        None => return StatusCode::NOT_FOUND.into_response(),
+        None => {
+            tracing::warn!("Route not found in registry: {}", path);
+            return StatusCode::NOT_FOUND.into_response();
+        }
     };
     drop(registry);
 
-    let path_and_query = req
-        .uri()
-        .path_and_query()
-        .map(|pq| pq.as_str())
-        .unwrap_or(path);
-    let target_uri_str = format!("{}{}", entry.upstream_base, path_and_query);
+    let target_path_and_query = if path.starts_with("/api-docs/") && path.ends_with("/openapi.json")
+    {
+        let query = req
+            .uri()
+            .query()
+            .map(|q| format!("?{}", q))
+            .unwrap_or_default();
+        format!("/api-docs/openapi.json{}", query)
+    } else {
+        req.uri()
+            .path_and_query()
+            .map(|pq| pq.as_str().to_string())
+            .unwrap_or_else(|| path.to_string())
+    };
+
+    let target_uri_str = format!("{}{}", entry.upstream_base, target_path_and_query);
 
     let target_uri = match Uri::from_str(&target_uri_str) {
         Ok(uri) => uri,

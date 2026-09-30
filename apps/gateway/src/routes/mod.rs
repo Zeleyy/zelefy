@@ -2,7 +2,6 @@ use axum::{
     Router, middleware,
     routing::{any, get},
 };
-use serde_json::json;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{AppState, middleware::auth::auth_middleware, proxy::handler::proxy_handler};
@@ -13,6 +12,13 @@ pub mod registry;
 pub fn routes(state: AppState) -> Router {
     let health_route = Router::new().route("/health", get(|| async { "OK" }));
 
+    let swagger_config = utoipa_swagger_ui::Config::new([
+        "/api-docs/auth/openapi.json",
+        "/api-docs/profiles/openapi.json",
+    ]);
+
+    let swagger_ui = SwaggerUi::new("/docs").config(swagger_config);
+
     let proxy_router =
         Router::new()
             .fallback(any(proxy_handler))
@@ -21,13 +27,9 @@ pub fn routes(state: AppState) -> Router {
                 auth_middleware,
             ));
 
-    let swagger_ui = SwaggerUi::new("/docs")
-        .external_url_unchecked("/api-docs/auth/openapi.json", json!({}))
-        .external_url_unchecked("/api-docs/profiles/openapi.json", json!({}));
-
     Router::new()
         .merge(health_route)
-        .merge(proxy_router)
         .merge(swagger_ui)
+        .merge(proxy_router)
         .with_state(state)
 }
