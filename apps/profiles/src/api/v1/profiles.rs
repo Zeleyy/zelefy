@@ -33,6 +33,7 @@ use crate::{
         (status = 404, description = "Пользователь не найден", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
+    security(),
     tag = "Profile"
 )]
 pub async fn get_by_permalink(
