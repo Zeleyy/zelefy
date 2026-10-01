@@ -6,7 +6,7 @@ use zelefy_backend::{
     s3::create_s3_client,
 };
 
-use zelefy_tracks::{AppState, config::Config};
+use zelefy_tracks::{AppState, api, config::Config};
 
 #[tokio::main]
 async fn main() {
@@ -34,7 +34,10 @@ async fn main() {
 
     let trace_layer = build_trace_layer();
 
-    let app = Router::new().layer(trace_layer).with_state(state);
+    let app = Router::new()
+        .merge(api::routes())
+        .layer(trace_layer)
+        .with_state(state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     tracing::info!("Сервер запущен на http://{}", addr);

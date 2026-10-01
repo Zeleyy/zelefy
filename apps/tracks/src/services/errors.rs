@@ -1,10 +1,18 @@
 use zelefy_backend::api::error::ApiErrorCode;
 
 #[derive(thiserror::Error, Debug, ApiErrorCode)]
-pub enum ProfileServiceError {
+pub enum TrackServiceError {
     #[error("No fields to update")]
     #[api_error(status = 400, code = "EMPTY_UPDATE")]
     EmptyUpdate,
+
+    #[error("Unsupported audio format")]
+    #[api_error(status = 400, code = "UNSUPPORTED_AUDIO_FORMAT")]
+    UnsupportedAudioFormat,
+
+    #[error("You don't have permission")]
+    #[api_error(status = 403, code = "FORBIDDEN")]
+    Forbidden,
 
     #[error("Track not found")]
     #[api_error(status = 404, code = "TRACK_NOT_FOUND")]
