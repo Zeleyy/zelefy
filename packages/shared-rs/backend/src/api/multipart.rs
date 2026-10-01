@@ -10,6 +10,12 @@ pub struct ImageForm {
     pub file: Bytes,
 }
 
+#[derive(ToSchema)]
+pub struct AudioForm {
+    #[schema(value_type = String, format = Binary)]
+    pub audio_file: Bytes,
+}
+
 pub async fn extract_file(
     mut multipart: Multipart,
     field_name: &str,
