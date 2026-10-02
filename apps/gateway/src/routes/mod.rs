@@ -15,6 +15,7 @@ pub fn routes(state: AppState) -> Router {
     let swagger_config = utoipa_swagger_ui::Config::new([
         "/api-docs/auth/openapi.json",
         "/api-docs/profiles/openapi.json",
+        "/api-docs/tracks/openapi.json",
     ]);
 
     let swagger_ui = SwaggerUi::new("/docs").config(swagger_config);

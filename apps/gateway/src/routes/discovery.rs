@@ -81,6 +81,7 @@ pub async fn discover_all(
     let services = [
         ("auth", config.auth_url.as_str()),
         ("profiles", config.profiles_url.as_str()),
+        ("tracks", config.tracks_url.as_str()),
     ];
 
     for (name, url) in services {

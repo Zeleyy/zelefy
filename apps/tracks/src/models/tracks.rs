@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -146,4 +146,15 @@ impl From<Track> for TrackWithStats {
     fn from(track: Track) -> Self {
         Self::for_new_track(track)
     }
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct UpdateTrackRequest {
+    pub title: Option<Option<String>>,
+    pub permalink: Option<String>,
+    pub genre: Option<Option<String>>,
+    pub description: Option<Option<String>>,
+    pub bpm: Option<Option<i32>>,
+    pub key_signature: Option<Option<String>>,
+    pub is_private: Option<bool>,
 }

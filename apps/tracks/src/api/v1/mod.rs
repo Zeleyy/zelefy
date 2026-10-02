@@ -14,6 +14,7 @@ pub fn routes() -> Router<AppState> {
     const MAX_UPLOAD_AUDIO_SIZE: usize = 102 * 1024 * 1024;
 
     Router::new()
+        .route(paths::v1::tracks::TRACK_BY_ID, patch(tracks::update))
         .route(
             paths::v1::tracks::TRACK_UPLOAD_AUDIO,
             post(tracks::upload_audio).layer(DefaultBodyLimit::max(MAX_UPLOAD_SIZE)),

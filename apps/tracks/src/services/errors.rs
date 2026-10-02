@@ -18,6 +18,14 @@ pub enum TrackServiceError {
     #[api_error(status = 404, code = "TRACK_NOT_FOUND")]
     TrackNotFound,
 
+    #[error("Track is still being processed")]
+    #[api_error(status = 409, code = "TRACK_STILL_PROCESSING")]
+    TrackStillProcessing,
+
+    #[error("Track processing failed")]
+    #[api_error(status = 409, code = "TRACK_PROCESSING_FAILED")]
+    TrackProcessingFailed,
+
     #[error("Database error: {0}")]
     #[api_error(status = 500, code = "INTERNAL_ERROR")]
     DatabaseError(#[from] sqlx::Error),

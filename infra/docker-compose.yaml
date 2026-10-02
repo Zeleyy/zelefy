@@ -9,11 +9,12 @@ services:
         ports:
             - "${GATEWAY_PORT}:${GATEWAY_PORT}"
         environment:
-            - PORT=${GATEWAY_PORT}
-            - URL=${GATEWAY_PUBLIC_URL}
-            - CACHE_URL=${SESSION_CACHE_URL}
-            - AUTH_URL=${AUTH_URL}
-            - PROFILES_URL=${PROFILES_URL}
+            PORT: ${GATEWAY_PORT}
+            URL: ${GATEWAY_PUBLIC_URL}
+            CACHE_URL: ${SESSION_CACHE_URL}
+            AUTH_URL: ${AUTH_URL}
+            PROFILES_URL: ${PROFILES_URL}
+            TRACKS_URL: ${TRACKS_URL}
         depends_on:
             - session_cache
 
@@ -27,11 +28,11 @@ services:
         ports:
             - "${AUTH_PORT}:${AUTH_PORT}"
         environment:
-            - PORT=${AUTH_PORT}
-            - DATABASE_URL=${AUTH_DB_URL}
-            - CACHE_URL=${SESSION_CACHE_URL}
-            - ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS}
-            - REFRESH_TOKEN_TTL_DAYS=${REFRESH_TOKEN_TTL_DAYS}
+            PORT: ${AUTH_PORT}
+            DATABASE_URL: ${AUTH_DB_URL}
+            CACHE_URL: ${SESSION_CACHE_URL}
+            ACCESS_TOKEN_TTL_SECONDS: ${ACCESS_TOKEN_TTL_SECONDS}
+            REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS}
         depends_on:
             - auth_db
             - session_cache
@@ -66,14 +67,14 @@ services:
         ports:
             - "${PROFILES_PORT}:${PROFILES_PORT}"
         environment:
-            - PORT=${PROFILES_PORT}
-            - DATABASE_URL=${PROFILES_DB_URL}
-            - S3_URL=${S3_URL}
-            - S3_BUCKET=${S3_BUCKET}
-            - S3_PUBLIC_URL=${S3_PUBLIC_URL}
-            - S3_REGION=${S3_REGION}
-            - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-            - S3_SECRET_KEY=${S3_SECRET_KEY}
+            PORT: ${PROFILES_PORT}
+            DATABASE_URL: ${PROFILES_DB_URL}
+            S3_URL: ${S3_URL}
+            S3_BUCKET: ${S3_BUCKET}
+            S3_PUBLIC_URL: ${S3_PUBLIC_URL}
+            S3_REGION: ${S3_REGION}
+            S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+            S3_SECRET_KEY: ${S3_SECRET_KEY}
         depends_on:
             - profiles_db
             - s3_storage
@@ -100,14 +101,14 @@ services:
         ports:
             - "${TRACKS_PORT}:${TRACKS_PORT}"
         environment:
-            - PORT=${TRACKS_PORT}
-            - DATABASE_URL=${TRACKS_DB_URL}
-            - S3_URL=${S3_URL}
-            - S3_BUCKET=${S3_BUCKET}
-            - S3_PUBLIC_URL=${S3_PUBLIC_URL}
-            - S3_REGION=${S3_REGION}
-            - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-            - S3_SECRET_KEY=${S3_SECRET_KEY}
+            PORT: ${TRACKS_PORT}
+            DATABASE_URL: ${TRACKS_DB_URL}
+            S3_URL: ${S3_URL}
+            S3_BUCKET: ${S3_BUCKET}
+            S3_PUBLIC_URL: ${S3_PUBLIC_URL}
+            S3_REGION: ${S3_REGION}
+            S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+            S3_SECRET_KEY: ${S3_SECRET_KEY}
         depends_on:
             - tracks_db
             - s3_storage
@@ -142,8 +143,8 @@ services:
         ports:
             - "${S3_WEBUI_PORT}:3909"
         environment:
-            - API_BASE_URL=${S3_ADMIN_URL}
-            - S3_ENDPOINT_URL=${S3_INTERNAL_URL}
+            API_BASE_URL: ${S3_ADMIN_URL}
+            S3_ENDPOINT_URL: ${S3_INTERNAL_URL}
         volumes:
             - ./garage.toml:/etc/garage.toml:ro
         depends_on:

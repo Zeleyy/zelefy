@@ -6,8 +6,9 @@ use super::v1::tracks;
 #[derive(OpenApi)]
 #[openapi(
     paths(
+        tracks::update,
         tracks::upload_audio,
-        tracks::update_cover
+        tracks::update_cover,
     ),
     security(
         ("X-User-Id" = []),

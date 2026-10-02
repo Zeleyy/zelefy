@@ -7,6 +7,7 @@ pub struct Config {
     pub cache_url: String,
     pub auth_url: String,
     pub profiles_url: String,
+    pub tracks_url: String,
 }
 
 impl Config {

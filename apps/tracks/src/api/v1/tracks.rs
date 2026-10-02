@@ -14,7 +14,11 @@ use zelefy_backend::{
 };
 use zelefy_common::paths;
 
-use crate::{AppState, models::tracks::TrackWithStats, services};
+use crate::{
+    AppState,
+    models::tracks::{TrackWithStats, UpdateTrackRequest},
+    services,
+};
 
 #[utoipa::path(
     post,
@@ -88,5 +92,27 @@ pub async fn update_cover(
     )
     .await?;
 
+    Ok(Json(track))
+}
+
+#[utoipa::path(
+    patch,
+    path = paths::v1::tracks::TRACK_BY_ID_FULL,
+    params(
+        ("track_id" = Uuid, Path, description = "Track Uuid")
+    ),
+    responses(
+        (status = 200, description = "Данные трека обновлены", body = TrackWithStats),
+        (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
+    ),
+    tag = "Track"
+)]
+pub async fn update(
+    State(state): State<AppState>,
+    user: TokenData,
+    Path(track_id): Path<Uuid>,
+    Json(payload): Json<UpdateTrackRequest>,
+) -> Result<impl IntoResponse, ApiError> {
+    let track = services::update(state.db, user.user_id, track_id, payload).await?;
     Ok(Json(track))
 }
