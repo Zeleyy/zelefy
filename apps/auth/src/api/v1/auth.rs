@@ -57,7 +57,7 @@ pub async fn login(
 ) -> Result<impl IntoResponse, ApiError> {
     let response = services::login(
         &state.db,
-        &mut state.redis,
+        &mut state.cache,
         &state.config,
         LoginParams {
             email: &payload.email,
@@ -125,7 +125,7 @@ pub async fn register(
 
     let response = services::register(
         &state.db,
-        &mut state.redis,
+        &mut state.cache,
         &state.config,
         RegisterParams {
             email: &payload.email,
@@ -189,7 +189,7 @@ pub async fn refresh(
 
     let response = services::refresh(
         &state.db,
-        &mut state.redis,
+        &mut state.cache,
         &state.config,
         RefreshParams {
             refresh_token: &refresh_token,
@@ -257,7 +257,7 @@ pub async fn logout(
 
     services::logout(
         &state.db,
-        &mut state.redis,
+        &mut state.cache,
         LogoutParams {
             user_id,
             access_token: bearer.token(),
@@ -297,7 +297,7 @@ pub async fn logout_all(
 ) -> Result<impl IntoResponse, ApiError> {
     let user_id = user.user_id;
 
-    services::logout_all(&state.db, &mut state.redis, LogoutAllParams { user_id }).await?;
+    services::logout_all(&state.db, &mut state.cache, LogoutAllParams { user_id }).await?;
 
     let expired_cookie = Cookie::build(("rt_sec", ""))
         .path("/")

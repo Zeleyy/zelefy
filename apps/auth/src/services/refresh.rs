@@ -21,7 +21,7 @@ pub struct RefreshParams<'a> {
 
 pub async fn refresh(
     db: &PgPool,
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     config: &Config,
     params: RefreshParams<'_>,
 ) -> Result<AuthTokens, AuthServiceError> {
@@ -55,7 +55,7 @@ pub async fn refresh(
     user_sessions::create(&mut *tx, refresh_session).await?;
 
     sessions::create(
-        redis,
+        cache,
         &access_token,
         &access_session,
         config.access_token_ttl_seconds,

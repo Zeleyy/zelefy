@@ -15,7 +15,7 @@ pub struct LogoutParams<'a> {
 
 pub async fn logout(
     db: &PgPool,
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     params: LogoutParams<'_>,
 ) -> Result<(), AuthServiceError> {
     let mut tx = db.begin().await?;
@@ -28,7 +28,7 @@ pub async fn logout(
         return Err(AuthServiceError::InvalidToken);
     }
 
-    sessions::revoke(redis, params.user_id, params.access_token)
+    sessions::revoke(cache, params.user_id, params.access_token)
         .await
         .map_err(|e| AuthServiceError::CacheError(e.to_string()))?;
 

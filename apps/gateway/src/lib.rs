@@ -13,7 +13,7 @@ pub type HttpClient = Client<HttpConnector, Body>;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub redis: ConnectionManager,
+    pub cache: ConnectionManager,
     pub config: Config,
     pub http_client: HttpClient,
     pub registry: SharedRegistry,

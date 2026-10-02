@@ -41,9 +41,9 @@ pub async fn auth_middleware(
         None => return StatusCode::UNAUTHORIZED.into_response(),
     };
 
-    let mut redis_conn = state.redis.clone();
+    let mut cache_conn = state.cache.clone();
 
-    let session = match sessions::get(&mut redis_conn, access_token).await {
+    let session = match sessions::get(&mut cache_conn, access_token).await {
         Ok(Some(s)) => s,
         _ => return StatusCode::UNAUTHORIZED.into_response(),
     };

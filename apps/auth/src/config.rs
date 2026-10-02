@@ -4,7 +4,7 @@ use serde::Deserialize;
 pub struct Config {
     pub port: u16,
     pub database_url: String,
-    pub redis_url: String,
+    pub cache_url: String,
     pub access_token_ttl_seconds: u64,
     pub refresh_token_ttl_days: i64,
 }

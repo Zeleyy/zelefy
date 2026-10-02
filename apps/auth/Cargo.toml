@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 zelefy_common = { workspace = true }
-zelefy_backend = { workspace = true, features = ["db", "redis"] }
+zelefy_backend = { workspace = true, features = ["db", "cache"] }
 
 serde = { workspace = true}
 serde_json = { workspace = true }

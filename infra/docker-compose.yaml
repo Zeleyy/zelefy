@@ -11,11 +11,11 @@ services:
         environment:
             - PORT=${GATEWAY_PORT}
             - URL=${GATEWAY_PUBLIC_URL}
-            - REDIS_URL=${AUTH_REDIS_URL}
+            - CACHE_URL=${SESSION_CACHE_URL}
             - AUTH_URL=${AUTH_URL}
             - PROFILES_URL=${PROFILES_URL}
         depends_on:
-            - redis_sessions
+            - session_cache
 
     auth:
         build:
@@ -29,12 +29,12 @@ services:
         environment:
             - PORT=${AUTH_PORT}
             - DATABASE_URL=${AUTH_DB_URL}
-            - REDIS_URL=${AUTH_REDIS_URL}
+            - CACHE_URL=${SESSION_CACHE_URL}
             - ACCESS_TOKEN_TTL_SECONDS=${ACCESS_TOKEN_TTL_SECONDS}
             - REFRESH_TOKEN_TTL_DAYS=${REFRESH_TOKEN_TTL_DAYS}
         depends_on:
             - auth_db
-            - redis_sessions
+            - session_cache
 
     auth_db:
         image: postgres:18-alpine
@@ -48,13 +48,13 @@ services:
         volumes:
             - auth_db_data:/var/lib/postgresql
 
-    redis_sessions:
-        image: redis:8-alpine
+    session_cache:
+        image: valkey/valkey:9.0-alpine
         restart: unless-stopped
         ports:
-            - "${AUTH_REDIS_PORT}:6379"
+            - "${SESSION_CACHE_PORT}:6379"
         volumes:
-            - redis_sessions_data:/data
+            - session_cache_data:/data
 
     profiles:
         build:
@@ -151,7 +151,7 @@ services:
 
 volumes:
     auth_db_data:
-    redis_sessions_data:
+    session_cache_data:
 
     profiles_db_data:
 

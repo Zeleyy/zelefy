@@ -2,7 +2,7 @@ use axum::Router;
 use std::net::SocketAddr;
 use zelefy_backend::{
     api::logs::{build_trace_layer, init_tracing},
-    cache::init_redis,
+    cache::init_cache,
     db::init_pool,
 };
 
@@ -19,13 +19,13 @@ async fn main() {
         .await
         .expect("Ошибка подключения к базе данных");
 
-    let redis_manager = init_redis(&config.redis_url)
+    let cache_manager = init_cache(&config.cache_url)
         .await
-        .expect("Ошибка подключения к Redis");
+        .expect("Failed to initialize cache connection");
 
     let state = AppState {
         db: db_pool,
-        redis: redis_manager,
+        cache: cache_manager,
         config: config.clone(),
     };
 

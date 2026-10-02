@@ -8,7 +8,7 @@ pub mod db;
 #[cfg(feature = "s3")]
 pub mod s3;
 
-#[cfg(feature = "redis")]
+#[cfg(feature = "cache")]
 pub mod cache;
 
 pub use headers::*;

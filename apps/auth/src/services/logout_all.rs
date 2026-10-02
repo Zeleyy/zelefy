@@ -11,14 +11,14 @@ pub struct LogoutAllParams {
 
 pub async fn logout_all(
     db: &PgPool,
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     params: LogoutAllParams,
 ) -> Result<(), AuthServiceError> {
     let mut tx = db.begin().await?;
 
     user_sessions::revoke_all_for_user(&mut *tx, params.user_id).await?;
 
-    sessions::revoke_all(redis, params.user_id)
+    sessions::revoke_all(cache, params.user_id)
         .await
         .map_err(|e| AuthServiceError::CacheError(e.to_string()))?;
 

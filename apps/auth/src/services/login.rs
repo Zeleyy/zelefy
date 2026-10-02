@@ -25,7 +25,7 @@ pub struct LoginParams<'a> {
 
 pub async fn login(
     db: &PgPool,
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     config: &Config,
     params: LoginParams<'_>,
 ) -> Result<AuthTokens, AuthServiceError> {
@@ -64,7 +64,7 @@ pub async fn login(
     user_sessions::create(&mut *tx, refresh_session).await?;
 
     sessions::create(
-        redis,
+        cache,
         &access_token,
         &access_session,
         config.access_token_ttl_seconds,

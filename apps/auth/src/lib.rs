@@ -13,6 +13,6 @@ pub mod services;
 #[derive(Clone)]
 pub struct AppState {
     pub db: PgPool,
-    pub redis: ConnectionManager,
+    pub cache: ConnectionManager,
     pub config: Config,
 }

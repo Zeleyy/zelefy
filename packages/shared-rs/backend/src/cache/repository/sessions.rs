@@ -4,14 +4,14 @@ use uuid::Uuid;
 use crate::{TokenData, cache::ops::get_json};
 
 pub async fn get(
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     session_key: &str,
 ) -> Result<Option<TokenData>, redis::RedisError> {
-    get_json(redis, session_key).await
+    get_json(cache, session_key).await
 }
 
 pub async fn create(
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     session_key: &str,
     data: &TokenData,
     ttl_seconds: u64,
@@ -28,12 +28,12 @@ pub async fn create(
         .sadd(&user_index_key, session_key)
         .expire(&user_index_key, ttl_seconds as i64);
 
-    let _: () = pipe.query_async(redis).await?;
+    let _: () = pipe.query_async(cache).await?;
     Ok(())
 }
 
 pub async fn revoke(
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     user_id: Uuid,
     session_key: &str,
 ) -> Result<(), redis::RedisError> {
@@ -44,16 +44,16 @@ pub async fn revoke(
         .del(session_key)
         .srem(&user_index_key, session_key);
 
-    pipe.query_async(redis).await?
+    pipe.query_async(cache).await?
 }
 
 pub async fn revoke_all(
-    redis: &mut ConnectionManager,
+    cache: &mut ConnectionManager,
     user_id: Uuid,
 ) -> Result<(), redis::RedisError> {
     let user_index_key = format!("user_sessions:{}", user_id);
 
-    let session_keys: Vec<String> = redis.smembers(&user_index_key).await?;
+    let session_keys: Vec<String> = cache.smembers(&user_index_key).await?;
 
     if !session_keys.is_empty() {
         let mut pipe = redis::pipe();
@@ -64,7 +64,7 @@ pub async fn revoke_all(
         }
         pipe.del(&user_index_key);
 
-        let _: () = pipe.query_async(redis).await?;
+        let _: () = pipe.query_async(cache).await?;
     }
 
     Ok(())

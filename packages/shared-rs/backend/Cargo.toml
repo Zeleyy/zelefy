@@ -27,5 +27,5 @@ aws-sdk-s3 = { workspace = true, optional = true }
 
 [features]
 db = ["dep:sqlx"]
-redis = ["dep:redis"]
+cache = ["dep:redis"]
 s3 = ["dep:aws-sdk-s3"]

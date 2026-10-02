@@ -3,7 +3,7 @@ use std::{net::SocketAddr, sync::Arc};
 use tokio::{signal, sync::RwLock};
 use zelefy_backend::{
     api::logs::{build_trace_layer, init_tracing},
-    cache::init_redis,
+    cache::init_cache,
 };
 
 use zelefy_gateway::{
@@ -21,7 +21,9 @@ async fn main() {
     init_tracing();
 
     let config = Config::from_env().expect("Config error");
-    let redis_manager = init_redis(&config.redis_url).await.expect("Redis error");
+    let cache_manager = init_cache(&config.cache_url)
+        .await
+        .expect("Failed to initialize cache connection");
 
     let http_client = Client::builder(TokioExecutor::new())
         .pool_max_idle_per_host(100)
@@ -30,7 +32,7 @@ async fn main() {
     let registry: SharedRegistry = Arc::new(RwLock::new(RouteRegistry::default()));
 
     let state = AppState {
-        redis: redis_manager,
+        cache: cache_manager,
         config: config.clone(),
         http_client,
         registry: registry.clone(),
