@@ -6,9 +6,17 @@ pub enum ProfileServiceError {
     #[api_error(status = 400, code = "EMPTY_UPDATE")]
     EmptyUpdate,
 
+    #[error("Unsupported image format")]
+    #[api_error(status = 400, code = "UNSUPPORTED_IMAGE_FORMAT")]
+    UnsupportedImageFormat,
+
     #[error("User not found")]
     #[api_error(status = 404, code = "USER_NOT_FOUND")]
     UserNotFound,
+
+    #[error("Image processing failed: {0}")]
+    #[api_error(status = 500, code = "IMAGE_PROCESSING_FAILED")]
+    ImageProcessingFailed(String),
 
     #[error("Database error: {0}")]
     #[api_error(status = 500, code = "INTERNAL_ERROR")]

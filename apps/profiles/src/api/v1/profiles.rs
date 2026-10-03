@@ -40,7 +40,7 @@ pub async fn get_by_permalink(
     State(state): State<AppState>,
     Path(permalink): Path<String>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let response = services::get_by_permalink(&state.db, permalink).await?;
+    let response = services::get_by_permalink(state.db, permalink).await?;
 
     Ok(Json(response))
 }
@@ -61,7 +61,7 @@ pub async fn create(
 ) -> Result<impl IntoResponse, ApiError> {
     let user_id = user.user_id;
 
-    let response = services::create(&state.db, user_id, payload).await?;
+    let response = services::create(state.db, user_id, payload).await?;
 
     Ok((StatusCode::CREATED, Json(response)))
 }
@@ -92,7 +92,7 @@ pub async fn update(
     let user_id = user.user_id;
 
     let response = services::update(
-        &state.db,
+        state.db,
         user_id,
         UpdateParams {
             display_name: payload.display_name,
@@ -131,12 +131,12 @@ pub async fn update_avatar(
     let (bytes, content_type) = extract_file(multipart, "file").await?;
 
     let profile = services::update_avatar(
-        &state.db,
-        &state.s3_client,
-        &state.config,
+        state.db,
+        state.s3_client,
+        state.config,
         user_id,
         bytes,
-        &content_type,
+        content_type,
     )
     .await?;
 
@@ -167,12 +167,12 @@ pub async fn update_banner(
     let (bytes, content_type) = extract_file(multipart, "file").await?;
 
     let profile = services::update_banner(
-        &state.db,
-        &state.s3_client,
-        &state.config,
+        state.db,
+        state.s3_client,
+        state.config,
         user_id,
         bytes,
-        &content_type,
+        content_type,
     )
     .await?;
 

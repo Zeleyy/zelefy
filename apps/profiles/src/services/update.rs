@@ -27,7 +27,7 @@ impl UpdateParams {
 }
 
 pub async fn update(
-    db: &PgPool,
+    db: PgPool,
     user_id: Uuid,
     params: UpdateParams,
 ) -> Result<ProfileWithStats, ProfileServiceError> {

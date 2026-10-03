@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub async fn get_by_permalink(
-    db: &PgPool,
+    db: PgPool,
     permalink: String,
 ) -> Result<ProfileWithStats, ProfileServiceError> {
     let mut tx = db.begin().await?;

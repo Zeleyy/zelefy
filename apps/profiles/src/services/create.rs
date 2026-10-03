@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub async fn create(
-    db: &PgPool,
+    db: PgPool,
     user_id: Uuid,
     params: CreateProfileDto,
 ) -> Result<ProfileWithStats, ProfileServiceError> {

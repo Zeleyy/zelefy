@@ -3,6 +3,7 @@ use axum::{
     extract::DefaultBodyLimit,
     routing::{get, patch, post},
 };
+use zelefy_backend::img::{MAX_UPLOAD_AVATAR_SIZE, MAX_UPLOAD_BANNER_SIZE};
 use zelefy_common::paths;
 
 use crate::AppState;
@@ -10,8 +11,6 @@ use crate::AppState;
 pub mod profiles;
 
 pub fn routes() -> Router<AppState> {
-    const MAX_UPLOAD_SIZE: usize = 12 * 1024 * 1024;
-
     Router::new()
         .route(
             paths::v1::profiles::PROFILE_BY_PERMALINK,
@@ -23,10 +22,10 @@ pub fn routes() -> Router<AppState> {
         )
         .route(
             paths::v1::profiles::PROFILE_AVATAR,
-            patch(profiles::update_avatar).layer(DefaultBodyLimit::max(MAX_UPLOAD_SIZE)),
+            patch(profiles::update_avatar).layer(DefaultBodyLimit::max(MAX_UPLOAD_AVATAR_SIZE)),
         )
         .route(
             paths::v1::profiles::PROFILE_BANNER,
-            patch(profiles::update_banner).layer(DefaultBodyLimit::max(MAX_UPLOAD_SIZE)),
+            patch(profiles::update_banner).layer(DefaultBodyLimit::max(MAX_UPLOAD_BANNER_SIZE)),
         )
 }

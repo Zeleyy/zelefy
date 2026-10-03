@@ -3,6 +3,7 @@ use axum::{
     extract::DefaultBodyLimit,
     routing::{get, patch, post},
 };
+use zelefy_backend::img::{MAX_UPLOAD_AUDIO_SIZE, MAX_UPLOAD_COVER_SIZE};
 use zelefy_common::paths;
 
 use crate::AppState;
@@ -10,9 +11,6 @@ use crate::AppState;
 pub mod tracks;
 
 pub fn routes() -> Router<AppState> {
-    const MAX_UPLOAD_SIZE: usize = 12 * 1024 * 1024;
-    const MAX_UPLOAD_AUDIO_SIZE: usize = 102 * 1024 * 1024;
-
     Router::new()
         .route(
             paths::v1::tracks::TRACK_BY_PERMALINK,
@@ -21,10 +19,10 @@ pub fn routes() -> Router<AppState> {
         .route(paths::v1::tracks::TRACK_BY_ID, patch(tracks::update))
         .route(
             paths::v1::tracks::TRACK_UPLOAD_AUDIO,
-            post(tracks::upload_audio).layer(DefaultBodyLimit::max(MAX_UPLOAD_SIZE)),
+            post(tracks::upload_audio).layer(DefaultBodyLimit::max(MAX_UPLOAD_AUDIO_SIZE)),
         )
         .route(
             paths::v1::tracks::TRACK_COVER,
-            patch(tracks::update_cover).layer(DefaultBodyLimit::max(MAX_UPLOAD_AUDIO_SIZE)),
+            patch(tracks::update_cover).layer(DefaultBodyLimit::max(MAX_UPLOAD_COVER_SIZE)),
         )
 }

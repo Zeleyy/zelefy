@@ -2,7 +2,10 @@ use aws_sdk_s3::Client;
 use axum::body::Bytes;
 use sqlx::PgPool;
 use uuid::Uuid;
-use zelefy_backend::s3::{build_key, delete_object, extract_key_from_url, upload_object};
+use zelefy_backend::{
+    img::{ALLOWED_IMAGE_TYPES, convert_to_webp},
+    s3::{build_key, delete_object, extract_key_from_url, upload_object},
+};
 
 use crate::{
     config::Config,
@@ -17,9 +20,13 @@ pub async fn update_cover(
     config: Config,
     user_id: Uuid,
     track_id: Uuid,
-    cover_file: Bytes,
+    cover: Bytes,
     content_type: String,
 ) -> Result<TrackWithStats, TrackServiceError> {
+    if !ALLOWED_IMAGE_TYPES.contains(&content_type.as_str()) {
+        return Err(TrackServiceError::UnsupportedImageFormat);
+    }
+
     let bucket_name = &config.s3_bucket;
 
     let current_track = tracks::get_by_id(&db, track_id)
@@ -35,19 +42,22 @@ pub async fn update_cover(
         .as_deref()
         .and_then(|url| extract_key_from_url("covers", url));
 
-    let file_ext = match content_type.as_str() {
-        "image/jpeg" => "jpg",
-        "image/webp" => "webp",
-        _ => "png",
-    };
+    let new_key = build_key("covers", track_id, "webp");
 
-    let new_key = build_key("covers", track_id, file_ext);
-
-    // TODO: Добавить конвертацию изображения в безопасный формат
-
-    upload_object(&s3_client, bucket_name, &new_key, cover_file, &content_type)
+    let webp_bytes = tokio::task::spawn_blocking(move || convert_to_webp(&cover, 1500, 1500))
         .await
-        .map_err(TrackServiceError::S3UploadError)?;
+        .map_err(|e| TrackServiceError::ImageProcessingFailed(e.to_string()))?
+        .map_err(|_| TrackServiceError::UnsupportedImageFormat)?;
+
+    upload_object(
+        &s3_client,
+        bucket_name,
+        &new_key,
+        Bytes::from(webp_bytes),
+        "image/webp",
+    )
+    .await
+    .map_err(TrackServiceError::S3UploadError)?;
 
     let new_cover_url = format!("{}/{}", config.s3_public_url.trim_end_matches('/'), new_key);
 

@@ -11,5 +11,8 @@ pub mod s3;
 #[cfg(feature = "cache")]
 pub mod cache;
 
+#[cfg(feature = "img")]
+pub mod img;
+
 pub use headers::*;
 pub use models::*;

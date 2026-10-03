@@ -19,13 +19,16 @@ tracing-subscriber = { workspace = true }
 tower-http = { workspace = true }
 tokio = { workspace = true }
 
-thiserror = {workspace = true }
+thiserror = { workspace = true }
 
 sqlx = { workspace = true, optional = true }
 redis = { workspace = true, optional = true }
 aws-sdk-s3 = { workspace = true, optional = true }
+image = { version = "0.25.10", optional = true }
+webp-rust = { version = "0.3.2", optional = true }
 
 [features]
 db = ["dep:sqlx"]
 cache = ["dep:redis"]
 s3 = ["dep:aws-sdk-s3"]
+img = ["dep:image", "dep:webp-rust"]

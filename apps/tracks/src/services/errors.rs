@@ -10,6 +10,10 @@ pub enum TrackServiceError {
     #[api_error(status = 400, code = "UNSUPPORTED_AUDIO_FORMAT")]
     UnsupportedAudioFormat,
 
+    #[error("Unsupported image format")]
+    #[api_error(status = 400, code = "UNSUPPORTED_IMAGE_FORMAT")]
+    UnsupportedImageFormat,
+
     #[error("You don't have permission")]
     #[api_error(status = 403, code = "FORBIDDEN")]
     Forbidden,
@@ -25,6 +29,10 @@ pub enum TrackServiceError {
     #[error("Track processing failed")]
     #[api_error(status = 409, code = "TRACK_PROCESSING_FAILED")]
     TrackProcessingFailed,
+
+    #[error("Image processing failed: {0}")]
+    #[api_error(status = 500, code = "IMAGE_PROCESSING_FAILED")]
+    ImageProcessingFailed(String),
 
     #[error("Database error: {0}")]
     #[api_error(status = 500, code = "INTERNAL_ERROR")]
