@@ -53,6 +53,7 @@ pub async fn get_by_permalink(
     ),
     responses(
         (status = 202, description = "Трек создан, обработка запущена", body = TrackWithStats),
+        (status = 400, description = "Не поддерживаемый аудио формат", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Track"
@@ -92,6 +93,8 @@ pub async fn upload_audio(
     ),
     responses(
         (status = 200, description = "Обложка трека обновлена", body = TrackWithStats),
+        (status = 403, description = "Не достаточно привилегий", body = ErrorResponse),
+        (status = 404, description = "Трек не найден", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Track"
@@ -126,6 +129,10 @@ pub async fn update_cover(
     ),
     responses(
         (status = 200, description = "Данные трека обновлены", body = TrackWithStats),
+        (status = 400, description = "Пустое обновление", body = ErrorResponse),
+        (status = 403, description = "Не достаточно привилегий", body = ErrorResponse),
+        (status = 404, description = "Трек не найден", body = ErrorResponse),
+        (status = 409, description = "Обработка трека завершилась неудачей", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Track"
@@ -137,5 +144,6 @@ pub async fn update(
     Json(payload): Json<UpdateTrackRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     let track = services::update(state.db, user.user_id, track_id, payload).await?;
+
     Ok(Json(track))
 }
