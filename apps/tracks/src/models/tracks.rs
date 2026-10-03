@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use utoipa::ToSchema;
 use uuid::Uuid;
-use zelefy_common::TrackStatus;
+use zelefy_common::{TrackStatus, models::double_option};
 
 use crate::models::track_stats::TrackStats;
 
@@ -39,7 +39,7 @@ pub struct NewTrack {
 
 #[derive(Debug, Default)]
 pub struct UpdateTrack {
-    pub title: Option<Option<String>>,
+    pub title: Option<String>,
     pub permalink: Option<String>,
 
     pub audio_url: Option<Option<String>>,
@@ -150,11 +150,20 @@ impl From<Track> for TrackWithStats {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct UpdateTrackRequest {
-    pub title: Option<Option<String>>,
+    pub title: Option<String>,
     pub permalink: Option<String>,
+
+    #[serde(default, with = "double_option")]
     pub genre: Option<Option<String>>,
+
+    #[serde(default, with = "double_option")]
     pub description: Option<Option<String>>,
+
+    #[serde(default, with = "double_option")]
     pub bpm: Option<Option<i32>>,
+
+    #[serde(default, with = "double_option")]
     pub key_signature: Option<Option<String>>,
+
     pub is_private: Option<bool>,
 }

@@ -63,6 +63,10 @@ where
     let mut query_builder = QueryBuilder::new("UPDATE tracks SET ");
     let mut sep = query_builder.separated(", ");
 
+    if let Some(title) = update.title {
+        sep.push("title = ").push_bind_unseparated(title);
+    }
+
     if let Some(permalink) = update.permalink {
         sep.push("permalink = ").push_bind_unseparated(permalink);
     }
@@ -75,7 +79,6 @@ where
         sep.push("status = ").push_bind_unseparated(status);
     }
 
-    push_opt_nullable(&mut sep, "title", update.title);
     push_opt_nullable(&mut sep, "audio_url", update.audio_url);
     push_opt_nullable(&mut sep, "cover_url", update.cover_url);
     push_opt_nullable(&mut sep, "waveform_url", update.waveform_url);
