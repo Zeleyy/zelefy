@@ -1,7 +1,7 @@
 use axum::{
     Router,
     extract::DefaultBodyLimit,
-    routing::{patch, post},
+    routing::{get, patch, post},
 };
 use zelefy_common::paths;
 
@@ -14,6 +14,10 @@ pub fn routes() -> Router<AppState> {
     const MAX_UPLOAD_AUDIO_SIZE: usize = 102 * 1024 * 1024;
 
     Router::new()
+        .route(
+            paths::v1::tracks::TRACK_BY_PERMALINK,
+            get(tracks::get_by_permalink),
+        )
         .route(paths::v1::tracks::TRACK_BY_ID, patch(tracks::update))
         .route(
             paths::v1::tracks::TRACK_UPLOAD_AUDIO,

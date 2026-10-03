@@ -21,6 +21,29 @@ use crate::{
 };
 
 #[utoipa::path(
+    get,
+    path = paths::v1::tracks::TRACK_BY_PERMALINK_FULL,
+    params(
+        ("permalink" = String, Path, description = "Track permalink")
+    ),
+    responses(
+        (status = 200, description = "Трек успешно получен", body = TrackWithStats),
+        (status = 404, description = "Трек не найден", body = ErrorResponse),
+        (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
+    ),
+    security(),
+    tag = "Public"
+)]
+pub async fn get_by_permalink(
+    State(state): State<AppState>,
+    Path(permalink): Path<String>,
+) -> Result<impl IntoResponse, ApiError> {
+    let response = services::get_by_permalink(state.db, permalink).await?;
+
+    Ok(Json(response))
+}
+
+#[utoipa::path(
     post,
     path = paths::v1::tracks::TRACK_UPLOAD_AUDIO_FULL,
     request_body(

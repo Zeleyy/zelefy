@@ -9,6 +9,7 @@ use super::v1::tracks;
         tracks::update,
         tracks::upload_audio,
         tracks::update_cover,
+        tracks::get_by_permalink,
     ),
     security(
         ("X-User-Id" = []),
