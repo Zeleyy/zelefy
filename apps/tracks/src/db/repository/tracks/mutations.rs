@@ -75,6 +75,7 @@ where
         sep.push("status = ").push_bind_unseparated(status);
     }
 
+    push_opt_nullable(&mut sep, "title", update.title);
     push_opt_nullable(&mut sep, "audio_url", update.audio_url);
     push_opt_nullable(&mut sep, "cover_url", update.cover_url);
     push_opt_nullable(&mut sep, "waveform_url", update.waveform_url);
