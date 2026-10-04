@@ -12,13 +12,13 @@ export const MainLayout = () => {
             <div className={styles.body}>
                 <Sidebar />
 
-                <div className={styles.contentWrapper}>
-                    <main className={styles.main}>
+                <main className={styles.main}>
+                    <div className={styles.scrollContent}>
                         <Outlet />
-                    </main>
+                    </div>
 
                     <PlayerBar />
-                </div>
+                </main>
             </div>
         </>
     );

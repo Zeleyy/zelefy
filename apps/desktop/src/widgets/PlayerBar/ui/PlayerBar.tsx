@@ -44,6 +44,11 @@ export const PlayerBar = () => {
     const toggleRepeat = usePlayerStore((state) => state.toggleRepeat);
 
     const track = usePlayerStore((state) => state.currentTrack);
+
+    const [lastTrack, setLastTrack] = useState(track);
+    if (track && track !== lastTrack) setLastTrack(track);
+    const displayTrack = track ?? lastTrack;
+
     const currentTime = usePlayerStore((state) => state.currentTime);
     const seek = usePlayerStore((state) => state.seek);
 
@@ -63,137 +68,151 @@ export const PlayerBar = () => {
             className={clsx(styles.wrapper, { [styles["wrapper--show"]]: track })}
             aria-hidden={!track}
         >
-            <div className={styles.container}>
-                <Flex direction="column" gap="md">
-                    <div className={styles.mainControls}>
-                        <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
-                            <Cover
-                                src={track?.coverUrl ?? undefined}
-                                alt={track?.title ?? "No track selected"}
-                                size="sm"
-                            />
-                            <div className={styles.meta}>
-                                <span className={styles.title}>
-                                    {track?.title ?? "No track selected"}
-                                </span>
-                                <span>Artist</span>
+            <div className={styles.clip}>
+                <Flex align="center" justify="center" className={styles.inner}>
+                    <div className={styles.container}>
+                        <Flex direction="column" gap="md">
+                            <div className={styles.mainControls}>
+                                <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
+                                    <Cover
+                                        src={displayTrack?.coverUrl ?? undefined}
+                                        alt={displayTrack?.title ?? "No track selected"}
+                                        size="sm"
+                                    />
+                                    <div className={styles.meta}>
+                                        <span className={styles.title}>
+                                            {displayTrack?.title ?? "No track selected"}
+                                        </span>
+                                        <span>Artist</span>
+                                    </div>
+                                    <Button variant="ghost" radius="full" square>
+                                        <HeartIcon width={16} height={16} />
+                                    </Button>
+                                </Flex>
+
+                                <div className={styles.divider} />
+
+                                <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
+                                    <Button
+                                        variant="ghost"
+                                        radius="full"
+                                        square
+                                        className={styles.optionalControl}
+                                        onClick={toggleShuffle}
+                                        colorScheme={
+                                            isShuffle
+                                                ? {
+                                                      color: "var(--primary)",
+                                                      colorHover: "var(--primary)",
+                                                  }
+                                                : undefined
+                                        }
+                                    >
+                                        <ShuffleIcon width={16} height={16} />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        radius="full"
+                                        square
+                                        onClick={previousTrack}
+                                    >
+                                        <SkipPrevIcon width={20} height={20} />
+                                    </Button>
+
+                                    <Button radius="full" size="large" square onClick={togglePlay}>
+                                        {isPlaying ? (
+                                            <PauseIcon width={20} height={20} />
+                                        ) : (
+                                            <PlayIcon width={20} height={20} />
+                                        )}
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        radius="full"
+                                        square
+                                        onClick={nextTrack}
+                                    >
+                                        <SkipNextIcon width={20} height={20} />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        radius="full"
+                                        square
+                                        className={styles.optionalControl}
+                                        onClick={toggleRepeat}
+                                        colorScheme={
+                                            repeatMode !== "off"
+                                                ? {
+                                                      color: "var(--primary)",
+                                                      colorHover: "var(--primary)",
+                                                  }
+                                                : undefined
+                                        }
+                                    >
+                                        {repeatMode === "track" ? (
+                                            <RepeatOneIcon width={16} height={16} />
+                                        ) : (
+                                            <RepeatIcon width={16} height={16} />
+                                        )}
+                                    </Button>
+                                </Flex>
+
+                                <div className={styles.divider}></div>
+
+                                <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
+                                    <Button
+                                        variant="ghost"
+                                        radius="full"
+                                        square
+                                        className={styles.secondaryControl}
+                                    >
+                                        <AudioSettings width={16} height={16} />
+                                    </Button>
+
+                                    <Button
+                                        variant="ghost"
+                                        radius="full"
+                                        square
+                                        className={styles.tertiaryControl}
+                                    >
+                                        <EqualizerIcon width={16} height={16} />
+                                    </Button>
+
+                                    <Button variant="ghost" radius="full" square>
+                                        <QueueIcon width={16} height={16} />
+                                    </Button>
+
+                                    <VolumeControl
+                                        volume={volume}
+                                        isMuted={isMuted}
+                                        onChange={(newVolume) => {
+                                            setVolume(newVolume);
+                                            if (isMuted && newVolume > 0) {
+                                                setIsMuted(false);
+                                            }
+                                        }}
+                                        onToggleMute={() => setIsMuted(!isMuted)}
+                                    />
+                                </Flex>
                             </div>
-                            <Button variant="ghost" radius="full" square>
-                                <HeartIcon width={16} height={16} />
-                            </Button>
+
+                            <div className={styles.progressSection}>
+                                <Flex justify="space-between">
+                                    <p>{formatTime(displayTime)}</p>
+                                    <span>{formatTime(displayTrack?.durationSeconds ?? 0)}</span>
+                                </Flex>
+
+                                <ProgressBar
+                                    time={displayTime}
+                                    duration={displayTrack?.durationSeconds ?? 0}
+                                    onChange={setDragTime}
+                                    onChangeEnd={handleSeekCommit}
+                                />
+                            </div>
                         </Flex>
-
-                        <div className={styles.divider} />
-
-                        <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
-                            <Button
-                                variant="ghost"
-                                radius="full"
-                                square
-                                className={styles.optionalControl}
-                                onClick={toggleShuffle}
-                                colorScheme={
-                                    isShuffle
-                                        ? {
-                                              color: "var(--primary)",
-                                              colorHover: "var(--primary)",
-                                          }
-                                        : undefined
-                                }
-                            >
-                                <ShuffleIcon width={16} height={16} />
-                            </Button>
-
-                            <Button variant="ghost" radius="full" square onClick={previousTrack}>
-                                <SkipPrevIcon width={20} height={20} />
-                            </Button>
-
-                            <Button radius="full" size="large" square onClick={togglePlay}>
-                                {isPlaying ? (
-                                    <PauseIcon width={20} height={20} />
-                                ) : (
-                                    <PlayIcon width={20} height={20} />
-                                )}
-                            </Button>
-
-                            <Button variant="ghost" radius="full" square onClick={nextTrack}>
-                                <SkipNextIcon width={20} height={20} />
-                            </Button>
-
-                            <Button
-                                variant="ghost"
-                                radius="full"
-                                square
-                                className={styles.optionalControl}
-                                onClick={toggleRepeat}
-                                colorScheme={
-                                    repeatMode !== "off"
-                                        ? {
-                                              color: "var(--primary)",
-                                              colorHover: "var(--primary)",
-                                          }
-                                        : undefined
-                                }
-                            >
-                                {repeatMode === "track" ? (
-                                    <RepeatOneIcon width={16} height={16} />
-                                ) : (
-                                    <RepeatIcon width={16} height={16} />
-                                )}
-                            </Button>
-                        </Flex>
-
-                        <div className={styles.divider}></div>
-
-                        <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
-                            <Button
-                                variant="ghost"
-                                radius="full"
-                                square
-                                className={styles.secondaryControl}
-                            >
-                                <AudioSettings width={16} height={16} />
-                            </Button>
-
-                            <Button
-                                variant="ghost"
-                                radius="full"
-                                square
-                                className={styles.tertiaryControl}
-                            >
-                                <EqualizerIcon width={16} height={16} />
-                            </Button>
-
-                            <Button variant="ghost" radius="full" square>
-                                <QueueIcon width={16} height={16} />
-                            </Button>
-
-                            <VolumeControl
-                                volume={volume}
-                                isMuted={isMuted}
-                                onChange={(newVolume) => {
-                                    setVolume(newVolume);
-                                    if (isMuted && newVolume > 0) {
-                                        setIsMuted(false);
-                                    }
-                                }}
-                                onToggleMute={() => setIsMuted(!isMuted)}
-                            />
-                        </Flex>
-                    </div>
-
-                    <div className={styles.progressSection}>
-                        <Flex justify="space-between">
-                            <p>{formatTime(displayTime)}</p>
-                            <span>{formatTime(track?.durationSeconds ?? 0)}</span>
-                        </Flex>
-
-                        <ProgressBar
-                            time={displayTime}
-                            duration={track?.durationSeconds ?? 0}
-                            onChange={setDragTime}
-                            onChangeEnd={handleSeekCommit}
-                        />
                     </div>
                 </Flex>
             </div>

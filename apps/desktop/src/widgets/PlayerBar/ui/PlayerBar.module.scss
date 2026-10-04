@@ -1,27 +1,37 @@
 @use "@zelefy/ui/styles" as *;
 
+$duration: 0.3s;
+$easing: cubic-bezier(0.16, 1, 0.3, 1);
+
 .wrapper {
     position: sticky;
     bottom: 0;
-    left: 0;
-    right: 0;
+    z-index: 10;
+}
+
+.clip {
+    overflow: hidden;
+
+    interpolate-size: allow-keywords;
+
+    height: 0;
+
+    transition: height $duration $easing;
+
+    .wrapper--show & {
+        height: auto;
+    }
+}
+
+.inner {
     padding: var(--spacing-md) var(--spacing-xs);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     container-type: inline-size;
+    will-change: transform;
 
-    opacity: 0;
-    visibility: hidden;
     transform: translateY(100%);
+    transition: transform $duration $easing;
 
-    transition: all 0.3s;
-
-    &--show {
-        opacity: 1;
-        visibility: visible;
+    .wrapper--show & {
         transform: translateY(0%);
     }
 }
@@ -32,6 +42,7 @@
     padding: var(--spacing-xs) var(--spacing-md);
     width: max-content;
     max-width: 100%;
+    background-color: var(--bg-primary);
 }
 
 .mainControls {
