@@ -1,4 +1,4 @@
-use axum::extract::FromRequestParts;
+use axum::extract::{FromRequestParts, OptionalFromRequestParts};
 use uuid::Uuid;
 
 use crate::{
@@ -52,5 +52,25 @@ where
             role,
             subscription,
         })
+    }
+}
+
+impl<S> OptionalFromRequestParts<S> for TokenData
+where
+    S: Send + Sync,
+{
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        if !parts.headers.contains_key(&X_USER_ID) {
+            return Ok(None);
+        }
+
+        <Self as FromRequestParts<S>>::from_request_parts(parts, state)
+            .await
+            .map(Some)
     }
 }

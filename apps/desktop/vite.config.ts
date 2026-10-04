@@ -12,7 +12,6 @@ export default defineConfig(() => ({
 
     resolve: {
         alias: [
-            { find: "@", replacement: path.resolve(import.meta.dirname, "./src") },
             {
                 find: "@zelefy/ui/styles",
                 replacement: path.resolve(
@@ -24,6 +23,14 @@ export default defineConfig(() => ({
                 find: "@zelefy/ui",
                 replacement: path.resolve(import.meta.dirname, "../../packages/shared-ts/ui/src"),
             },
+            {
+                find: "@zelefy/types",
+                replacement: path.resolve(
+                    import.meta.dirname,
+                    "../../packages/shared-ts/types/src",
+                ),
+            },
+            { find: "@", replacement: path.resolve(import.meta.dirname, "./src") },
         ],
     },
 

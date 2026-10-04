@@ -19,6 +19,7 @@
         "@tauri-apps/plugin-store": "^2.4.5",
         "@tauri-apps/plugin-updater": "^2.12.0",
         "@zelefy/ui": "workspace:*",
+        "@zelefy/types": "workspace:*",
         "clsx": "^2.1.1",
         "i18next": "^26.4.2",
         "i18next-resources-to-backend": "^1.2.3",

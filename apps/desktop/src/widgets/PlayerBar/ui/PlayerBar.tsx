@@ -12,12 +12,14 @@ import {
     ProgressBar,
     QueueIcon,
     RepeatIcon,
+    RepeatOneIcon,
     ShuffleIcon,
     SkipNextIcon,
     SkipPrevIcon,
     VolumeControl,
 } from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
+import clsx from "clsx";
 
 const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -33,9 +35,16 @@ export const PlayerBar = () => {
 
     const isPlaying = usePlayerStore((state) => state.isPlaying);
     const togglePlay = usePlayerStore((state) => state.togglePlay);
+    const nextTrack = usePlayerStore((state) => state.nextTrack);
+    const previousTrack = usePlayerStore((state) => state.previousTrack);
 
+    const isShuffle = usePlayerStore((state) => state.isShuffle);
+    const toggleShuffle = usePlayerStore((state) => state.toggleShuffle);
+    const repeatMode = usePlayerStore((state) => state.repeatMode);
+    const toggleRepeat = usePlayerStore((state) => state.toggleRepeat);
+
+    const track = usePlayerStore((state) => state.currentTrack);
     const currentTime = usePlayerStore((state) => state.currentTime);
-    const duration = usePlayerStore((state) => state.duration);
     const seek = usePlayerStore((state) => state.seek);
 
     const [dragTime, setDragTime] = useState<number | null>(null);
@@ -50,21 +59,24 @@ export const PlayerBar = () => {
     };
 
     return (
-        <div className={styles.wrapper}>
+        <div
+            className={clsx(styles.wrapper, { [styles["wrapper--show"]]: track })}
+            aria-hidden={!track}
+        >
             <div className={styles.container}>
                 <Flex direction="column" gap="md">
                     <div className={styles.mainControls}>
                         <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
                             <Cover
-                                src="https://avatars.githubusercontent.com/u/192537945?s=400&u=193d7630edda49abaa85c6014c8018b0f0963ae7&v=4"
-                                alt="track cover"
+                                src={track?.coverUrl ?? undefined}
+                                alt={track?.title ?? "No track selected"}
                                 size="sm"
                             />
                             <div className={styles.meta}>
                                 <span className={styles.title}>
-                                    A-One - U.N. Owen Was Her? feat. HIKO
+                                    {track?.title ?? "No track selected"}
                                 </span>
-                                <span>A-One</span>
+                                <span>Artist</span>
                             </div>
                             <Button variant="ghost" radius="full" square>
                                 <HeartIcon width={16} height={16} />
@@ -79,11 +91,20 @@ export const PlayerBar = () => {
                                 radius="full"
                                 square
                                 className={styles.optionalControl}
+                                onClick={toggleShuffle}
+                                colorScheme={
+                                    isShuffle
+                                        ? {
+                                              color: "var(--primary)",
+                                              colorHover: "var(--primary)",
+                                          }
+                                        : undefined
+                                }
                             >
                                 <ShuffleIcon width={16} height={16} />
                             </Button>
 
-                            <Button variant="ghost" radius="full" square>
+                            <Button variant="ghost" radius="full" square onClick={previousTrack}>
                                 <SkipPrevIcon width={20} height={20} />
                             </Button>
 
@@ -95,7 +116,7 @@ export const PlayerBar = () => {
                                 )}
                             </Button>
 
-                            <Button variant="ghost" radius="full" square>
+                            <Button variant="ghost" radius="full" square onClick={nextTrack}>
                                 <SkipNextIcon width={20} height={20} />
                             </Button>
 
@@ -104,8 +125,21 @@ export const PlayerBar = () => {
                                 radius="full"
                                 square
                                 className={styles.optionalControl}
+                                onClick={toggleRepeat}
+                                colorScheme={
+                                    repeatMode !== "off"
+                                        ? {
+                                              color: "var(--primary)",
+                                              colorHover: "var(--primary)",
+                                          }
+                                        : undefined
+                                }
                             >
-                                <RepeatIcon width={16} height={16} />
+                                {repeatMode === "track" ? (
+                                    <RepeatOneIcon width={16} height={16} />
+                                ) : (
+                                    <RepeatIcon width={16} height={16} />
+                                )}
                             </Button>
                         </Flex>
 
@@ -151,12 +185,12 @@ export const PlayerBar = () => {
                     <div className={styles.progressSection}>
                         <Flex justify="space-between">
                             <p>{formatTime(displayTime)}</p>
-                            <span>{formatTime(duration)}</span>
+                            <span>{formatTime(track?.durationSeconds ?? 0)}</span>
                         </Flex>
 
                         <ProgressBar
                             time={displayTime}
-                            duration={duration}
+                            duration={track?.durationSeconds ?? 0}
                             onChange={setDragTime}
                             onChangeEnd={handleSeekCommit}
                         />

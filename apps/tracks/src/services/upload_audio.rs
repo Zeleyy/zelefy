@@ -27,9 +27,7 @@ pub async fn upload_audio(
         _ => return Err(TrackServiceError::UnsupportedAudioFormat),
     };
 
-    let create = NewTrack {
-        permalink: format!("draft-{}", Uuid::new_v4().simple()),
-    };
+    let create = NewTrack::new_draft();
     let new_track = tracks::create(&db, user_id, create).await?;
 
     let track_id = new_track.track_id;

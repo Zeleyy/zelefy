@@ -12,6 +12,18 @@
     justify-content: center;
 
     container-type: inline-size;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(100%);
+
+    transition: all 0.3s;
+
+    &--show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0%);
+    }
 }
 
 .container {

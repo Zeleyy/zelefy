@@ -25,6 +25,7 @@ import PlayIcon from "../assets/player/play.svg?react";
 import PauseIcon from "../assets/player/pause.svg?react";
 import SkipNextIcon from "../assets/player/skip-next.svg?react";
 import RepeatIcon from "../assets/player/repeat.svg?react";
+import RepeatOneIcon from "../assets/player/repeat-one.svg?react";
 import AudioSettings from "../assets/player/audio-settings.svg?react";
 import EqualizerIcon from "../assets/player/equalizer.svg?react";
 import QueueIcon from "../assets/player/queue.svg?react";
@@ -57,6 +58,7 @@ export {
     PauseIcon,
     SkipNextIcon,
     RepeatIcon,
+    RepeatOneIcon,
     AudioSettings,
     EqualizerIcon,
     QueueIcon,

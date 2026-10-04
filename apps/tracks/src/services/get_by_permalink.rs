@@ -1,20 +1,33 @@
 use sqlx::PgPool;
+use uuid::Uuid;
+use zelefy_common::TrackStatus;
 
 use crate::{
-    db::repository::tracks, models::tracks::TrackWithStats, services::errors::TrackServiceError,
+    db::repository::tracks, models::tracks::TrackResponse, services::errors::TrackServiceError,
 };
 
 pub async fn get_by_permalink(
     db: PgPool,
     permalink: String,
-) -> Result<TrackWithStats, TrackServiceError> {
-    let mut tx = db.begin().await?;
-
-    let track = tracks::get_by_permalink(&mut *tx, permalink)
+    viewer_id: Option<Uuid>,
+) -> Result<TrackResponse, TrackServiceError> {
+    let track = tracks::get_by_permalink(&db, permalink)
         .await?
         .ok_or(TrackServiceError::TrackNotFound)?;
 
-    tx.commit().await?;
+    let is_owner = viewer_id == Some(track.user_id);
 
-    Ok(track)
+    if track.is_private && !is_owner {
+        return Err(TrackServiceError::TrackNotFound);
+    }
+
+    if !is_owner && !matches!(track.status, TrackStatus::Ready | TrackStatus::Published) {
+        return Err(TrackServiceError::TrackNotFound);
+    }
+
+    if is_owner {
+        Ok(TrackResponse::Full(track.into()))
+    } else {
+        Ok(TrackResponse::Public(track.into()))
+    }
 }

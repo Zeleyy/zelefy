@@ -16,7 +16,7 @@ use zelefy_common::paths;
 
 use crate::{
     AppState,
-    models::tracks::{TrackWithStats, UpdateTrackRequest},
+    models::tracks::{TrackResponse, TrackWithStats, UpdateTrackRequest},
     services,
 };
 
@@ -27,20 +27,24 @@ use crate::{
         ("permalink" = String, Path, description = "Track permalink")
     ),
     responses(
-        (status = 200, description = "Трек успешно получен", body = TrackWithStats),
+        (status = 200, description = "Трек успешно получен", body = TrackResponse),
         (status = 404, description = "Трек не найден", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
-    security(),
+    security(
+        (),
+        ("X-User-Id" = [], "X-User-Role" = [], "X-User-Subscription" = []),
+    ),
     tag = "Public"
 )]
 pub async fn get_by_permalink(
     State(state): State<AppState>,
+    user: Option<TokenData>,
     Path(permalink): Path<String>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let response = services::get_by_permalink(state.db, permalink).await?;
-
-    Ok(Json(response))
+    let viewer_id = user.map(|u| u.user_id);
+    let track = services::get_by_permalink(state.db, permalink, viewer_id).await?;
+    Ok(track)
 }
 
 #[utoipa::path(

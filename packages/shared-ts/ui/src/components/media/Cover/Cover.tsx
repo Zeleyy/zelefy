@@ -2,6 +2,7 @@ import styles from "./Cover.module.scss";
 import clsx from "clsx";
 import { Button, Image } from "../../primitives";
 import { PauseIcon, PlayIcon } from "../../../icons";
+import { getGradientByString } from "../../../utils";
 
 export type CoverSize = "sm" | "md" | "lg" | "xl";
 
@@ -22,12 +23,20 @@ export const Cover = ({
     isPlaying = false,
     onPlayClick,
 }: CoverProps) => {
+    const backgroundGradient = getGradientByString(alt);
+
     return (
         <Image
             className={clsx(styles.cover, styles[`cover--${size}`])}
             src={src}
             aspectRatio="1/1"
             alt={alt}
+            fallbackNode={
+                <div
+                    className={styles.gradientFallback}
+                    style={{ background: backgroundGradient }}
+                />
+            }
         >
             {isPlaying || showPlayOverlay ? (
                 <div

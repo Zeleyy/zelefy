@@ -1,3 +1,4 @@
+use axum::{Json, response::IntoResponse};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
@@ -34,7 +35,20 @@ pub struct Track {
 
 #[derive(Debug)]
 pub struct NewTrack {
+    pub title: Option<String>,
     pub permalink: String,
+}
+
+impl NewTrack {
+    pub fn new_draft() -> Self {
+        let id = Uuid::new_v4();
+        let short_id = &id.simple().to_string();
+
+        Self {
+            title: Some(format!("Untitled Track #{short_id}")),
+            permalink: format!("draft-{id}"),
+        }
+    }
 }
 
 #[derive(Debug, Default)]
@@ -148,6 +162,55 @@ impl From<Track> for TrackWithStats {
     }
 }
 
+#[derive(Debug, Clone, Serialize, ToSchema)]
+pub struct PublicTrack {
+    pub track_id: Uuid,
+    pub user_id: Uuid,
+
+    pub title: String,
+    pub permalink: String,
+    pub audio_url: String,
+    pub cover_url: Option<String>,
+    pub waveform_url: Option<String>,
+    pub duration_seconds: i32,
+
+    pub genre: Option<String>,
+    pub description: Option<String>,
+    pub bpm: Option<i32>,
+    pub key_signature: Option<String>,
+
+    pub created_at: DateTime<Utc>,
+
+    pub plays_count: i64,
+    pub likes_count: i32,
+    pub reposts_count: i32,
+    pub comments_count: i32,
+}
+
+impl From<TrackWithStats> for PublicTrack {
+    fn from(t: TrackWithStats) -> Self {
+        Self {
+            track_id: t.track_id,
+            user_id: t.user_id,
+            title: t.title.unwrap_or_default(),
+            permalink: t.permalink,
+            audio_url: t.audio_url.unwrap_or_default(),
+            cover_url: t.cover_url,
+            waveform_url: t.waveform_url,
+            duration_seconds: t.duration_seconds.unwrap_or_default(),
+            genre: t.genre,
+            description: t.description,
+            bpm: t.bpm,
+            key_signature: t.key_signature,
+            created_at: t.created_at,
+            plays_count: t.plays_count,
+            likes_count: t.likes_count,
+            reposts_count: t.reposts_count,
+            comments_count: t.comments_count,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct UpdateTrackRequest {
     pub title: Option<String>,
@@ -166,4 +229,20 @@ pub struct UpdateTrackRequest {
     pub key_signature: Option<Option<String>>,
 
     pub is_private: Option<bool>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+#[serde(untagged)]
+pub enum TrackResponse {
+    Full(TrackWithStats),
+    Public(PublicTrack),
+}
+
+impl IntoResponse for TrackResponse {
+    fn into_response(self) -> axum::response::Response {
+        match self {
+            TrackResponse::Full(t) => Json(t).into_response(),
+            TrackResponse::Public(t) => Json(t).into_response(),
+        }
+    }
 }
