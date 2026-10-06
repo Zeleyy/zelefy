@@ -6,6 +6,7 @@ import {
     Cover,
     EqualizerIcon,
     Flex,
+    formatTime,
     HeartIcon,
     PauseIcon,
     PlayIcon,
@@ -20,12 +21,6 @@ import {
 } from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
 import clsx from "clsx";
-
-const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-};
 
 export const PlayerBar = () => {
     const isMuted = useSettingsStore((state) => state.isMuted);

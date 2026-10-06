@@ -4,7 +4,7 @@ import { Button, Image } from "../../primitives";
 import { PauseIcon, PlayIcon } from "../../../icons";
 import { getGradientByString } from "../../../utils";
 
-export type CoverSize = "sm" | "md" | "lg" | "xl";
+export type CoverSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 interface CoverProps {
     src?: string;

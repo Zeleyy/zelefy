@@ -1,0 +1,272 @@
+.storageDashboard {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+
+    .dashboardHeader {
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: var(--spacing-xs);
+
+        .storageTitle {
+            font-size: var(--font-size-sm);
+            text-transform: uppercase;
+            letter-spacing: var(--letter-spacing-wide);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .totalInfo {
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+
+            strong {
+                color: var(--text-primary);
+            }
+
+            .freeDisk {
+                color: var(--text-muted);
+                font-size: var(--font-size-xs);
+            }
+        }
+    }
+
+    .storageGrid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .storageCard {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-md);
+
+        .cardHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .cardTitle {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-2xs);
+                font-size: var(--font-size-sm);
+                font-weight: var(--font-weight-semibold);
+
+                .dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: var(--radius-full);
+
+                    &Cache {
+                        background-color: var(--primary);
+                    }
+
+                    &Imported {
+                        background-color: var(--accent);
+                    }
+                }
+            }
+
+            .cardMetrics {
+                font-size: var(--font-size-sm);
+                font-weight: var(--font-weight-bold);
+
+                .limitText {
+                    font-size: var(--font-size-xs);
+                    font-weight: var(--font-weight-regular);
+                    color: var(--text-secondary);
+                }
+            }
+        }
+
+        .progressBarTrack {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-surface-hover);
+            border-radius: 3px;
+            overflow: hidden;
+
+            .progressSegmentCache {
+                height: 100%;
+                background-color: var(--primary);
+                border-radius: 3px;
+            }
+        }
+
+        .cardFooter {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .localStats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+
+            .statItem {
+                display: flex;
+                gap: var(--spacing-2xs);
+
+                strong {
+                    color: var(--text-primary);
+                }
+            }
+        }
+    }
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    .tabs {
+        display: flex;
+        background-color: var(--bg-secondary);
+        padding: var(--spacing-2xs);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-subtle);
+
+        .tab {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &Active {
+                background-color: var(--bg-surface);
+                color: var(--text-primary);
+            }
+        }
+    }
+
+    .search {
+        flex: 1;
+        max-width: 320px;
+    }
+}
+
+.trackList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+
+    .listHeader {
+        display: grid;
+        grid-template-columns: 40px 2fr 1.5fr 110px 100px 80px 40px;
+        padding: var(--spacing-xs) var(--spacing-md);
+        color: var(--text-muted);
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        letter-spacing: var(--letter-spacing-wide);
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .trackRow {
+        display: grid;
+        grid-template-columns: 40px 2fr 1.5fr 110px 100px 80px 40px;
+        align-items: center;
+        padding: var(--spacing-xs) var(--spacing-md);
+        background-color: transparent;
+        border-radius: var(--radius-sm);
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: var(--bg-surface);
+
+            .actionsCell .iconBtn {
+                opacity: 1;
+            }
+        }
+
+        .index {
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+        }
+
+        .mainInfo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+
+            .meta {
+                display: flex;
+                flex-direction: column;
+
+                .title {
+                    font-size: var(--font-size-sm);
+                    color: var(--text-primary);
+                }
+
+                .artist {
+                    font-size: var(--font-size-xs);
+                    color: var(--text-secondary);
+                }
+            }
+        }
+
+        .album,
+        .size,
+        .duration {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .badgeCell {
+            display: flex;
+            align-items: center;
+
+            .badge {
+                padding: 2px 8px;
+                border-radius: var(--radius-sm);
+                font-size: var(--font-size-xs);
+                font-weight: var(--font-weight-semibold);
+                text-transform: uppercase;
+
+                &Cache {
+                    background-color: var(--primary-subtle-bg);
+                    color: var(--primary);
+                    border: 1px solid var(--primary-subtle-border);
+                }
+
+                &Copied {
+                    background-color: var(--accent-subtle-bg);
+                    color: var(--accent);
+                    border: 1px solid var(--accent-subtle-border);
+                }
+
+                &Linked {
+                    background-color: var(--success-subtle-bg);
+                    color: var(--success);
+                    border: 1px solid var(--success-subtle-border);
+                }
+            }
+        }
+
+        .actionsCell {
+            display: flex;
+            justify-content: flex-end;
+
+            .iconBtn {
+                opacity: 0;
+                transition: opacity 0.15s ease;
+
+                &:hover {
+                    color: var(--danger);
+                    background-color: transparent;
+                }
+            }
+        }
+    }
+}

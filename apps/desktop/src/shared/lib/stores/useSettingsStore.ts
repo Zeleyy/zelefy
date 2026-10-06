@@ -13,6 +13,7 @@ interface SettingsState {
     isSidebarMinified: boolean;
     isMuted: boolean;
     volume: number;
+    cacheLimitMb: number;
 
     _hasHydrated: boolean;
 
@@ -23,6 +24,7 @@ interface SettingsState {
     toggleSidebar: () => void;
     setIsMuted: (isMuted: boolean) => void;
     setVolume: (volume: number) => void;
+    setCacheLimitMb: (cacheLimitMb: number) => void;
 
     setHasHydrated: (state: boolean) => void;
 }
@@ -41,6 +43,7 @@ export const useSettingsStore = create<SettingsState>()(
             isSidebarMinified: false,
             isMuted: false,
             volume: 50,
+            cacheLimitMb: 1024,
 
             _hasHydrated: false,
 
@@ -62,8 +65,10 @@ export const useSettingsStore = create<SettingsState>()(
             },
             toggleSidebar: () => set((state) => ({ isSidebarMinified: !state.isSidebarMinified })),
 
-            setIsMuted: (state) => set({ isMuted: state }),
-            setVolume: (state) => set({ volume: state }),
+            setIsMuted: (isMuted) => set({ isMuted: isMuted }),
+            setVolume: (volume) => set({ volume: volume }),
+
+            setCacheLimitMb: (cacheLimitMb) => set({ cacheLimitMb: cacheLimitMb }),
 
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
@@ -76,6 +81,7 @@ export const useSettingsStore = create<SettingsState>()(
                 isSidebarMinified: state.isSidebarMinified,
                 isMuted: state.isMuted,
                 volume: state.volume,
+                cacheLimitMb: state.cacheLimitMb,
             }),
             storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {

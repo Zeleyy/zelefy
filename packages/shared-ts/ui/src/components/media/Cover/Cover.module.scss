@@ -1,7 +1,7 @@
 .cover {
     position: relative;
     overflow: hidden;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
 
     &:hover {
         .overlay {
@@ -9,6 +9,10 @@
         }
     }
 
+    &--xs {
+        width: 36px;
+        height: 36px;
+    }
     &--sm {
         width: 48px;
         height: 48px;
