@@ -1,0 +1,183 @@
+.storageDashboard {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+
+    .dashboardHeader {
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: var(--spacing-xs);
+
+        .storageTitle {
+            font-size: var(--font-size-sm);
+            text-transform: uppercase;
+            letter-spacing: var(--letter-spacing-wide);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .totalInfo {
+            font-size: var(--font-size-sm);
+        }
+    }
+
+    .storageGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        gap: var(--spacing-md);
+
+        overflow-x: auto;
+        padding-bottom: var(--spacing-2xs);
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: var(--radius-full);
+        }
+    }
+
+    .storageCard {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-md);
+        min-width: 330px;
+        min-height: 100px;
+
+        .cardHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-xs);
+
+            .cardTitle {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-2xs);
+                font-size: var(--font-size-sm);
+                font-weight: var(--font-weight-semibold);
+                min-width: 0;
+
+                .dot {
+                    width: 8px;
+                    height: 8px;
+                    flex-shrink: 0;
+                    border-radius: var(--radius-full);
+
+                    &Cache {
+                        background-color: var(--primary);
+                    }
+                    &Imported {
+                        background-color: var(--accent);
+                    }
+                    &External {
+                        background-color: var(--success);
+                    }
+                }
+
+                .titleText {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            .cardMetrics {
+                font-size: var(--font-size-sm);
+                font-weight: var(--font-weight-bold);
+                flex-shrink: 0;
+
+                .subText {
+                    font-size: var(--font-size-xs);
+                    font-weight: var(--font-weight-regular);
+                    color: var(--text-muted);
+                }
+            }
+        }
+
+        .progressBarTrack {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-surface-hover);
+            border-radius: 3px;
+            overflow: hidden;
+
+            .progressSegmentCache {
+                height: 100%;
+                background-color: var(--primary);
+            }
+
+            .progressSegmentImported {
+                height: 100%;
+                background-color: var(--accent);
+            }
+
+            .progressSegmentExternal {
+                height: 100%;
+                background-color: var(--success);
+            }
+        }
+
+        .cardFooter {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+
+            .pathText {
+                color: var(--text-muted);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 170px;
+            }
+
+            .badgePrimary {
+                font-size: 10px;
+                padding: 1px 6px;
+                border-radius: var(--radius-sm);
+                background-color: var(--accent-subtle-bg);
+                color: var(--accent);
+                border: 1px solid var(--accent-subtle-border);
+                text-transform: uppercase;
+                font-weight: var(--font-weight-semibold);
+            }
+
+            .actionBtn {
+                color: var(--primary);
+                &:hover {
+                    color: var(--primary-hover);
+                    background: transparent;
+                }
+            }
+        }
+
+        &.moreCard {
+            border: 1px dashed var(--border-strong);
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:hover {
+                background-color: var(--bg-surface-hover);
+                border-color: var(--accent);
+
+                .moreCount,
+                .moreText {
+                    color: var(--accent);
+                }
+            }
+
+            .moreCount {
+                font-size: var(--font-size-md);
+                font-weight: var(--font-weight-bold);
+                color: var(--text-secondary);
+            }
+
+            .moreText {
+                font-size: var(--font-size-xs);
+                color: var(--text-muted);
+            }
+        }
+    }
+}

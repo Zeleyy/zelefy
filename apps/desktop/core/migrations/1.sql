@@ -1,10 +1,3 @@
-CREATE TABLE storages (
-    storage_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    path TEXT NOT NULL UNIQUE,
-    is_primary BOOLEAN NOT NULL DEFAULT 0,
-    created_at INTEGER NOT NULL
-);
-
 CREATE TABLE storage_types (
     storage_type_id INTEGER PRIMARY KEY,
     storage_type TEXT NOT NULL UNIQUE
@@ -13,26 +6,34 @@ CREATE TABLE storage_types (
 INSERT INTO
     storage_types (storage_type_id, storage_type)
 VALUES
-    (1, 'cache'),
-    (2, 'imported_copy'),
-    (3, 'imported_link');
+    (0, 'cache'),
+    (1, 'library');
+
+CREATE TABLE storages (
+    storage_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT NOT NULL UNIQUE,
+    storage_type_id INTEGER NOT NULL,
+    is_primary BOOLEAN NOT NULL DEFAULT 0,
+    max_size_bytes INTEGER,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (storage_type_id) REFERENCES storage_types (storage_type_id) ON DELETE RESTRICT
+);
 
 CREATE TABLE local_files (
     file_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    file_path TEXT NOT NULL,
     storage_id INTEGER,
-    storage_type_id INTEGER NOT NULL,
+    file_path TEXT NOT NULL UNIQUE,
+    is_link BOOLEAN NOT NULL DEFAULT 0,
     file_hash TEXT,
     file_size_bytes INTEGER NOT NULL,
     last_accessed_at INTEGER NOT NULL,
     created_at INTEGER NOT NULL,
-    FOREIGN KEY (storage_type_id) REFERENCES storage_types (storage_type_id) ON DELETE RESTRICT,
-    FOREIGN KEY (storage_id) REFERENCES storages (storage_id) ON DELETE SET NULL
+    FOREIGN KEY (storage_id) REFERENCES storages (storage_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_local_files_hash ON local_files (file_hash);
 
-CREATE INDEX idx_local_files_type ON local_files (storage_type_id);
+CREATE INDEX idx_local_files_storage ON local_files (storage_id);
 
 CREATE TABLE local_tracks (
     track_id INTEGER PRIMARY KEY AUTOINCREMENT,

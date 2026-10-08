@@ -1,104 +1,22 @@
 import styles from "./OfflinePage.module.scss";
 import { useState } from "react";
 import { Button, Cover, Flex, formatBytes, formatTime, Input } from "@zelefy/ui";
+import { StorageDashboard } from "./StorageDashboard";
 
 export const OfflinePage = () => {
     const [activeTab, setActiveTab] = useState<"all" | "imported" | "cache">("all");
 
     return (
         <Flex direction="column" gap="lg">
-            <Flex as="header" justify="space-between" align="flex-end">
+            <Flex as="header" justify="space-between" align="flex-end" wrap="wrap" gap="md">
                 <h1>Офлайн библиотека</h1>
                 <Flex gap="md">
-                    <Button variant="secondary">Настройки лимита</Button>
+                    <Button variant="secondary">Настройки хранилища</Button>
                     <Button variant="primary">+ Импортировать треки</Button>
                 </Flex>
             </Flex>
 
-            <Flex as={"section"} direction="column" gap="md" className={styles.storageDashboard}>
-                <Flex justify="space-between" align="center" className={styles.dashboardHeader}>
-                    <span className={styles.storageTitle}>Хранилище приложения</span>
-                    <div className={styles.totalInfo}>
-                        Всего занято: <strong>{formatBytes(1_059_061.76, 2)} GB</strong>
-                        <span className={styles.freeDisk}>
-                            {" "}
-                            (Доступно на диске: {formatBytes(153_008_209_920)})
-                        </span>
-                    </div>
-                </Flex>
-
-                <div className={styles.storageGrid}>
-                    <Flex
-                        direction="column"
-                        justify="space-between"
-                        gap="xs"
-                        className={styles.storageCard}
-                    >
-                        <div className={styles.cardHeader}>
-                            <span className={styles.cardTitle}>
-                                <span className={`${styles.dot} ${styles.dotCache}`} />
-                                Кэш стриминга
-                            </span>
-                            <span className={styles.cardMetrics}>
-                                {formatBytes(734_003_200)}{" "}
-                                <span className={styles.limitText}>
-                                    из {formatBytes(2_147_483_648)} лимита
-                                </span>
-                            </span>
-                        </div>
-
-                        <div className={styles.progressBarTrack}>
-                            <div
-                                className={styles.progressSegmentCache}
-                                style={{ width: "35%" }}
-                                title="Занято кэшем: 35%"
-                            />
-                        </div>
-
-                        <Flex align="center" justify="space-between" className={styles.cardFooter}>
-                            <span>Свободно в лимите кэша: {formatBytes(1_395_864_371.2)}</span>
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                colorScheme={{
-                                    color: "var(--primary)",
-                                    colorHover: "var(--primary-hover)",
-                                    bgColor: "transparent",
-                                    bgColorHover: "transparent",
-                                }}
-                                noPadding
-                            >
-                                Изменить лимит
-                            </Button>
-                        </Flex>
-                    </Flex>
-
-                    <Flex
-                        direction="column"
-                        justify="space-between"
-                        gap="xs"
-                        className={styles.storageCard}
-                    >
-                        <div className={styles.cardHeader}>
-                            <span className={styles.cardTitle}>
-                                <span className={`${styles.dot} ${styles.dotImported}`} /> Локальные
-                                файлы
-                            </span>
-                            <span className={styles.cardMetrics}>{formatBytes(326_841_139.2)}</span>
-                        </div>
-
-                        <div className={styles.localStats}>
-                            <div className={styles.statItem}>
-                                <span>Файлов в медиатеке:</span>
-                                <strong>15 треков</strong>
-                            </div>
-                            <div className={styles.statItem}>
-                                <span>Без ограничений по лимиту</span>
-                            </div>
-                        </div>
-                    </Flex>
-                </div>
-            </Flex>
+            <StorageDashboard />
 
             <section className={styles.controls}>
                 <div className={styles.tabs}>
