@@ -1,7 +1,6 @@
 import styles from "./Avatar.module.scss";
 import clsx from "clsx";
-import { Image } from "../../primitives";
-import { getGradientByString } from "../../../utils";
+import { GradientImage } from "../../primitives";
 
 export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 
@@ -23,19 +22,15 @@ const getInitials = (name?: string): string => {
 
 export const Avatar = ({ src, name, size = "md", className }: AvatarProps) => {
     const initials = getInitials(name);
-    const backgroundGradient = getGradientByString(name);
 
     return (
-        <Image
+        <GradientImage
             src={src}
+            seed={name}
             alt={name || "User avatar"}
             aspectRatio="1/1"
             className={clsx(styles.avatar, styles[`avatar--${size}`], className)}
-            fallbackNode={
-                <div className={styles.gradientFallback} style={{ background: backgroundGradient }}>
-                    <span className={styles.initials}>{initials}</span>
-                </div>
-            }
+            fallbackContent={<span className={styles.initials}>{initials}</span>}
         />
     );
 };

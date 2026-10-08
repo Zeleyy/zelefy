@@ -1,1 +1,1 @@
-export { VolumeControl } from "./VolumeControl";
+export { VolumeControl, type VolumeControlProps } from "./VolumeControl";

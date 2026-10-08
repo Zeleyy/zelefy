@@ -1,12 +1,11 @@
 import styles from "./Cover.module.scss";
 import clsx from "clsx";
-import { Button, Image } from "../../primitives";
+import { Button, GradientImage } from "../../primitives";
 import { PauseIcon, PlayIcon } from "../../../icons";
-import { getGradientByString } from "../../../utils";
 
 export type CoverSize = "xs" | "sm" | "md" | "lg" | "xl";
 
-interface CoverProps {
+export interface CoverProps {
     src?: string;
     size?: CoverSize;
     alt?: string;
@@ -23,27 +22,16 @@ export const Cover = ({
     isPlaying = false,
     onPlayClick,
 }: CoverProps) => {
-    const backgroundGradient = getGradientByString(alt);
-
     return (
-        <Image
+        <GradientImage
             className={clsx(styles.cover, styles[`cover--${size}`])}
             src={src}
+            seed={alt}
             aspectRatio="1/1"
             alt={alt}
-            fallbackNode={
-                <div
-                    className={styles.gradientFallback}
-                    style={{ background: backgroundGradient }}
-                />
-            }
         >
-            {isPlaying || showPlayOverlay ? (
-                <div
-                    className={clsx(styles.overlay, {
-                        [styles["overlay--visible"]]: isPlaying,
-                    })}
-                >
+            {(isPlaying || showPlayOverlay) && (
+                <div className={clsx(styles.overlay, { [styles["overlay--visible"]]: isPlaying })}>
                     <Button
                         variant="primary"
                         radius="full"
@@ -58,7 +46,7 @@ export const Cover = ({
                         )}
                     </Button>
                 </div>
-            ) : null}
-        </Image>
+            )}
+        </GradientImage>
     );
 };

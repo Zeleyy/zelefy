@@ -40,7 +40,7 @@ interface BaseFlexProps {
     children?: ReactNode;
 }
 
-type FlexProps<T extends ElementType> = BaseFlexProps & {
+export type FlexProps<T extends ElementType> = BaseFlexProps & {
     as?: T;
 } & Omit<HTMLAttributes<HTMLElement>, keyof BaseFlexProps | "as">;
 

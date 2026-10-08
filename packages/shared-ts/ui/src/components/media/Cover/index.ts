@@ -1,1 +1,1 @@
-export { Cover } from "./Cover";
+export { Cover, type CoverProps } from "./Cover";

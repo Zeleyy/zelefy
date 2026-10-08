@@ -1,7 +1,7 @@
 import styles from "./ProgressBar.module.scss";
 import * as Slider from "@radix-ui/react-slider";
 
-interface ProgressBarProps {
+export interface ProgressBarProps {
     time?: number;
     duration?: number;
     step?: number;

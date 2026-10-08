@@ -1,1 +1,1 @@
-export { SpinnerLoader } from "./SpinnerLoader";
+export { SpinnerLoader, type SpinnerLoaderProps } from "./SpinnerLoader";
