@@ -1,5 +1,5 @@
 {
-    "plugins": ["prettier-plugin-sql"],
+    "plugins": ["prettier-plugin-sql", "prettier-plugin-toml"],
     "tabWidth": 4,
     "useTabs": false,
     "printWidth": 100,
@@ -14,6 +14,12 @@
             "files": "*.sql",
             "options": {
                 "language": "postgresql"
+            }
+        },
+        {
+            "files": "Cargo.toml",
+            "options": {
+                "parser": "toml"
             }
         }
     ]

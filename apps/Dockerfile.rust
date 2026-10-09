@@ -8,13 +8,11 @@ ARG APP_DIR
 COPY Cargo.toml Cargo.lock ./
 COPY packages/shared-rs/ ./packages/shared-rs/
 
-RUN mkdir -p apps/auth/src apps/gateway/src apps/profiles/src apps/tracks/src apps/desktop/src-tauri/src apps/desktop/core/src && \
+RUN mkdir -p apps/auth/src apps/gateway/src apps/profiles/src apps/tracks/src && \
     printf 'fn main() {}' > apps/auth/src/main.rs && printf '[package]\nname = "zelefy_auth"\nversion = "0.1.0"\n' > apps/auth/Cargo.toml && \
     printf 'fn main() {}' > apps/gateway/src/main.rs && printf '[package]\nname = "zelefy_gateway"\nversion = "0.1.0"\n' > apps/gateway/Cargo.toml && \
     printf 'fn main() {}' > apps/profiles/src/main.rs && printf '[package]\nname = "zelefy_profiles"\nversion = "0.1.0"\n' > apps/profiles/Cargo.toml && \
-    printf 'fn main() {}' > apps/tracks/src/main.rs && printf '[package]\nname = "zelefy_tracks"\nversion = "0.1.0"\n' > apps/tracks/Cargo.toml && \
-    printf 'fn main() {}' > apps/desktop/src-tauri/src/main.rs && printf '[package]\nname = "zelefy_desktop_tauri"\nversion = "0.1.0"\n' > apps/desktop/src-tauri/Cargo.toml && \
-    printf 'fn main() {}' > apps/desktop/core/src/main.rs && printf '[package]\nname = "core"\nversion = "0.1.0"\n' > apps/desktop/core/Cargo.toml
+    printf 'fn main() {}' > apps/tracks/src/main.rs && printf '[package]\nname = "zelefy_tracks"\nversion = "0.1.0"\n' > apps/tracks/Cargo.toml
 
 COPY apps/${APP_DIR}/ ./apps/${APP_DIR}/
 

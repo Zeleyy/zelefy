@@ -8,8 +8,9 @@
         "dev:desktop": "pnpm --filter zelefy_desktop run dev",
         "lint": "pnpm -r run lint"
     },
-    "dependencies": {
+    "devDependencies": {
         "prettier": "^3.9.9",
-        "prettier-plugin-sql": "^0.20.0"
+        "prettier-plugin-sql": "^0.20.0",
+        "prettier-plugin-toml": "^3.0.2"
     }
 }

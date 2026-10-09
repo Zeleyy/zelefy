@@ -7,7 +7,7 @@ edition = "2024"
 zelefy_common = { workspace = true }
 zelefy_backend = { workspace = true, features = ["db", "cache"] }
 
-serde = { workspace = true}
+serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }
 chrono = { workspace = true }
@@ -29,10 +29,10 @@ utoipa-swagger-ui = { workspace = true }
 
 time = "0.3.55"
 
-argon2 = { version = "0.5.3", features = ["std"] }
+argon2 = "0.6.0"
 hex = "0.4.3"
 sha2 = "0.11.0"
-rand = "0.10.2"
+rand = "0.10.3"
 
 ipnetwork = { version = "0.21.1", features = ["serde"] }
 axum-extra = { version = "0.12.6", features = ["cookie", "typed-header"] }
