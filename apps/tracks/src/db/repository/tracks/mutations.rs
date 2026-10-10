@@ -1,9 +1,10 @@
 use sqlx::{PgExecutor, QueryBuilder};
 use uuid::Uuid;
 use zelefy_backend::db::query_builder::push_opt_nullable;
-use zelefy_common::TrackStatus;
-
-use crate::models::tracks::{NewTrack, Track, UpdateTrack};
+use zelefy_common::{
+    TrackStatus,
+    tracks::{NewTrack, Track, UpdateTrack},
+};
 
 pub async fn create<'e, E>(
     executor: E,
@@ -19,8 +20,9 @@ where
             INSERT INTO tracks (
                 user_id
                 , permalink
+                , title
             )
-            VALUES ($1, $2)
+            VALUES ($1, $2, $3)
             RETURNING
                 track_id
                 , user_id
@@ -41,7 +43,8 @@ where
                 , updated_at
         "#,
         user_id,
-        params.permalink
+        params.permalink,
+        params.title
     )
     .fetch_one(executor)
     .await

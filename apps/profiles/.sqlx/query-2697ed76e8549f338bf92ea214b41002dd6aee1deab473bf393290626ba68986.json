@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.social_links\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            WHERE p.user_id = $1\n        ",
+  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n                , COALESCE(\n                    json_agg(\n                        json_build_object(\n                            'platform', psl.platform,\n                            'url', psl.url\n                        )\n                    ) FILTER (WHERE psl.platform IS NOT NULL),\n                    '[]'::json\n                ) AS \"social_links: sqlx::types::Json<Vec<ProfileSocialLinkResponse>>\"\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            LEFT JOIN profile_social_links psl ON psl.user_id = p.user_id\n            WHERE p.permalink = $1\n            GROUP BY p.user_id, ps.followers_count, ps.following_count, ps.tracks_count\n        ",
   "describe": {
     "columns": [
       {
@@ -87,17 +87,6 @@
       },
       {
         "ordinal": 7,
-        "name": "social_links",
-        "type_info": "Jsonb",
-        "origin": {
-          "Table": {
-            "table": "profiles",
-            "name": "social_links"
-          }
-        }
-      },
-      {
-        "ordinal": 8,
         "name": "is_verified",
         "type_info": "Bool",
         "origin": {
@@ -108,7 +97,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 8,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -119,7 +108,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 9,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -130,7 +119,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 10,
         "name": "followers_count",
         "type_info": "Int4",
         "origin": {
@@ -141,7 +130,7 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 11,
         "name": "following_count",
         "type_info": "Int4",
         "origin": {
@@ -152,7 +141,7 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 12,
         "name": "tracks_count",
         "type_info": "Int4",
         "origin": {
@@ -161,11 +150,22 @@
             "name": "tracks_count"
           }
         }
+      },
+      {
+        "ordinal": 13,
+        "name": "social_links: sqlx::types::Json<Vec<ProfileSocialLinkResponse>>",
+        "type_info": "Json",
+        "origin": "Expression"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        }
       ]
     },
     "nullable": [
@@ -182,8 +182,8 @@
       false,
       false,
       false,
-      false
+      null
     ]
   },
-  "hash": "afaf74ad769bece796841ee730c685758491821eb8325ef5df3f1065dff7c640"
+  "hash": "2697ed76e8549f338bf92ea214b41002dd6aee1deab473bf393290626ba68986"
 }

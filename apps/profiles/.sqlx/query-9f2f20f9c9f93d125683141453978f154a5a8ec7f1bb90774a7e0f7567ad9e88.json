@@ -1,0 +1,53 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM profile_social_links AS psl\n            USING (\n                SELECT * FROM UNNEST($1::uuid[], $2::text[])\n                AS t(user_id, platform)\n            ) AS del\n            WHERE psl.user_id = del.user_id\n              AND psl.platform = del.platform\n            RETURNING psl.user_id, psl.platform, psl.url\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "profile_social_links",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "platform",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profile_social_links",
+            "name": "platform"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "url",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "profile_social_links",
+            "name": "url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "9f2f20f9c9f93d125683141453978f154a5a8ec7f1bb90774a7e0f7567ad9e88"
+}

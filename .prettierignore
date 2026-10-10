@@ -1,6 +1,8 @@
 *
 
+!*/
+!/src
 !/Cargo.toml
 !/package.json
 !/README.md
-!/src
+!*.sql

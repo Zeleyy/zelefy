@@ -3,14 +3,12 @@ use axum::body::Bytes;
 use sqlx::PgPool;
 use uuid::Uuid;
 use zelefy_backend::s3::{build_key, delete_object, upload_object};
-use zelefy_common::TrackStatus;
-
-use crate::{
-    config::Config,
-    db::repository::tracks,
-    models::tracks::{NewTrack, TrackWithStats, UpdateTrack},
-    services::errors::TrackServiceError,
+use zelefy_common::{
+    TrackStatus,
+    tracks::{NewTrack, TrackWithStats, UpdateTrack},
 };
+
+use crate::{config::Config, db::repository::tracks, services::errors::TrackServiceError};
 
 pub async fn upload_audio(
     db: PgPool,

@@ -1,10 +1,12 @@
 use sqlx::PgPool;
 use uuid::Uuid;
-use zelefy_common::TrackStatus;
+use zelefy_common::{
+    TrackStatus,
+    tracks::{TrackWithStats, UpdateTrack, UpdateTrackRequest},
+};
 
 use crate::{
     db::repository::{stats, tracks},
-    models::tracks::{TrackWithStats, UpdateTrack, UpdateTrackRequest},
     services::errors::TrackServiceError,
 };
 

@@ -24,7 +24,7 @@ CREATE TYPE track_status AS ENUM('processing', 'ready', 'failed', 'published');
 CREATE TABLE tracks (
     track_id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
-    title varchar(150) NULL,
+    title varchar(150) NOT NULL,
     permalink citext NOT NULL,
     audio_url text NULL,
     cover_url text NULL,

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+
 #[cfg(feature = "backend")]
 use sqlx::prelude::Type;
 #[cfg(feature = "backend")]
@@ -30,6 +31,7 @@ pub enum SubscriptionTier {
     ProUnlimited,
 }
 
+#[cfg_attr(not(feature = "backend"), repr(u8))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "backend", derive(Type, ToSchema))]
 #[cfg_attr(
@@ -38,8 +40,8 @@ pub enum SubscriptionTier {
 )]
 #[serde(rename_all = "snake_case")]
 pub enum TrackStatus {
-    Processing,
-    Ready,
-    Failed,
-    Published,
+    Processing = 0,
+    Ready = 1,
+    Failed = 2,
+    Published = 3,
 }

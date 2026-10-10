@@ -1,19 +1,23 @@
-use axum::{Json, response::IntoResponse};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
-use utoipa::ToSchema;
 use uuid::Uuid;
-use zelefy_common::{TrackStatus, models::double_option};
 
-use crate::models::track_stats::TrackStats;
+#[cfg(feature = "backend")]
+use axum::{Json, response::IntoResponse};
+#[cfg(feature = "backend")]
+use sqlx::prelude::FromRow;
+#[cfg(feature = "backend")]
+use utoipa::ToSchema;
 
-#[derive(Debug, Clone, FromRow)]
+use crate::{TrackStatus, double_option, tracks::TrackStats};
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "backend", derive(FromRow))]
 pub struct Track {
     pub track_id: Uuid,
     pub user_id: Uuid,
 
-    pub title: Option<String>,
+    pub title: String,
     pub permalink: String,
     pub audio_url: Option<String>,
     pub cover_url: Option<String>,
@@ -35,7 +39,7 @@ pub struct Track {
 
 #[derive(Debug)]
 pub struct NewTrack {
-    pub title: Option<String>,
+    pub title: String,
     pub permalink: String,
 }
 
@@ -45,7 +49,7 @@ impl NewTrack {
         let short_id = &id.simple().to_string();
 
         Self {
-            title: Some(format!("Untitled Track #{short_id}")),
+            title: format!("Untitled Track #{short_id}"),
             permalink: format!("draft-{id}"),
         }
     }
@@ -89,12 +93,13 @@ impl UpdateTrack {
     }
 }
 
-#[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
+#[derive(Debug, Clone, Serialize)]
+#[cfg_attr(feature = "backend", derive(FromRow, ToSchema))]
 pub struct TrackWithStats {
     pub track_id: Uuid,
     pub user_id: Uuid,
 
-    pub title: Option<String>,
+    pub title: String,
     pub permalink: String,
     pub audio_url: Option<String>,
     pub cover_url: Option<String>,
@@ -162,7 +167,8 @@ impl From<Track> for TrackWithStats {
     }
 }
 
-#[derive(Debug, Clone, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize)]
+#[cfg_attr(feature = "backend", derive(ToSchema))]
 pub struct PublicTrack {
     pub track_id: Uuid,
     pub user_id: Uuid,
@@ -192,7 +198,7 @@ impl From<TrackWithStats> for PublicTrack {
         Self {
             track_id: t.track_id,
             user_id: t.user_id,
-            title: t.title.unwrap_or_default(),
+            title: t.title,
             permalink: t.permalink,
             audio_url: t.audio_url.unwrap_or_default(),
             cover_url: t.cover_url,
@@ -211,7 +217,8 @@ impl From<TrackWithStats> for PublicTrack {
     }
 }
 
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Deserialize)]
+#[cfg_attr(feature = "backend", derive(ToSchema))]
 pub struct UpdateTrackRequest {
     pub title: Option<String>,
     pub permalink: Option<String>,
@@ -231,13 +238,15 @@ pub struct UpdateTrackRequest {
     pub is_private: Option<bool>,
 }
 
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize)]
+#[cfg_attr(feature = "backend", derive(ToSchema))]
 #[serde(untagged)]
 pub enum TrackResponse {
     Full(TrackWithStats),
     Public(PublicTrack),
 }
 
+#[cfg(feature = "backend")]
 impl IntoResponse for TrackResponse {
     fn into_response(self) -> axum::response::Response {
         match self {

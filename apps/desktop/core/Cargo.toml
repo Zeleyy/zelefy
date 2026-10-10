@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+chrono = { workspace = true }
 include_dir = "0.7.4"
-rusqlite = { version = "0.40.2", features = ["bundled"] }
+rusqlite = { version = "0.40.2", features = ["bundled", "chrono", "uuid"] }
 rusqlite_migration = { version = "2.6.0", features = ["from-directory"] }
+uuid = { workspace = true }
+
+zelefy_common = { workspace = true }

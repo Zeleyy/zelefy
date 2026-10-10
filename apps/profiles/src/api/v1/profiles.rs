@@ -5,7 +5,6 @@ use axum::{
     response::IntoResponse,
 };
 use serde::Deserialize;
-use std::collections::HashMap;
 use utoipa::ToSchema;
 use zelefy_backend::{
     TokenData,
@@ -14,12 +13,17 @@ use zelefy_backend::{
         multipart::{ImageForm, extract_file},
     },
 };
-use zelefy_common::paths;
+use zelefy_common::{
+    paths,
+    profiles::{DeleteProfileSocialLink, NewProfile, NewProfileSocialLink, ProfileDetails},
+};
 
 use crate::{
     AppState,
-    models::profiles::{CreateProfileDto, ProfileWithStats},
-    services::{self, update::UpdateParams},
+    services::{
+        self, update::UpdateParams, update_avatar::UpdateAvatarResponse,
+        update_banner::UpdateBannerResponse,
+    },
 };
 
 #[utoipa::path(
@@ -29,7 +33,7 @@ use crate::{
         ("permalink" = String, Path, description = "User permalink")
     ),
     responses(
-        (status = 200, description = "Пользователь получен", body = ProfileWithStats),
+        (status = 200, description = "Пользователь получен", body = ProfileDetails),
         (status = 404, description = "Пользователь не найден", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
@@ -49,7 +53,7 @@ pub async fn get_by_permalink(
     post,
     path = paths::v1::profiles::PROFILE_FULL,
     responses(
-        (status = 201, description = "Профиль создан", body = ProfileWithStats),
+        (status = 201, description = "Профиль создан", body = ProfileDetails),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
@@ -57,7 +61,7 @@ pub async fn get_by_permalink(
 pub async fn create(
     State(state): State<AppState>,
     user: TokenData,
-    Json(payload): Json<CreateProfileDto>,
+    Json(payload): Json<NewProfile>,
 ) -> Result<impl IntoResponse, ApiError> {
     let user_id = user.user_id;
 
@@ -72,14 +76,15 @@ pub struct UpdateRequest {
     pub permalink: Option<String>,
     pub bio: Option<Option<String>>,
     pub location: Option<Option<String>>,
-    pub social_links: Option<HashMap<String, String>>,
+    pub new_social_links: Option<Vec<NewProfileSocialLink>>,
+    pub delete_social_links: Option<Vec<DeleteProfileSocialLink>>,
 }
 
 #[utoipa::path(
     patch,
     path = paths::v1::profiles::PROFILE_FULL,
     responses(
-        (status = 200, description = "Успешное обновление данных профиля", body = ProfileWithStats),
+        (status = 200, description = "Успешное обновление данных профиля", body = ProfileDetails),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
@@ -99,7 +104,8 @@ pub async fn update(
             permalink: payload.permalink,
             bio: payload.bio,
             location: payload.location,
-            social_links: payload.social_links,
+            new_social_links: payload.new_social_links,
+            delete_social_links: payload.delete_social_links,
         },
     )
     .await?;
@@ -116,7 +122,7 @@ pub async fn update(
         content_type = "multipart/form-data",
     ),
     responses(
-        (status = 200, description = "Успешное обновление аватара профиля"),
+        (status = 200, description = "Успешное обновление аватара профиля", body = UpdateAvatarResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
@@ -130,7 +136,7 @@ pub async fn update_avatar(
 
     let (bytes, content_type) = extract_file(multipart, "file").await?;
 
-    let profile = services::update_avatar(
+    let response = services::update_avatar(
         state.db,
         state.s3_client,
         state.config,
@@ -140,7 +146,7 @@ pub async fn update_avatar(
     )
     .await?;
 
-    Ok(Json(profile))
+    Ok(Json(response))
 }
 
 #[utoipa::path(
@@ -152,7 +158,7 @@ pub async fn update_avatar(
         content_type = "multipart/form-data",
     ),
     responses(
-        (status = 200, description = "Успешное обновление баннера профиля"),
+        (status = 200, description = "Успешное обновление баннера профиля", body = UpdateBannerResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
     tag = "Profile",
@@ -166,7 +172,7 @@ pub async fn update_banner(
 
     let (bytes, content_type) = extract_file(multipart, "file").await?;
 
-    let profile = services::update_banner(
+    let response = services::update_banner(
         state.db,
         state.s3_client,
         state.config,
@@ -176,5 +182,5 @@ pub async fn update_banner(
     )
     .await?;
 
-    Ok(Json(profile))
+    Ok(Json(response))
 }

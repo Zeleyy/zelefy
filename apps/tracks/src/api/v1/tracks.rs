@@ -12,13 +12,12 @@ use zelefy_backend::{
         multipart::{AudioForm, ImageForm, extract_file},
     },
 };
-use zelefy_common::paths;
-
-use crate::{
-    AppState,
-    models::tracks::{TrackResponse, TrackWithStats, UpdateTrackRequest},
-    services,
+use zelefy_common::{
+    paths,
+    tracks::{TrackResponse, TrackWithStats, UpdateTrackRequest},
 };
+
+use crate::{AppState, services};
 
 #[utoipa::path(
     get,

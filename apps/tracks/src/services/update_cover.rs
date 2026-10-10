@@ -6,11 +6,11 @@ use zelefy_backend::{
     img::{ALLOWED_IMAGE_TYPES, convert_to_webp},
     s3::{build_key, delete_object, extract_key_from_url, upload_object},
 };
+use zelefy_common::tracks::{TrackWithStats, UpdateTrack};
 
 use crate::{
     config::Config,
     db::repository::{stats, tracks},
-    models::tracks::{TrackWithStats, UpdateTrack},
     services::errors::TrackServiceError,
 };
 

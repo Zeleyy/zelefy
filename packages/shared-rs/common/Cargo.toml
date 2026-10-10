@@ -7,11 +7,13 @@ edition = "2024"
 chrono = { workspace = true }
 uuid = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
+const_format = { workspace = true }
 
 sqlx = { workspace = true, optional = true }
 utoipa = { workspace = true, optional = true }
-const_format = { workspace = true }
+axum = { workspace = true, optional = true }
 
 [features]
 default = []
-backend = ["sqlx", "utoipa"]
+backend = ["sqlx", "utoipa", "axum"]

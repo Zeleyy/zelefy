@@ -10,7 +10,6 @@ CREATE TABLE profiles (
     banner_url text NULL,
     bio text NULL,
     "location" varchar(100) NULL,
-    social_links jsonb DEFAULT '{}'::jsonb NOT NULL,
     is_verified boolean DEFAULT false NOT NULL,
     created_at timestamptz DEFAULT now() NOT NULL,
     updated_at timestamptz DEFAULT now() NOT NULL,
@@ -31,6 +30,13 @@ $$ LANGUAGE 'plpgsql';
 CREATE TRIGGER trigger_profiles_updated_at
 BEFORE UPDATE ON profiles FOR EACH ROW
 EXECUTE FUNCTION set_updated_at ();
+
+CREATE TABLE profile_social_links (
+    user_id uuid REFERENCES profiles (user_id) ON DELETE CASCADE,
+    platform varchar(50) NOT NULL,
+    url varchar(255) NOT NULL,
+    PRIMARY KEY (user_id, platform)
+);
 
 CREATE TABLE profile_stats (
     user_id uuid NOT NULL,

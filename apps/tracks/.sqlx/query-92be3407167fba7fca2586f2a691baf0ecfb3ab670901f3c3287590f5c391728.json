@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO tracks (\n                user_id\n                , permalink\n            )\n            VALUES ($1, $2)\n            RETURNING\n                track_id\n                , user_id\n                , title\n                , permalink\n                , audio_url\n                , cover_url\n                , waveform_url\n                , duration_seconds\n                , genre\n                , description\n                , bpm\n                , key_signature\n                , is_private\n                , status AS \"status: TrackStatus\"\n                , processing_error\n                , created_at\n                , updated_at\n        ",
+  "query": "\n            INSERT INTO tracks (\n                user_id\n                , permalink\n                , title\n            )\n            VALUES ($1, $2, $3)\n            RETURNING\n                track_id\n                , user_id\n                , title\n                , permalink\n                , audio_url\n                , cover_url\n                , waveform_url\n                , duration_seconds\n                , genre\n                , description\n                , bpm\n                , key_signature\n                , is_private\n                , status AS \"status: TrackStatus\"\n                , processing_error\n                , created_at\n                , updated_at\n        ",
   "describe": {
     "columns": [
       {
@@ -216,13 +216,14 @@
             "name": "citext",
             "kind": "Simple"
           }
-        }
+        },
+        "Varchar"
       ]
     },
     "nullable": [
       false,
       false,
-      true,
+      false,
       false,
       true,
       true,
@@ -239,5 +240,5 @@
       false
     ]
   },
-  "hash": "3a579988555486297f03823c0fc304286bc2eaff1de596c2846d63d99d5dfc40"
+  "hash": "92be3407167fba7fca2586f2a691baf0ecfb3ab670901f3c3287590f5c391728"
 }

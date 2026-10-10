@@ -1,10 +1,8 @@
 use sqlx::PgPool;
 use uuid::Uuid;
-use zelefy_common::TrackStatus;
+use zelefy_common::{TrackStatus, tracks::TrackResponse};
 
-use crate::{
-    db::repository::tracks, models::tracks::TrackResponse, services::errors::TrackServiceError,
-};
+use crate::{db::repository::tracks, services::errors::TrackServiceError};
 
 pub async fn get_by_permalink(
     db: PgPool,

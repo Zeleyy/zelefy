@@ -1,7 +1,10 @@
-use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Default, FromRow)]
+#[cfg(feature = "backend")]
+use sqlx::prelude::FromRow;
+
+#[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "backend", derive(FromRow))]
 pub struct TrackStats {
     pub track_id: Uuid,
     pub plays_count: i64,

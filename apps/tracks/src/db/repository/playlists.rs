@@ -1,8 +1,7 @@
 use sqlx::{PgExecutor, QueryBuilder};
 use uuid::Uuid;
 use zelefy_backend::db::query_builder::push_opt_nullable;
-
-use crate::models::playlists::{NewPlaylist, Playlist, UpdatePlaylist};
+use zelefy_common::tracks::{NewPlaylist, Playlist, UpdatePlaylist};
 
 pub async fn get_by_id<'e, E>(
     executor: E,

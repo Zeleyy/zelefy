@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.social_links\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            WHERE p.permalink = $1\n        ",
+  "query": "\n            INSERT INTO profiles (\n                user_id\n                , display_name\n                , permalink\n                , bio\n                , location\n            )\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING\n                user_id\n                , display_name\n                , permalink\n                , avatar_url\n                , banner_url\n                , bio\n                , location\n                , is_verified\n                , created_at\n                , updated_at\n        ",
   "describe": {
     "columns": [
       {
@@ -87,17 +87,6 @@
       },
       {
         "ordinal": 7,
-        "name": "social_links",
-        "type_info": "Jsonb",
-        "origin": {
-          "Table": {
-            "table": "profiles",
-            "name": "social_links"
-          }
-        }
-      },
-      {
-        "ordinal": 8,
         "name": "is_verified",
         "type_info": "Bool",
         "origin": {
@@ -108,7 +97,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 8,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -119,7 +108,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 9,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -128,49 +117,20 @@
             "name": "updated_at"
           }
         }
-      },
-      {
-        "ordinal": 11,
-        "name": "followers_count",
-        "type_info": "Int4",
-        "origin": {
-          "Table": {
-            "table": "profile_stats",
-            "name": "followers_count"
-          }
-        }
-      },
-      {
-        "ordinal": 12,
-        "name": "following_count",
-        "type_info": "Int4",
-        "origin": {
-          "Table": {
-            "table": "profile_stats",
-            "name": "following_count"
-          }
-        }
-      },
-      {
-        "ordinal": 13,
-        "name": "tracks_count",
-        "type_info": "Int4",
-        "origin": {
-          "Table": {
-            "table": "profile_stats",
-            "name": "tracks_count"
-          }
-        }
       }
     ],
     "parameters": {
       "Left": [
+        "Uuid",
+        "Varchar",
         {
           "Custom": {
             "name": "citext",
             "kind": "Simple"
           }
-        }
+        },
+        "Text",
+        "Varchar"
       ]
     },
     "nullable": [
@@ -183,12 +143,8 @@
       true,
       false,
       false,
-      false,
-      false,
-      false,
-      false,
       false
     ]
   },
-  "hash": "7f43f139ecdb03f030d0408cb627cc89254ab41ac23fb99ab64967af135098db"
+  "hash": "f11b3c58ca670052efd3ece625d1c2a7d27a7e01a7555904c728566dd54ef68f"
 }

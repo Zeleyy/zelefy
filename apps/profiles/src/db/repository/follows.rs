@@ -1,8 +1,7 @@
 use sqlx::PgExecutor;
+use zelefy_common::profiles::{DeleteFollow, Follow, NewFollow};
 
-use crate::models::follows::{CreateFollowDto, DeleteFollowDto, Follow};
-
-pub async fn create<'e, E>(executor: E, params: CreateFollowDto) -> Result<Follow, sqlx::Error>
+pub async fn create<'e, E>(executor: E, params: NewFollow) -> Result<Follow, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
@@ -23,7 +22,7 @@ where
     .await
 }
 
-pub async fn delete<'e, E>(executor: E, params: DeleteFollowDto) -> Result<bool, sqlx::Error>
+pub async fn delete<'e, E>(executor: E, params: DeleteFollow) -> Result<bool, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {

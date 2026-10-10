@@ -1,8 +1,11 @@
 use chrono::{DateTime, Utc};
-use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, FromRow)]
+#[cfg(feature = "backend")]
+use sqlx::prelude::FromRow;
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "backend", derive(FromRow))]
 pub struct Playlist {
     pub playlist_id: Uuid,
     pub user_id: Uuid,

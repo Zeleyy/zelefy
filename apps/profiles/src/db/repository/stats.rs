@@ -1,7 +1,6 @@
 use sqlx::PgExecutor;
 use uuid::Uuid;
-
-use crate::models::profile_stats::ProfileStats;
+use zelefy_common::profiles::ProfileStats;
 
 pub async fn get_by_id<'e, E>(executor: E, user_id: Uuid) -> Result<ProfileStats, sqlx::Error>
 where

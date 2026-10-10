@@ -1,7 +1,6 @@
 use sqlx::PgExecutor;
 use uuid::Uuid;
-
-use crate::models::track_stats::TrackStats;
+use zelefy_common::tracks::TrackStats;
 
 pub async fn get_by_id<'e, E>(
     executor: E,

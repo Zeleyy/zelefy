@@ -1,18 +1,21 @@
 use aws_sdk_s3::Client;
 use axum::body::Bytes;
+use serde::Serialize;
 use sqlx::PgPool;
+use utoipa::ToSchema;
 use uuid::Uuid;
 use zelefy_backend::{
     img::{ALLOWED_IMAGE_TYPES, convert_to_webp},
     s3::{build_key, delete_object, extract_key_from_url, upload_object},
 };
+use zelefy_common::profiles::UpdateProfile;
 
-use crate::{
-    config::Config,
-    db::repository::{profiles, stats},
-    models::profiles::{ProfileWithStats, UpdateProfileDto},
-    services::errors::ProfileServiceError,
-};
+use crate::{config::Config, db::repository::profiles, services::errors::ProfileServiceError};
+
+#[derive(Serialize, ToSchema)]
+pub struct UpdateAvatarResponse {
+    pub avatar_url: String,
+}
 
 pub async fn update_avatar(
     db: PgPool,
@@ -21,7 +24,7 @@ pub async fn update_avatar(
     user_id: Uuid,
     avatar: Bytes,
     content_type: String,
-) -> Result<ProfileWithStats, ProfileServiceError> {
+) -> Result<UpdateAvatarResponse, ProfileServiceError> {
     if !ALLOWED_IMAGE_TYPES.contains(&content_type.as_str()) {
         return Err(ProfileServiceError::UnsupportedImageFormat);
     }
@@ -58,15 +61,14 @@ pub async fn update_avatar(
 
     let mut tx = db.begin().await?;
 
-    let update = UpdateProfileDto {
-        avatar_url: Some(Some(new_avatar_url)),
+    let update = UpdateProfile {
+        avatar_url: Some(Some(new_avatar_url.clone())),
         ..Default::default()
     };
 
-    let profile = profiles::update(&mut *tx, user_id, update)
+    profiles::update(&mut *tx, user_id, update)
         .await?
         .ok_or(ProfileServiceError::UserNotFound)?;
-    let stats = stats::get_by_id(&mut *tx, user_id).await?;
 
     if let Err(err) = tx.commit().await {
         let _ = delete_object(&s3_client, bucket_name, &new_key).await;
@@ -79,5 +81,7 @@ pub async fn update_avatar(
         }
     }
 
-    Ok(ProfileWithStats::from_parts(profile, stats))
+    Ok(UpdateAvatarResponse {
+        avatar_url: new_avatar_url,
+    })
 }
