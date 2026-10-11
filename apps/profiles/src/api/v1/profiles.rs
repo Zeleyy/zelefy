@@ -37,14 +37,19 @@ use crate::{
         (status = 404, description = "Пользователь не найден", body = ErrorResponse),
         (status = 500, description = "Внутренняя ошибка сервера", body = ErrorResponse),
     ),
-    security(),
-    tag = "Profile"
+    security(
+        (),
+        ("X-User-Id" = [], "X-User-Role" = [], "X-User-Subscription" = []),
+    ),
+    tag = "Public"
 )]
 pub async fn get_by_permalink(
     State(state): State<AppState>,
+    user: Option<TokenData>,
     Path(permalink): Path<String>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let response = services::get_by_permalink(state.db, permalink).await?;
+    let viewer_id = user.map(|u| u.user_id);
+    let response = services::get_by_permalink(state.db, permalink, viewer_id).await?;
 
     Ok(Json(response))
 }

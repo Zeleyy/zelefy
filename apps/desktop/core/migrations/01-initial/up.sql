@@ -43,10 +43,14 @@ CREATE TABLE profiles (
     avatar_path TEXT,
     banner_path TEXT,
     bio TEXT,
+    location TEXT,
     is_verified BOOLEAN DEFAULT 0,
-    is_me BOOLEAN DEFAULT 0,
-    updated_at INTEGER NOT NULL,
-    last_accessed_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    last_accessed_at INTEGER NOT NULL,
+    -- 
+    followers_count INTEGER NOT NULL DEFAULT 0,
+    following_count INTEGER NOT NULL DEFAULT 0,
+    tracks_count INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX idx_profiles_permalink ON profiles (permalink);

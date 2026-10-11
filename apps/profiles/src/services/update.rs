@@ -66,5 +66,10 @@ pub async fn update(
 
     tx.commit().await?;
 
-    Ok(ProfileDetails::from_parts(profile, stats, social_links))
+    Ok(ProfileDetails::from_parts(
+        profile,
+        stats,
+        social_links,
+        Some(user_id),
+    ))
 }

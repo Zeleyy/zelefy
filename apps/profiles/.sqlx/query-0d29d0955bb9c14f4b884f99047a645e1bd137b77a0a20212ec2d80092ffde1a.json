@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n                , COALESCE(\n                    json_agg(\n                        json_build_object(\n                            'platform', psl.platform,\n                            'url', psl.url\n                        )\n                    ) FILTER (WHERE psl.platform IS NOT NULL),\n                    '[]'::json\n                ) AS \"social_links: sqlx::types::Json<Vec<ProfileSocialLinkResponse>>\"\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            LEFT JOIN profile_social_links psl ON psl.user_id = p.user_id\n            WHERE p.permalink = $1\n            GROUP BY p.user_id, ps.followers_count, ps.following_count, ps.tracks_count\n        ",
+  "query": "\n            SELECT\n                p.user_id\n                , p.display_name\n                , p.permalink\n                , p.avatar_url\n                , p.banner_url\n                , p.bio\n                , p.location\n                , p.is_verified\n                , p.created_at\n                , p.updated_at\n                , ps.followers_count\n                , ps.following_count\n                , ps.tracks_count\n            FROM profiles p\n            JOIN profile_stats ps ON ps.user_id = p.user_id\n            WHERE p.permalink = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -150,12 +150,6 @@
             "name": "tracks_count"
           }
         }
-      },
-      {
-        "ordinal": 13,
-        "name": "social_links: sqlx::types::Json<Vec<ProfileSocialLinkResponse>>",
-        "type_info": "Json",
-        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -181,9 +175,8 @@
       false,
       false,
       false,
-      false,
-      null
+      false
     ]
   },
-  "hash": "2697ed76e8549f338bf92ea214b41002dd6aee1deab473bf393290626ba68986"
+  "hash": "0d29d0955bb9c14f4b884f99047a645e1bd137b77a0a20212ec2d80092ffde1a"
 }

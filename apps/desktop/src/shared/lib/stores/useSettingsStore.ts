@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { tauriStorage } from "@/shared/lib/storage";
 import i18n from "@/shared/config/i18n";
+import { invoke } from "@tauri-apps/api/core";
 
 export type Theme = "dark" | "light";
 export type ColorScheme = "orange" | "green" | "purple" | "blue";
@@ -14,6 +15,7 @@ interface SettingsState {
     isMuted: boolean;
     volume: number;
     cacheLimitMb: number;
+    gatewayUrl: string;
 
     _hasHydrated: boolean;
 
@@ -24,7 +26,12 @@ interface SettingsState {
     toggleSidebar: () => void;
     setIsMuted: (isMuted: boolean) => void;
     setVolume: (volume: number) => void;
-    setCacheLimitMb: (cacheLimitMb: number) => void;
+
+    setCacheLimitMb: (limitMb: number) => Promise<void>;
+    initCacheLimitMb: () => Promise<void>;
+
+    setGatewayUrl: (newUrl: string) => Promise<void>;
+    initGatewayUrl: () => Promise<void>;
 
     setHasHydrated: (state: boolean) => void;
 }
@@ -44,6 +51,7 @@ export const useSettingsStore = create<SettingsState>()(
             isMuted: false,
             volume: 50,
             cacheLimitMb: 1024,
+            gatewayUrl: "https://api.zelefy.com",
 
             _hasHydrated: false,
 
@@ -68,7 +76,41 @@ export const useSettingsStore = create<SettingsState>()(
             setIsMuted: (isMuted) => set({ isMuted: isMuted }),
             setVolume: (volume) => set({ volume: volume }),
 
-            setCacheLimitMb: (cacheLimitMb) => set({ cacheLimitMb: cacheLimitMb }),
+            setCacheLimitMb: async (limitMb) => {
+                try {
+                    await invoke("set_cache_limit", { limitMb });
+                    set({ cacheLimitMb: limitMb });
+                } catch (error) {
+                    console.error("Failed to update cache limit in backend:", error);
+                }
+            },
+
+            initCacheLimitMb: async () => {
+                try {
+                    const limit = await invoke<number>("get_cache_limit");
+                    set({ cacheLimitMb: limit });
+                } catch (error) {
+                    console.error("Failed to fetch cache limit from backend:", error);
+                }
+            },
+
+            setGatewayUrl: async (newUrl) => {
+                try {
+                    await invoke("set_gateway_url", { newUrl });
+                    set({ gatewayUrl: newUrl });
+                } catch (error) {
+                    console.error("Failed to update gateway URL in backend:", error);
+                }
+            },
+
+            initGatewayUrl: async () => {
+                try {
+                    const url = await invoke<string>("get_gateway_url");
+                    set({ gatewayUrl: url });
+                } catch (error) {
+                    console.error("Failed to fetch gateway URL from backend:", error);
+                }
+            },
 
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
@@ -82,10 +124,13 @@ export const useSettingsStore = create<SettingsState>()(
                 isMuted: state.isMuted,
                 volume: state.volume,
                 cacheLimitMb: state.cacheLimitMb,
+                gatewayUrl: state.gatewayUrl,
             }),
             storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);
+                state?.initGatewayUrl();
+                state?.initCacheLimitMb();
             },
         },
     ),

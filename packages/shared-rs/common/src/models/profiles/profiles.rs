@@ -134,6 +134,7 @@ pub struct ProfileDetails {
     pub bio: Option<String>,
     pub location: Option<String>,
     pub is_verified: bool,
+    pub is_me: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 
@@ -155,6 +156,7 @@ impl From<(ProfileWithStats, Vec<ProfileSocialLink>)> for ProfileDetails {
             bio: p.bio,
             location: p.location,
             is_verified: p.is_verified,
+            is_me: false,
             created_at: p.created_at,
             updated_at: p.updated_at,
             followers_count: p.followers_count,
@@ -166,7 +168,14 @@ impl From<(ProfileWithStats, Vec<ProfileSocialLink>)> for ProfileDetails {
 }
 
 impl ProfileDetails {
-    pub fn from_parts(p: Profile, s: ProfileStats, sl: Vec<ProfileSocialLink>) -> Self {
+    pub fn from_parts(
+        p: Profile,
+        s: ProfileStats,
+        sl: Vec<ProfileSocialLink>,
+        viewer_id: Option<Uuid>,
+    ) -> Self {
+        let is_me = viewer_id == Some(p.user_id);
+
         Self {
             user_id: p.user_id,
             display_name: p.display_name,
@@ -176,6 +185,7 @@ impl ProfileDetails {
             bio: p.bio,
             location: p.location,
             is_verified: p.is_verified,
+            is_me,
             created_at: p.created_at,
             updated_at: p.updated_at,
 

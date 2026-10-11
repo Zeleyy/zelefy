@@ -19,5 +19,8 @@ pub async fn create(
 
     tx.commit().await?;
 
-    Ok((profile.into(), social_links).into())
+    let mut profile_details: ProfileDetails = (profile.into(), social_links).into();
+    profile_details.is_me = true;
+
+    Ok(profile_details)
 }

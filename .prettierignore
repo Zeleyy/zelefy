@@ -1,8 +1,17 @@
-*
+node_modules/
+dist/
+build/
+coverage/
 
-!*/
-!/src
-!/Cargo.toml
-!/package.json
-!/README.md
-!*.sql
+package-lock.json
+yarn.lock
+*.min.js
+
+public/*
+!public/index.html
+
+target/
+Cargo.lock
+
+.sqlx/
+gen/
