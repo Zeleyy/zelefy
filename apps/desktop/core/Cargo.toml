@@ -5,10 +5,12 @@ edition = "2024"
 
 [dependencies]
 chrono = { workspace = true }
+uuid = { workspace = true }
+serde = { workspace = true }
+
 include_dir = "0.7.4"
 reqwest = { version = "0.13.5", features = ["json"] }
 rusqlite = { version = "0.40.2", features = ["bundled", "chrono", "uuid"] }
 rusqlite_migration = { version = "2.6.0", features = ["from-directory"] }
-uuid = { workspace = true }
 
 zelefy_common = { workspace = true }

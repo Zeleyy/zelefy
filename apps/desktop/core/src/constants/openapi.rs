@@ -1,10 +1,10 @@
-use std::path::Path;
-
 use include_dir::{Dir, include_dir};
+use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 pub static OPENAPI_SPECS: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/openapi");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum ApiService {
     Profiles,
     Tracks,

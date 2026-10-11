@@ -1,4 +1,4 @@
-import type { RouteObject } from "react-router-dom";
+import { Navigate, type RouteObject } from "react-router-dom";
 import { MainLayout } from "@/app/layouts";
 import { HomePage } from "@/pages/HomePage";
 
@@ -38,6 +38,47 @@ export const routes: RouteObject[] = [
                     const { SettingsPage } = await import("@/pages/SettingsPage");
                     return { Component: SettingsPage };
                 },
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="general" replace />,
+                    },
+                    {
+                        path: "general",
+                        lazy: async () => {
+                            const { GeneralSettings } = await import("@/pages/SettingsPage");
+                            return { Component: GeneralSettings };
+                        },
+                    },
+                    {
+                        path: "appearance",
+                        lazy: async () => {
+                            const { AppearanceSettings } = await import("@/pages/SettingsPage");
+                            return { Component: AppearanceSettings };
+                        },
+                    },
+                    {
+                        path: "audio",
+                        lazy: async () => {
+                            const { AudioSettings } = await import("@/pages/SettingsPage");
+                            return { Component: AudioSettings };
+                        },
+                    },
+                    {
+                        path: "network",
+                        lazy: async () => {
+                            const { NetworkSettings } = await import("@/pages/SettingsPage");
+                            return { Component: NetworkSettings };
+                        },
+                    },
+                    {
+                        path: "storage",
+                        lazy: async () => {
+                            const { StorageSettings } = await import("@/pages/SettingsPage");
+                            return { Component: StorageSettings };
+                        },
+                    },
+                ],
             },
             {
                 path: "profile",

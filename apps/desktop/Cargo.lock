@@ -847,6 +847,7 @@ dependencies = [
  "reqwest",
  "rusqlite",
  "rusqlite_migration",
+ "serde",
  "uuid",
  "zelefy_common",
 ]

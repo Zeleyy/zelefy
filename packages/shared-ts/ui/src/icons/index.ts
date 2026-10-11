@@ -7,9 +7,14 @@ import HomeIcon from "../assets/common/home.svg?react";
 import LibraryIcon from "../assets/common/library.svg?react";
 import DownloadIcon from "../assets/common/download.svg?react";
 import SettingsIcon from "../assets/common/settings.svg?react";
-import LanguageIcon from "../assets/common/language.svg?react";
+import GlobeIcon from "../assets/common/globe.svg?react";
 import CollapseIcon from "../assets/common/collapse.svg?react";
 import ExpandIcon from "../assets/common/expand.svg?react";
+import DatabaseIcon from "../assets/common/database.svg?react";
+import UserIcon from "../assets/common/user.svg?react";
+import SparklesIcon from "../assets/common/sparkles.svg?react";
+import HeadphonesIcon from "../assets/common/headphones.svg?react";
+import CloudIcon from "../assets/common/cloud.svg?react";
 
 import MinimizeIcon from "../assets/window/minimize.svg?react";
 import MaximizeIcon from "../assets/window/maximize.svg?react";
@@ -43,14 +48,22 @@ export {
     LibraryIcon,
     DownloadIcon,
     SettingsIcon,
-    LanguageIcon,
+    GlobeIcon,
     CollapseIcon,
     ExpandIcon,
+    DatabaseIcon,
+    UserIcon,
+    SparklesIcon,
+    HeadphonesIcon,
+    CloudIcon,
+    //
     MinimizeIcon,
     MaximizeIcon,
     CloseIcon,
+    //
     ChevronLeftIcon,
     ChevronRightIcon,
+    //
     HeartIcon,
     ShuffleIcon,
     SkipPrevIcon,
@@ -62,6 +75,7 @@ export {
     AudioSettings,
     EqualizerIcon,
     QueueIcon,
+    //
     MuteIcon,
     LowVolumeIcon,
     HighVolumeIcon,

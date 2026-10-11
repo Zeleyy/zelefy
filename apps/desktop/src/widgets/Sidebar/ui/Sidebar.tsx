@@ -8,7 +8,7 @@ import {
     CollapseIcon,
     ExpandIcon,
     Flex,
-    LanguageIcon,
+    GlobeIcon,
     SettingsIcon,
 } from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";
@@ -80,7 +80,7 @@ export const Sidebar = () => {
                     title={isMinified ? t("language.current") : undefined}
                     aria-label={t("language.current")}
                 >
-                    <LanguageIcon width={22} height={22} />
+                    <GlobeIcon width={22} height={22} />
                     <span>{t("language.current")}</span>
                 </Button>
 

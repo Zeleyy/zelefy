@@ -36,6 +36,7 @@ pub fn run() {
             commands::set_gateway_url,
             commands::get_cache_limit,
             commands::set_cache_limit,
+            commands::get_available_endpoints,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

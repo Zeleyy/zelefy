@@ -1,61 +1,42 @@
+import styles from "./SettingsPage.module.scss";
+import { NavLink, Outlet } from "react-router-dom";
+import { Button, Flex } from "@zelefy/ui";
+import { navItems } from "../config";
 import { useTranslation } from "react-i18next";
-import { Button, Flex, SpinnerLoader } from "@zelefy/ui";
-import { useUpdate } from "@/features/update";
+import clsx from "clsx";
 
 export const SettingsPage = () => {
     const { t } = useTranslation();
-    const {
-        currentVersion,
-        latestVersion,
-        hasUpdate,
-        isChecking,
-        isInstalling,
-        checkForUpdates,
-        installUpdate,
-        updateInfo,
-    } = useUpdate();
+
+    const getNavClass = ({ isActive }: { isActive: boolean }) =>
+        clsx(styles.navButton, {
+            [styles["navButton--active"]]: isActive,
+        });
 
     return (
-        <Flex direction="column" gap="lg" size="form-sm" container fullWidth>
-            <h2>{t("settings.updates.title")}</h2>
-
-            <Flex direction="column" gap="sm">
-                <Flex justify="space-between" align="center">
-                    <span>{t("settings.updates.currentVersion")}:</span>
-                    <strong>{currentVersion || "..."}</strong>
+        <Flex direction="column" gap="lg" size="page-md" container fullWidth>
+            <Flex gap="lg">
+                <Flex as={"nav"} direction="column" gap="2xs" className={styles.navigation}>
+                    {navItems.map((item) => (
+                        <Button
+                            key={item.path}
+                            variant="ghost"
+                            as={NavLink}
+                            to={item.path}
+                            size="small"
+                            className={getNavClass}
+                            title={t(item.label)}
+                            aria-label={t(item.label)}
+                        >
+                            <item.icon width={22} height={22} />
+                            <span>{t(item.label)}</span>
+                        </Button>
+                    ))}
                 </Flex>
 
-                {updateInfo && (
-                    <Flex justify="space-between" align="center">
-                        <span>{t("settings.updates.latestVersion")}:</span>
-                        <strong>{hasUpdate ? latestVersion : currentVersion}</strong>
-                    </Flex>
-                )}
-
-                <div>
-                    {!updateInfo && !isChecking && t("settings.updates.status.idle")}
-                    {isChecking && t("settings.updates.status.checking")}
-                    {updateInfo && hasUpdate && t("settings.updates.status.available")}
-                    {updateInfo && !hasUpdate && t("settings.updates.status.notAvailable")}
-                </div>
-            </Flex>
-
-            <Flex gap="md" align="center">
-                {!hasUpdate ? (
-                    <>
-                        <Button onClick={checkForUpdates} disabled={isChecking}>
-                            {t("settings.updates.actions.check")}
-                        </Button>
-                        <SpinnerLoader isLoading={isChecking} />
-                    </>
-                ) : (
-                    <>
-                        <Button onClick={() => installUpdate()} disabled={isInstalling}>
-                            {t("settings.updates.actions.install")}
-                        </Button>
-                        <SpinnerLoader isLoading={isInstalling} />
-                    </>
-                )}
+                <Flex direction="column">
+                    <Outlet />
+                </Flex>
             </Flex>
         </Flex>
     );

@@ -2,6 +2,7 @@ import styles from "./StorageDashboard.module.scss";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
 import { StorageType, type StorageItem } from "@/shared/types/storages";
+import { useNavigate } from "react-router-dom";
 
 const storages: StorageItem[] = [
     {
@@ -56,6 +57,7 @@ export const StorageDashboard = () => {
     const visibleStorages = storages.slice(0, MAX_VISIBLE);
     const remainingCount = storages.length - MAX_VISIBLE;
     const totalUsedBytes = storages.reduce((acc, s) => acc + s.usedSizeBytes, 0);
+    const navigate = useNavigate();
 
     return (
         <Flex as={"section"} direction="column" gap="md" className={styles.storageDashboard}>
@@ -188,7 +190,7 @@ export const StorageDashboard = () => {
                         justify="center"
                         gap="2xs"
                         className={`${styles.storageCard} ${styles.moreCard}`}
-                        onClick={() => {}}
+                        onClick={() => navigate("/settings/storage")}
                     >
                         <span className={styles.moreCount}>+{remainingCount}</span>
                         <span className={styles.moreText}>Ещё хранилища</span>

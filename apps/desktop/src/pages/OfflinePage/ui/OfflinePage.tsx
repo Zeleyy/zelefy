@@ -2,16 +2,20 @@ import styles from "./OfflinePage.module.scss";
 import { useState } from "react";
 import { Button, Cover, Flex, formatBytes, formatTime, Input } from "@zelefy/ui";
 import { StorageDashboard } from "./StorageDashboard";
+import { useNavigate } from "react-router-dom";
 
 export const OfflinePage = () => {
     const [activeTab, setActiveTab] = useState<"all" | "imported" | "cache">("all");
+    const navigate = useNavigate();
 
     return (
         <Flex direction="column" gap="lg">
             <Flex as="header" justify="space-between" align="flex-end" wrap="wrap" gap="md">
                 <h1>Офлайн библиотека</h1>
                 <Flex gap="md">
-                    <Button variant="secondary">Настройки хранилища</Button>
+                    <Button variant="secondary" onClick={() => navigate("/settings/storage")}>
+                        Настройки хранилища
+                    </Button>
                     <Button variant="primary">+ Импортировать треки</Button>
                 </Flex>
             </Flex>
