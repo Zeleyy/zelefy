@@ -1,10 +1,10 @@
 import styles from "./StorageDashboard.module.scss";
+import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
-import { StorageType, type StorageItem } from "@/shared/types/storages";
-import { useNavigate } from "react-router-dom";
+import { StorageType, type StorageWithStats } from "@/shared/types";
 
-const storages: StorageItem[] = [
+const storages: StorageWithStats[] = [
     {
         storageId: 1,
         path: "C:/Users/User/AppData/Local/zelefy/cache",
@@ -13,6 +13,7 @@ const storages: StorageItem[] = [
         maxSizeBytes: 2_147_483_648,
         usedSizeBytes: 734_003_200,
         filesCount: 42,
+        createdAt: 0,
     },
     {
         storageId: 2,
@@ -22,6 +23,7 @@ const storages: StorageItem[] = [
         maxSizeBytes: null,
         usedSizeBytes: 326_841_139,
         filesCount: 15,
+        createdAt: 0,
     },
     {
         storageId: 3,
@@ -31,6 +33,7 @@ const storages: StorageItem[] = [
         maxSizeBytes: null,
         usedSizeBytes: 120_500_100,
         filesCount: 8,
+        createdAt: 0,
     },
     {
         storageId: 4,
@@ -40,6 +43,7 @@ const storages: StorageItem[] = [
         maxSizeBytes: null,
         usedSizeBytes: 5_368_709_120,
         filesCount: 120,
+        createdAt: 0,
     },
     {
         storageId: 5,
@@ -49,6 +53,7 @@ const storages: StorageItem[] = [
         maxSizeBytes: null,
         usedSizeBytes: 1_073_741_824,
         filesCount: 30,
+        createdAt: 0,
     },
 ];
 

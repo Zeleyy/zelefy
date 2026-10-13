@@ -37,6 +37,7 @@ pub fn run() {
             commands::get_cache_limit,
             commands::set_cache_limit,
             commands::get_available_endpoints,
+            commands::create_storage,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

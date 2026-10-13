@@ -14,3 +14,4 @@ rusqlite = { version = "0.40.2", features = ["bundled", "chrono", "uuid"] }
 rusqlite_migration = { version = "2.6.0", features = ["from-directory"] }
 
 zelefy_common = { workspace = true }
+thiserror = "2.0.21"
