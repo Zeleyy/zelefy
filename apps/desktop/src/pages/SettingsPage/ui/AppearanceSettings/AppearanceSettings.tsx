@@ -1,3 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export const AppearanceSettings = () => {
-    return <div>AppearanceSettings</div>;
+    const { t } = useTranslation();
+
+    return <h1>{t("settings.appearance.title")}</h1>;
 };

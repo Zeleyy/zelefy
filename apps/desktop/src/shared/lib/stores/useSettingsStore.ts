@@ -16,6 +16,7 @@ interface SettingsState {
     volume: number;
     cacheLimitMb: number;
     gatewayUrl: string;
+    defaultGatewayUrl: string;
 
     _hasHydrated: boolean;
 
@@ -31,7 +32,9 @@ interface SettingsState {
     initCacheLimitMb: () => Promise<void>;
 
     setGatewayUrl: (newUrl: string) => Promise<void>;
+    resetGatewayUrl: () => Promise<void>;
     initGatewayUrl: () => Promise<void>;
+    initDefaultGatewayUrl: () => Promise<void>;
 
     setHasHydrated: (state: boolean) => void;
 }
@@ -51,7 +54,8 @@ export const useSettingsStore = create<SettingsState>()(
             isMuted: false,
             volume: 50,
             cacheLimitMb: 1024,
-            gatewayUrl: "https://api.zelefy.com",
+            gatewayUrl: "",
+            defaultGatewayUrl: "",
 
             _hasHydrated: false,
 
@@ -103,6 +107,15 @@ export const useSettingsStore = create<SettingsState>()(
                 }
             },
 
+            resetGatewayUrl: async () => {
+                try {
+                    const url = await invoke<string>("reset_gateway_url");
+                    set({ gatewayUrl: url });
+                } catch (error) {
+                    console.error("Failed to reset gateway URL from backend:", error);
+                }
+            },
+
             initGatewayUrl: async () => {
                 try {
                     const url = await invoke<string>("get_gateway_url");
@@ -112,6 +125,14 @@ export const useSettingsStore = create<SettingsState>()(
                 }
             },
 
+            initDefaultGatewayUrl: async () => {
+                try {
+                    const url = await invoke<string>("get_default_gateway_url");
+                    set({ defaultGatewayUrl: url });
+                } catch (error) {
+                    console.error("Failed to fetch default gateway URL from backend:", error);
+                }
+            },
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
         {
@@ -130,6 +151,7 @@ export const useSettingsStore = create<SettingsState>()(
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);
                 state?.initGatewayUrl();
+                state?.initDefaultGatewayUrl();
                 state?.initCacheLimitMb();
             },
         },

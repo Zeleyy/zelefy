@@ -1,9 +1,9 @@
 import styles from "./SettingsPage.module.scss";
 import { NavLink, Outlet } from "react-router-dom";
-import { Button, Flex } from "@zelefy/ui";
-import { navItems } from "../config";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
+import { Button, Flex } from "@zelefy/ui";
+import { navItems } from "../config";
 
 export const SettingsPage = () => {
     const { t } = useTranslation();
@@ -15,7 +15,7 @@ export const SettingsPage = () => {
 
     return (
         <Flex direction="column" gap="lg" size="page-md" container fullWidth>
-            <Flex gap="lg">
+            <Flex gap="lg" align="flex-start">
                 <Flex as={"nav"} direction="column" gap="2xs" className={styles.navigation}>
                     {navItems.map((item) => (
                         <Button
@@ -34,7 +34,7 @@ export const SettingsPage = () => {
                     ))}
                 </Flex>
 
-                <Flex direction="column">
+                <Flex direction="column" gap="md" fullWidth>
                     <Outlet />
                 </Flex>
             </Flex>

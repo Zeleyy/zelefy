@@ -54,7 +54,7 @@
 
         &:hover:not(:disabled) {
             background-color: var(--btn-color, var(--primary));
-            color: var(--neutral-50);
+            color: var(--neutral-900);
         }
     }
 
@@ -97,6 +97,9 @@
     }
 
     &--radius {
+        &-none {
+            border-radius: 0px;
+        }
         &-xs {
             border-radius: var(--radius-xs);
         }

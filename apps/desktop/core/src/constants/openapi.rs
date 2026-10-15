@@ -1,13 +1,31 @@
 use include_dir::{Dir, include_dir};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::path::Path;
+use strum::{AsRefStr, EnumIter, IntoEnumIterator};
 
 pub static OPENAPI_SPECS: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/openapi");
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, EnumIter, AsRefStr)]
 pub enum ApiService {
     Profiles,
     Tracks,
+}
+
+impl<'de> Deserialize<'de> for ApiService {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        match s.to_lowercase().as_str() {
+            "profiles" => Ok(ApiService::Profiles),
+            "tracks" => Ok(ApiService::Tracks),
+            other => Err(serde::de::Error::unknown_variant(
+                other,
+                &["Profiles", "Tracks"],
+            )),
+        }
+    }
 }
 
 impl ApiService {
@@ -16,6 +34,10 @@ impl ApiService {
             ApiService::Profiles => "profiles.json",
             ApiService::Tracks => "tracks.json",
         }
+    }
+
+    pub fn all() -> Vec<Self> {
+        Self::iter().collect()
     }
 }
 

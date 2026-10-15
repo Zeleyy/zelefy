@@ -17,7 +17,7 @@ export const GeneralSettings = () => {
 
     return (
         <>
-            <div>GeneralSettings</div>
+            <h1>{t("settings.general.title")}</h1>
 
             <Flex direction="column" gap="sm">
                 <Flex justify="space-between" align="center">

@@ -20,6 +20,8 @@ tauri-plugin-store = "2"
 tauri-plugin-os = "2"
 tauri-plugin-process = "2"
 
+strum = { workspace = true }
+
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
 

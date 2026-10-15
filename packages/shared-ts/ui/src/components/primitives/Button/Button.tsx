@@ -11,7 +11,7 @@ import clsx from "clsx";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
 export type ButtonSize = "small" | "medium" | "large";
-export type ButtonRadius = "xs" | "sm" | "md" | "lg" | "xl" | "full";
+export type ButtonRadius = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "full";
 
 interface ColorScheme {
     color?: string;

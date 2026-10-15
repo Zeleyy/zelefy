@@ -1,6 +1,12 @@
 use desktop_core::constants::openapi::{get_spec_or_default, ApiService};
 use serde::Serialize;
+use strum::IntoEnumIterator;
 use tauri::{AppHandle, Manager};
+
+#[tauri::command]
+pub fn get_available_services() -> Vec<String> {
+    ApiService::iter().map(|s| s.as_ref().to_string()).collect()
+}
 
 #[derive(Serialize, Clone)]
 pub struct ApiEndpointInfo {

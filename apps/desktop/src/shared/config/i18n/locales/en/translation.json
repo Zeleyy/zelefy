@@ -1,4 +1,9 @@
 {
+    "common": {
+        "save": "Save",
+        "reset": "Reset",
+        "loading": "Loading..."
+    },
     "language": {
         "current": "English",
         "ru": "Русский",
@@ -51,7 +56,17 @@
             "title": "Audio"
         },
         "network": {
-            "title": "Network"
+            "title": "Network",
+            "connection": {
+                "title": "Server Connection",
+                "description": "Specify the host address to connect the application to the backend",
+                "defaultHint": "Default value: {{url}}"
+            },
+            "services": {
+                "title": "Services & Endpoints",
+                "description": "List of available endpoints for the selected microservice",
+                "empty": "Endpoints not found"
+            }
         },
         "storage": {
             "title": "Storage"

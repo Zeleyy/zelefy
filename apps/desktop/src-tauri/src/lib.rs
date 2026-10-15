@@ -34,8 +34,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::get_gateway_url,
             commands::set_gateway_url,
+            commands::reset_gateway_url,
+            commands::get_default_gateway_url,
             commands::get_cache_limit,
             commands::set_cache_limit,
+            commands::get_available_services,
             commands::get_available_endpoints,
             commands::create_storage,
         ])

@@ -1,0 +1,81 @@
+$method-colors: (
+    get: #5fa2ff,
+    post: #02d990,
+    patch: #50e3c2,
+    put: #ff9f03,
+    delete: #ff001d,
+    head: #9012fe,
+    options: #0d5aa7,
+    trace: #7d7d7d,
+);
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--text-secondary);
+}
+
+.tab {
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition:
+        color 0.15s,
+        border-color 0.15s;
+
+    &:hover {
+        color: var(--text-primary);
+    }
+
+    &--active {
+        border-bottom-color: var(--primary);
+        color: var(--primary);
+    }
+}
+
+.endpoint {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    background-color: transparent;
+    transition: background-color 0.15s;
+
+    &:hover {
+        background-color: var(--bg-surface);
+    }
+
+    &__method {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        color: #fff;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        flex-shrink: 0;
+        width: 65px;
+        text-align: center;
+        text-transform: uppercase;
+
+        @each $method, $color in $method-colors {
+            &--#{$method} {
+                background-color: $color;
+            }
+        }
+    }
+
+    &__path {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: monospace;
+    }
+}
+
+.loaderPlaceholder,
+.empty,
+.error {
+    padding: var(--spacing-md);
+    color: var(--text-secondary);
+    text-align: center;
+}

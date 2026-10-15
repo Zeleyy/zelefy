@@ -1,3 +1,11 @@
+import { useTranslation } from "react-i18next";
+
 export const StorageSettings = () => {
-    return <div>StorageSettings</div>;
+    const { t } = useTranslation();
+
+    return (
+        <>
+            <h1>{t("settings.storage.title")}</h1>
+        </>
+    );
 };
