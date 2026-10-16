@@ -1,24 +1,28 @@
-import { DownloadIcon, HomeIcon, LibraryIcon, SearchIcon } from "@zelefy/ui";
+import { type IconName } from "@zelefy/ui";
 
-export const navItems = [
+export const navItems: {
+    path: string;
+    label: string;
+    icon: IconName;
+}[] = [
     {
         path: "/",
         label: "sidebar.home",
-        icon: HomeIcon,
+        icon: "common-home",
     },
     {
         path: "/search",
         label: "sidebar.search",
-        icon: SearchIcon,
+        icon: "common-search",
     },
     {
         path: "/library",
         label: "sidebar.library",
-        icon: LibraryIcon,
+        icon: "common-library",
     },
     {
         path: "/offline",
         label: "sidebar.offline",
-        icon: DownloadIcon,
+        icon: "common-download",
     },
 ];

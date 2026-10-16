@@ -9,6 +9,9 @@ export {
     type ImageProps,
     GradientImage,
     type GradientImageProps,
+    Icon,
+    type IconProps,
+    type IconName,
 } from "./primitives";
 
 export { SpinnerLoader, type SpinnerLoaderProps } from "./loading";

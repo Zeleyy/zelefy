@@ -2,7 +2,7 @@ import styles from "./VolumeControl.module.scss";
 import { Flex } from "../../../primitives/Flex";
 import { Button } from "../../../primitives/Button";
 import { ProgressBar } from "../../progress";
-import { HighVolumeIcon, LowVolumeIcon, MuteIcon } from "../../../../icons";
+import { Icon } from "../../../primitives";
 
 export interface VolumeControlProps {
     isMuted?: boolean;
@@ -44,13 +44,17 @@ export const VolumeControl = ({
                 onClick={onToggleMute}
                 aria-label={isMuted ? "Unmute volume" : "Mute volume"}
             >
-                {isMuted || volume === 0 ? (
-                    <MuteIcon width={16} height={16} />
-                ) : volume < 50 ? (
-                    <LowVolumeIcon width={16} height={16} />
-                ) : (
-                    <HighVolumeIcon width={16} height={16} />
-                )}
+                <Icon
+                    name={
+                        isMuted || volume === 0
+                            ? "player-volume-mute"
+                            : volume < 50
+                              ? "player-volume-low"
+                              : "player-volume-high"
+                    }
+                    width={16}
+                    height={16}
+                />
             </Button>
         </div>
     );

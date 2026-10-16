@@ -14,3 +14,8 @@ declare module "*.svg?react" {
     const ReactComponent: FC<SVGProps<SVGSVGElement>>;
     export default ReactComponent;
 }
+
+declare module "*.svg?no-inline" {
+    const content: string;
+    export default content;
+}

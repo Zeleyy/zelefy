@@ -1,7 +1,6 @@
 import styles from "./Cover.module.scss";
 import clsx from "clsx";
-import { Button, GradientImage } from "../../primitives";
-import { PauseIcon, PlayIcon } from "../../../icons";
+import { Button, GradientImage, Icon } from "../../primitives";
 
 export type CoverSize = "xs" | "sm" | "md" | "lg" | "xl";
 
@@ -39,11 +38,11 @@ export const Cover = ({
                         onClick={onPlayClick}
                         aria-label={isPlaying ? "Pause track" : "Play track"}
                     >
-                        {isPlaying ? (
-                            <PauseIcon width={24} height={24} />
-                        ) : (
-                            <PlayIcon width={24} height={24} />
-                        )}
+                        <Icon
+                            name={isPlaying ? "player-pause" : "player-play"}
+                            width={24}
+                            height={24}
+                        />
                     </Button>
                 </div>
             )}

@@ -2,15 +2,7 @@ import styles from "./Sidebar.module.scss";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
-import {
-    Avatar,
-    Button,
-    CollapseIcon,
-    ExpandIcon,
-    Flex,
-    GlobeIcon,
-    SettingsIcon,
-} from "@zelefy/ui";
+import { Avatar, Button, Flex, Icon } from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";
 import { navItems } from "../config";
 
@@ -49,7 +41,7 @@ export const Sidebar = () => {
                         title={isMinified ? t(item.label) : undefined}
                         aria-label={t(item.label)}
                     >
-                        <item.icon width={22} height={22} />
+                        <Icon name={item.icon} width={22} height={22} />
                         <span>{t(item.label)}</span>
                     </Button>
                 ))}
@@ -64,11 +56,11 @@ export const Sidebar = () => {
                     title={isMinified ? t("sidebar.expand") : undefined}
                     aria-label={isMinified ? t("sidebar.expand") : t("sidebar.collapse")}
                 >
-                    {isMinified ? (
-                        <ExpandIcon width={22} height={22} />
-                    ) : (
-                        <CollapseIcon width={22} height={22} />
-                    )}
+                    <Icon
+                        name={isMinified ? "common-expand" : "common-collapse"}
+                        width={22}
+                        height={22}
+                    />
                     <span>{t("sidebar.collapse")}</span>
                 </Button>
 
@@ -80,7 +72,7 @@ export const Sidebar = () => {
                     title={isMinified ? t("language.current") : undefined}
                     aria-label={t("language.current")}
                 >
-                    <GlobeIcon width={22} height={22} />
+                    <Icon name="common-globe" width={22} height={22} />
                     <span>{t("language.current")}</span>
                 </Button>
 
@@ -93,7 +85,7 @@ export const Sidebar = () => {
                     title={isMinified ? t("sidebar.settings") : undefined}
                     aria-label={t("sidebar.settings")}
                 >
-                    <SettingsIcon width={22} height={22} />
+                    <Icon name="common-settings" width={22} height={22} />
                     <span>{t("sidebar.settings")}</span>
                 </Button>
 

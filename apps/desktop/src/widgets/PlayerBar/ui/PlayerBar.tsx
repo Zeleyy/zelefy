@@ -1,24 +1,6 @@
 import styles from "./PlayerBar.module.scss";
 import { useState } from "react";
-import {
-    AudioSettings,
-    Button,
-    Cover,
-    EqualizerIcon,
-    Flex,
-    formatTime,
-    HeartIcon,
-    PauseIcon,
-    PlayIcon,
-    ProgressBar,
-    QueueIcon,
-    RepeatIcon,
-    RepeatOneIcon,
-    ShuffleIcon,
-    SkipNextIcon,
-    SkipPrevIcon,
-    VolumeControl,
-} from "@zelefy/ui";
+import { Button, Cover, Flex, formatTime, Icon, ProgressBar, VolumeControl } from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
 import clsx from "clsx";
 
@@ -81,7 +63,7 @@ export const PlayerBar = () => {
                                         <span>Artist</span>
                                     </div>
                                     <Button variant="ghost" radius="full" square>
-                                        <HeartIcon width={16} height={16} />
+                                        <Icon name="player-heart" width={16} height={16} />
                                     </Button>
                                 </Flex>
 
@@ -103,7 +85,7 @@ export const PlayerBar = () => {
                                                 : undefined
                                         }
                                     >
-                                        <ShuffleIcon width={16} height={16} />
+                                        <Icon name="player-shuffle" width={16} height={16} />
                                     </Button>
 
                                     <Button
@@ -112,15 +94,15 @@ export const PlayerBar = () => {
                                         square
                                         onClick={previousTrack}
                                     >
-                                        <SkipPrevIcon width={20} height={20} />
+                                        <Icon name="player-skip-prev" width={20} height={20} />
                                     </Button>
 
                                     <Button radius="full" size="large" square onClick={togglePlay}>
-                                        {isPlaying ? (
-                                            <PauseIcon width={20} height={20} />
-                                        ) : (
-                                            <PlayIcon width={20} height={20} />
-                                        )}
+                                        <Icon
+                                            name={isPlaying ? "player-pause" : "player-play"}
+                                            width={20}
+                                            height={20}
+                                        />
                                     </Button>
 
                                     <Button
@@ -129,7 +111,7 @@ export const PlayerBar = () => {
                                         square
                                         onClick={nextTrack}
                                     >
-                                        <SkipNextIcon width={20} height={20} />
+                                        <Icon name="player-skip-next" width={20} height={20} />
                                     </Button>
 
                                     <Button
@@ -147,11 +129,15 @@ export const PlayerBar = () => {
                                                 : undefined
                                         }
                                     >
-                                        {repeatMode === "track" ? (
-                                            <RepeatOneIcon width={16} height={16} />
-                                        ) : (
-                                            <RepeatIcon width={16} height={16} />
-                                        )}
+                                        <Icon
+                                            name={
+                                                repeatMode === "track"
+                                                    ? "player-repeat-one"
+                                                    : "player-repeat"
+                                            }
+                                            width={16}
+                                            height={16}
+                                        />
                                     </Button>
                                 </Flex>
 
@@ -164,7 +150,7 @@ export const PlayerBar = () => {
                                         square
                                         className={styles.secondaryControl}
                                     >
-                                        <AudioSettings width={16} height={16} />
+                                        <Icon name="player-audio-settings" width={16} height={16} />
                                     </Button>
 
                                     <Button
@@ -173,11 +159,11 @@ export const PlayerBar = () => {
                                         square
                                         className={styles.tertiaryControl}
                                     >
-                                        <EqualizerIcon width={16} height={16} />
+                                        <Icon name="player-equalizer" width={16} height={16} />
                                     </Button>
 
                                     <Button variant="ghost" radius="full" square>
-                                        <QueueIcon width={16} height={16} />
+                                        <Icon name="player-queue" width={16} height={16} />
                                     </Button>
 
                                     <VolumeControl

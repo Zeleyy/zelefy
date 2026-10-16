@@ -1,29 +1,33 @@
-import { CloudIcon, DatabaseIcon, GlobeIcon, HeadphonesIcon, SparklesIcon } from "@zelefy/ui";
+import { type IconName } from "@zelefy/ui";
 
-export const navItems = [
+export const navItems: {
+    path: string;
+    label: string;
+    icon: IconName;
+}[] = [
     {
         path: "/settings/general",
         label: "settings.general.title",
-        icon: GlobeIcon,
+        icon: "common-globe",
     },
     {
         path: "/settings/appearance",
         label: "settings.appearance.title",
-        icon: SparklesIcon,
+        icon: "common-sparkles",
     },
     {
         path: "/settings/audio",
         label: "settings.audio.title",
-        icon: HeadphonesIcon,
+        icon: "common-headphones",
     },
     {
         path: "/settings/network",
         label: "settings.network.title",
-        icon: CloudIcon,
+        icon: "common-cloud",
     },
     {
         path: "/settings/storage",
         label: "settings.storage.title",
-        icon: DatabaseIcon,
+        icon: "common-database",
     },
 ];

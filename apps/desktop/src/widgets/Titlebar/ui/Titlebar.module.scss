@@ -26,12 +26,6 @@
         pointer-events: none;
         user-select: none;
     }
-
-    &__overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-    }
 }
 
 .searchWrapper {
