@@ -1,6 +1,6 @@
 import styles from "./Sidebar.module.scss";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import clsx from "clsx";
 import { Avatar, Button, Flex, Icon } from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";

@@ -1,4 +1,4 @@
-import { Navigate, type RouteObject } from "react-router-dom";
+import { Navigate, type RouteObject } from "react-router";
 import { MainLayout } from "@/app/layouts";
 import { HomePage } from "@/pages/HomePage";
 

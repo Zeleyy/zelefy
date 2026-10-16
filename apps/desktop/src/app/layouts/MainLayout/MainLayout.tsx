@@ -1,5 +1,5 @@
 import styles from "./MainLayout.module.scss";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
 import { PlayerBar } from "@/widgets/PlayerBar";

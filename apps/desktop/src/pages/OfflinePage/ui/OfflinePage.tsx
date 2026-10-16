@@ -2,7 +2,7 @@ import styles from "./OfflinePage.module.scss";
 import { useState } from "react";
 import { Button, Cover, Flex, formatBytes, formatTime, Input } from "@zelefy/ui";
 import { StorageDashboard } from "./StorageDashboard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export const OfflinePage = () => {
     const [activeTab, setActiveTab] = useState<"all" | "imported" | "cache">("all");

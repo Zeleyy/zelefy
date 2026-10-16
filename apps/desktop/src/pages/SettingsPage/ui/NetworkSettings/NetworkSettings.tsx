@@ -1,7 +1,7 @@
 import styles from "./NetworkSettings.module.scss";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import clsx from "clsx";
 import { Button, Flex, Input } from "@zelefy/ui";
 import { useServices, useEndpoints } from "../../hooks";

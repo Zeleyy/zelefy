@@ -1,5 +1,5 @@
 import styles from "./StorageDashboard.module.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
 import { StorageType, type StorageWithStats } from "@/shared/types";

@@ -1,7 +1,7 @@
 import styles from "./Titlebar.module.scss";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Button, Flex, Icon, Input } from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";
 import { useBlurOnOutsideClick } from "../hooks";

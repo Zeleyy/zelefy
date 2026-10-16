@@ -30,6 +30,9 @@
         "collapse": "Collapse",
         "expand": "Expand"
     },
+    "home": {
+        "title": "Home"
+    },
     "settings": {
         "general": {
             "title": "General",

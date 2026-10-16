@@ -1,12 +1,22 @@
 import styles from "./SettingsPage.module.scss";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, useLocation, useOutlet } from "react-router";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { Button, Flex, Icon } from "@zelefy/ui";
 import { navItems } from "../config";
+import { cloneElement } from "react";
+
+const variants = {
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -8 },
+};
 
 export const SettingsPage = () => {
     const { t } = useTranslation();
+    const location = useLocation();
+    const element = useOutlet();
 
     const getNavClass = ({ isActive }: { isActive: boolean }) =>
         clsx(styles.navButton, {
@@ -34,9 +44,21 @@ export const SettingsPage = () => {
                     ))}
                 </Flex>
 
-                <Flex direction="column" gap="md" fullWidth>
-                    <Outlet />
-                </Flex>
+                <AnimatePresence mode="wait">
+                    {element && (
+                        <motion.div
+                            key={location.pathname}
+                            variants={variants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            className={styles.content}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                        >
+                            {cloneElement(element, { key: location.pathname })}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </Flex>
         </Flex>
     );

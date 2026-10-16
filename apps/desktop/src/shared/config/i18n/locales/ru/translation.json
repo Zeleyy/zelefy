@@ -30,6 +30,9 @@
         "collapse": "Свернуть",
         "expand": "Развернуть"
     },
+    "home": {
+        "title": "Главная"
+    },
     "settings": {
         "general": {
             "title": "Общее",

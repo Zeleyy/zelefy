@@ -1,13 +1,16 @@
 import { usePlayerStore } from "@/shared/lib/stores";
 import { Button } from "@zelefy/ui";
+import { useTranslation } from "react-i18next";
 
 export const HomePage = () => {
+    const { t } = useTranslation();
     const resetPlayer = usePlayerStore((state) => state.resetPlayer);
     const playTrack = usePlayerStore((state) => state.playTrack);
 
     return (
         <>
-            <div>HomePage</div>
+            <h1>{t("home.title")}</h1>
+
             <Button variant="primary" onClick={resetPlayer}>
                 Hide player
             </Button>
