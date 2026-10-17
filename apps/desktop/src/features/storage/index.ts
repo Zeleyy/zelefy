@@ -1,1 +1,1 @@
-export { useCreateStorage } from "./hooks";
+export { useCreateStorage, useStorages } from "./hooks";

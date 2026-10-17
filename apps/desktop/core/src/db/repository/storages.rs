@@ -1,7 +1,7 @@
 use chrono::Utc;
 use rusqlite::{Connection, params, params_from_iter, types::Value};
 
-use crate::models::storages::{NewStorage, Storage, UpdateStorage};
+use crate::models::storages::{NewStorage, Storage, StorageType, UpdateStorage};
 
 pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
     let mut stmt = conn.prepare(
@@ -14,6 +14,10 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
                 , max_size_bytes
                 , created_at
             FROM storages
+            ORDER BY
+                storage_type_id ASC
+                , is_primary DESC
+                , created_at ASC
         "#,
     )?;
 
@@ -23,6 +27,64 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
             path: row.get(1)?,
             storage_type: row.get(2)?,
             is_primary: row.get(3)?,
+            max_size_bytes: row.get(4)?,
+            created_at: row.get(5)?,
+        })
+    })?;
+
+    rows.collect()
+}
+
+pub fn get_by(
+    conn: &Connection,
+    path: Option<String>,
+    storage_type: Option<StorageType>,
+    is_primary: Option<bool>,
+) -> rusqlite::Result<Vec<Storage>> {
+    let mut where_parts: Vec<String> = Vec::new();
+    let mut values: Vec<Value> = Vec::new();
+
+    if let Some(p) = path {
+        where_parts.push("path = ?".to_string());
+        values.push(Value::Text(p));
+    }
+
+    if let Some(st) = storage_type {
+        where_parts.push("storage_type_id = ?".to_string());
+        values.push(Value::Integer(st as i64));
+    }
+
+    if let Some(ip) = is_primary {
+        where_parts.push("is_primary = ?".to_string());
+        values.push(Value::Integer(ip as i64));
+    }
+
+    let mut sql = String::from(
+        r#"
+            SELECT
+                storage_id
+                , path
+                , storage_type_id
+                , is_primary
+                , max_size_bytes
+                , created_at
+            FROM storages
+        "#,
+    );
+
+    if !where_parts.is_empty() {
+        sql.push_str(" WHERE ");
+        sql.push_str(&where_parts.join(" AND "));
+    }
+
+    let mut stmt = conn.prepare(&sql)?;
+
+    let rows = stmt.query_map(params_from_iter(values), |row| {
+        Ok(Storage {
+            storage_id: row.get(0)?,
+            path: row.get(1)?,
+            storage_type: row.get(2)?,
+            is_primary: row.get::<_, i64>(3)? != 0,
             max_size_bytes: row.get(4)?,
             created_at: row.get(5)?,
         })

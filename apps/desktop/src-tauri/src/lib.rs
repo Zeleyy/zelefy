@@ -1,13 +1,19 @@
 pub mod commands;
 pub mod state;
 
-use desktop_core::db::{init_db, DbState};
+use desktop_core::{
+    db::{init_db, DbState},
+    services::storages::init_app_cache,
+};
 use state::AppState;
 use tauri::Manager;
+
+use crate::state::DEFAULT_CACHE_LIMIT_MB;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_os::init())
@@ -26,6 +32,9 @@ pub fn run() {
             let db_path = app_dir.join("zelefy.db");
             let conn = init_db(&db_path.to_string_lossy()).expect("Failed to initialize database");
 
+            init_app_cache(&conn, &app_dir, DEFAULT_CACHE_LIMIT_MB)
+                .expect("Failed to initialize app cache");
+
             app.manage(DbState::new(conn));
             app.manage(AppState::default());
 
@@ -40,7 +49,8 @@ pub fn run() {
             commands::set_cache_limit,
             commands::get_available_services,
             commands::get_available_endpoints,
-            commands::create_storage,
+            commands::get_all_storages,
+            commands::add_user_library,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

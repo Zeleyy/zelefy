@@ -1,8 +1,9 @@
 use rusqlite::types::{FromSql, FromSqlError, FromSqlResult, ValueRef};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
 pub enum StorageType {
     Cache = 0,
     Library = 1,
@@ -19,7 +20,8 @@ impl FromSql for StorageType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Storage {
     pub storage_id: i64,
     pub path: String,
@@ -41,4 +43,13 @@ pub struct UpdateStorage {
     pub path: Option<String>,
     pub is_primary: Option<bool>,
     pub max_size_bytes: Option<Option<i64>>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StorageWithStats {
+    #[serde(flatten)]
+    pub storage: Storage,
+    pub used_size_bytes: i64,
+    pub files_count: i64,
 }

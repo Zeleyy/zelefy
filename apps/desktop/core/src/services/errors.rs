@@ -9,6 +9,9 @@ pub enum CoreError {
     #[error("storage path already exists: {0}")]
     PathAlreadyExists(String),
 
+    #[error("invalid storage path: {0}")]
+    InvalidPath(String),
+
     #[error("storage not found: {0}")]
     NotFound(i64),
 }

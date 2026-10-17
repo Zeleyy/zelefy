@@ -2,67 +2,72 @@ import styles from "./StorageDashboard.module.scss";
 import { useNavigate } from "react-router";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
-import { StorageType, type StorageWithStats } from "@/shared/types";
+import { StorageType } from "@/shared/types";
+import { useStorages } from "@/features/storage";
 
-const storages: StorageWithStats[] = [
-    {
-        storageId: 1,
-        path: "C:/Users/User/AppData/Local/zelefy/cache",
-        storageType: StorageType.Cache,
-        isPrimary: false,
-        maxSizeBytes: 2_147_483_648,
-        usedSizeBytes: 734_003_200,
-        filesCount: 42,
-        createdAt: 0,
-    },
-    {
-        storageId: 2,
-        path: "C:/Users/User/Music/zelefy-library",
-        storageType: StorageType.Library,
-        isPrimary: true,
-        maxSizeBytes: null,
-        usedSizeBytes: 326_841_139,
-        filesCount: 15,
-        createdAt: 0,
-    },
-    {
-        storageId: 3,
-        path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
-        storageType: StorageType.Library,
-        isPrimary: false,
-        maxSizeBytes: null,
-        usedSizeBytes: 120_500_100,
-        filesCount: 8,
-        createdAt: 0,
-    },
-    {
-        storageId: 4,
-        path: "E:/Flac_Collection",
-        storageType: StorageType.Library,
-        isPrimary: false,
-        maxSizeBytes: null,
-        usedSizeBytes: 5_368_709_120,
-        filesCount: 120,
-        createdAt: 0,
-    },
-    {
-        storageId: 5,
-        path: "F:/DJ_Sets",
-        storageType: StorageType.Library,
-        isPrimary: false,
-        maxSizeBytes: null,
-        usedSizeBytes: 1_073_741_824,
-        filesCount: 30,
-        createdAt: 0,
-    },
-];
+// const _storages: StorageWithStats[] = [
+//     {
+//         storageId: 1,
+//         path: "C:/Users/User/AppData/Local/zelefy/cache",
+//         storageType: StorageType.Cache,
+//         isPrimary: false,
+//         maxSizeBytes: 2_147_483_648,
+//         usedSizeBytes: 734_003_200,
+//         filesCount: 42,
+//         createdAt: 0,
+//     },
+//     {
+//         storageId: 2,
+//         path: "C:/Users/User/Music/zelefy-library",
+//         storageType: StorageType.Library,
+//         isPrimary: true,
+//         maxSizeBytes: null,
+//         usedSizeBytes: 326_841_139,
+//         filesCount: 15,
+//         createdAt: 0,
+//     },
+//     {
+//         storageId: 3,
+//         path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
+//         storageType: StorageType.Library,
+//         isPrimary: false,
+//         maxSizeBytes: null,
+//         usedSizeBytes: 120_500_100,
+//         filesCount: 8,
+//         createdAt: 0,
+//     },
+//     {
+//         storageId: 4,
+//         path: "E:/Flac_Collection",
+//         storageType: StorageType.Library,
+//         isPrimary: false,
+//         maxSizeBytes: null,
+//         usedSizeBytes: 5_368_709_120,
+//         filesCount: 120,
+//         createdAt: 0,
+//     },
+//     {
+//         storageId: 5,
+//         path: "F:/DJ_Sets",
+//         storageType: StorageType.Library,
+//         isPrimary: false,
+//         maxSizeBytes: null,
+//         usedSizeBytes: 1_073_741_824,
+//         filesCount: 30,
+//         createdAt: 0,
+//     },
+// ];
 
 export const StorageDashboard = () => {
+    const navigate = useNavigate();
+    const { data } = useStorages();
+
+    const storages = data ?? [];
+
     const MAX_VISIBLE = storages.length === 4 ? 4 : 3;
     const visibleStorages = storages.slice(0, MAX_VISIBLE);
     const remainingCount = storages.length - MAX_VISIBLE;
     const totalUsedBytes = storages.reduce((acc, s) => acc + s.usedSizeBytes, 0);
-    const navigate = useNavigate();
 
     return (
         <Flex as={"section"} direction="column" gap="md" className={styles.storageDashboard}>

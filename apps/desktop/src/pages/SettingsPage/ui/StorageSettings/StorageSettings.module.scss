@@ -1,0 +1,139 @@
+.storageSettingsList {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-secondary);
+    overflow: hidden;
+
+    .storageRow {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background-color 0.15s ease;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: var(--bg-surface-hover);
+        }
+
+        .rowInfo {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 155px;
+            flex-shrink: 0;
+
+            .rowTitleWrapper {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-2xs);
+
+                .dot {
+                    width: 7px;
+                    height: 7px;
+                    flex-shrink: 0;
+                    border-radius: var(--radius-full);
+
+                    &Cache {
+                        background-color: var(--primary);
+                    }
+
+                    &Imported {
+                        background-color: var(--accent);
+                    }
+
+                    &External {
+                        background-color: var(--success);
+                    }
+                }
+
+                .label {
+                    font-size: var(--font-size-sm);
+                    font-weight: var(--font-weight-semibold);
+                    color: var(--text-primary);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .badgePrimary {
+                    font-size: 9px;
+                    padding: 0 4px;
+                    border-radius: var(--radius-sm);
+                    background-color: var(--accent-subtle-bg);
+                    color: var(--accent);
+                    border: 1px solid var(--accent-subtle-border);
+                    text-transform: uppercase;
+                    font-weight: var(--font-weight-semibold);
+                }
+            }
+
+            .metrics {
+                font-size: var(--font-size-xs);
+                color: var(--text-muted);
+                padding-left: calc(7px + var(--spacing-2xs));
+
+                strong {
+                    color: var(--text-secondary);
+                }
+            }
+        }
+
+        .rowPathControl {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            flex: 1;
+
+            :global(.ui-input) {
+                flex: 1;
+                font-size: var(--font-size-xs);
+            }
+        }
+
+        .rowActions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: var(--spacing-2xs);
+            flex-shrink: 0;
+        }
+
+        &.storageRowAction {
+            border: 1px dashed var(--border-strong);
+            background-color: transparent;
+            cursor: pointer;
+            justify-content: center;
+            transition: all 0.15s ease;
+
+            &:hover {
+                background-color: var(--bg-surface-hover);
+                border-color: var(--accent);
+
+                .actionIcon,
+                .actionText {
+                    color: var(--accent);
+                }
+            }
+
+            .actionContent {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-2xs);
+
+                .actionIcon,
+                .actionText {
+                    font-size: var(--font-size-sm);
+                    font-weight: var(--font-weight-semibold);
+                }
+            }
+        }
+    }
+}

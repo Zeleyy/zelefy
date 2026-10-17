@@ -72,7 +72,31 @@
             }
         },
         "storage": {
-            "title": "Хранилище"
+            "title": "Хранилище",
+            "section": {
+                "title": "Пути и хранилища",
+                "description": "Управление расположением кэша, локальных библиотек и внешних папок"
+            },
+            "types": {
+                "cache": "Кэш стриминга",
+                "library": "Библиотека",
+                "libraryFallback": "Папка библиотеки"
+            },
+            "metrics": {
+                "cacheUsage": "Занято: <strong>{{used}}</strong> / {{max}}",
+                "tracksCount": "<strong>{{count}}</strong> треков ({{size}})",
+                "tracks_one": "<strong>{{count}}</strong> трек ({{size}})",
+                "tracks_few": "<strong>{{count}}</strong> трека ({{size}})",
+                "tracks_many": "<strong>{{count}}</strong> треков ({{size}})"
+            },
+            "actions": {
+                "browse": "Обзор",
+                "options": "Опции",
+                "addLibraryFolder": "Добавить папку библиотеки"
+            },
+            "errors": {
+                "browseFailed": "Ошибка при выборе папки"
+            }
         }
     }
 }

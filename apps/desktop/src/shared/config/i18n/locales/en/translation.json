@@ -72,7 +72,29 @@
             }
         },
         "storage": {
-            "title": "Storage"
+            "title": "Storage",
+            "section": {
+                "title": "Paths & storages",
+                "description": "Manage the location of cache, local libraries and external folders"
+            },
+            "types": {
+                "cache": "Streaming cache",
+                "library": "Library",
+                "libraryFallback": "Library folder"
+            },
+            "metrics": {
+                "cacheUsage": "Used: <strong>{{used}}</strong> / {{max}}",
+                "tracksCount_one": "<strong>{{count}}</strong> track ({{size}})",
+                "tracksCount_other": "<strong>{{count}}</strong> tracks ({{size}})"
+            },
+            "actions": {
+                "browse": "Browse",
+                "options": "Options",
+                "addLibraryFolder": "Add library folder"
+            },
+            "errors": {
+                "browseFailed": "Failed to pick a folder"
+            }
         }
     }
 }
