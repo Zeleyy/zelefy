@@ -34,6 +34,10 @@ pub enum TrackServiceError {
     #[api_error(status = 500, code = "IMAGE_PROCESSING_FAILED")]
     ImageProcessingFailed(String),
 
+    #[error("Audio processing failed: {0}")]
+    #[api_error(status = 500, code = "AUDIO_PROCESSING_FAILED")]
+    AudioProcessingFailed(String),
+
     #[error("Database error: {0}")]
     #[api_error(status = 500, code = "INTERNAL_ERROR")]
     DatabaseError(#[from] sqlx::Error),

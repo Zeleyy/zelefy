@@ -146,6 +146,7 @@ name = "audio-core"
 version = "0.1.0"
 dependencies = [
  "bytemuck",
+ "bytes",
  "symphonia",
  "thiserror",
 ]
@@ -4884,6 +4885,7 @@ dependencies = [
 name = "zelefy_tracks"
 version = "0.1.0"
 dependencies = [
+ "audio-core",
  "aws-sdk-s3",
  "axum",
  "bigdecimal",

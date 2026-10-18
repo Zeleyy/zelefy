@@ -1,3 +1,7 @@
+use audio_core::{
+    decoder::{WaveformOptions, decode_waveform_from_bytes},
+    processor::to_bin_bytes,
+};
 use aws_sdk_s3::Client;
 use axum::body::Bytes;
 use sqlx::PgPool;
@@ -69,17 +73,38 @@ async fn process_audio_upload(
 ) -> Result<(), TrackServiceError> {
     let bucket_name = &config.s3_bucket;
     let track_key = build_key("tracks", track_id, file_ext);
+    let waveform_key = build_key("waveforms", track_id, "bin");
+
+    let waveform_bytes: Vec<u8> = {
+        let bytes = audio_file.clone();
+        tokio::task::spawn_blocking(move || {
+            let wave = decode_waveform_from_bytes(bytes, WaveformOptions::default())
+                .map_err(|e| TrackServiceError::AudioProcessingFailed(e.to_string()))?;
+            Ok::<Vec<u8>, TrackServiceError>(to_bin_bytes(&wave.peaks))
+        })
+        .await
+        .map_err(|e| TrackServiceError::AudioProcessingFailed(e.to_string()))??
+    };
 
     upload_object(s3_client, bucket_name, &track_key, audio_file, content_type).await?;
 
-    let new_track_url = format!(
-        "{}/{}",
-        config.s3_public_url.trim_end_matches('/'),
-        track_key
-    );
+    if let Err(e) = upload_object(
+        s3_client,
+        bucket_name,
+        &waveform_key,
+        waveform_bytes.into(),
+        "application/octet-stream",
+    )
+    .await
+    {
+        let _ = delete_object(s3_client, bucket_name, &track_key).await;
+        return Err(e.into());
+    }
 
+    let base = config.s3_public_url.trim_end_matches('/');
     let update = UpdateTrack {
-        audio_url: Some(Some(new_track_url)),
+        audio_url: Some(Some(format!("{base}/{track_key}"))),
+        waveform_url: Some(Some(format!("{base}/{waveform_key}"))),
         status: Some(TrackStatus::Ready),
         ..Default::default()
     };
@@ -88,6 +113,7 @@ async fn process_audio_upload(
 
     if updated.is_none() {
         let _ = delete_object(s3_client, bucket_name, &track_key).await;
+        let _ = delete_object(s3_client, bucket_name, &waveform_key).await;
     }
 
     Ok(())

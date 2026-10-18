@@ -50,6 +50,7 @@ aws-sdk-s3 = { version = "1.152.0", features = ["behavior-version-latest"] }
 
 zelefy_common = { path = "packages/shared-rs/common", features = ["backend"] }
 zelefy_backend = { path = "packages/shared-rs/backend" }
+audio-core = { path = "packages/shared-rs/audio-core" }
 
 [profile.release]
 strip = true

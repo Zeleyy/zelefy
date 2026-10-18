@@ -1,4 +1,5 @@
-use std::io::{Read, Seek};
+use bytes::Bytes;
+use std::io::{self, Read, Seek, SeekFrom};
 use symphonia::{
     core::{
         audio::GenericAudioBufferRef,
@@ -11,7 +12,7 @@ use symphonia::{
     default::{get_codecs, get_probe},
 };
 
-use crate::error::AudioError;
+use crate::errors::AudioError;
 
 pub struct Waveform {
     pub peaks: Vec<f32>,
@@ -193,4 +194,44 @@ fn compress_peaks(peaks: &[f32], points: usize) -> Vec<f32> {
         out.push(c.iter().fold(0.0f32, |m, &s| m.max(s)));
     }
     out
+}
+
+struct BytesMediaSource {
+    cursor: io::Cursor<Bytes>,
+}
+
+impl BytesMediaSource {
+    fn new(bytes: Bytes) -> Self {
+        Self {
+            cursor: io::Cursor::new(bytes),
+        }
+    }
+}
+
+impl Read for BytesMediaSource {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.cursor.read(buf)
+    }
+}
+
+impl Seek for BytesMediaSource {
+    fn seek(&mut self, pos: SeekFrom) -> io::Result<u64> {
+        self.cursor.seek(pos)
+    }
+}
+
+impl MediaSource for BytesMediaSource {
+    fn is_seekable(&self) -> bool {
+        true
+    }
+    fn byte_len(&self) -> Option<u64> {
+        Some(self.cursor.get_ref().len() as u64)
+    }
+}
+
+pub fn decode_waveform_from_bytes(
+    bytes: Bytes,
+    opts: WaveformOptions,
+) -> Result<Waveform, AudioError> {
+    decode_waveform(BytesMediaSource::new(bytes), opts)
 }
