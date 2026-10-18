@@ -49,8 +49,6 @@ pub fn run() {
             commands::set_gateway_url,
             commands::reset_gateway_url,
             commands::get_default_gateway_url,
-            commands::get_cache_limit,
-            commands::set_cache_limit,
             commands::get_available_services,
             commands::get_available_endpoints,
             commands::get_all_storages,
@@ -59,6 +57,10 @@ pub fn run() {
             state::cache::commands::set_cache_root,
             state::cache::commands::get_default_cache_root,
             state::cache::commands::reset_cache_root,
+            state::cache::commands::get_cache_limit,
+            state::cache::commands::set_cache_limit,
+            state::cache::commands::get_default_cache_limit,
+            state::cache::commands::reset_cache_limit,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

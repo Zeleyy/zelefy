@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { tauriStorage } from "@/shared/lib/storage";
 import i18n from "@/shared/config/i18n";
 import { invoke } from "@tauri-apps/api/core";
+import { invokeTry } from "./helpers";
 
 export type Theme = "dark" | "light";
 export type ColorScheme = "orange" | "green" | "purple" | "blue";
@@ -14,13 +15,8 @@ interface SettingsState {
     isSidebarMinified: boolean;
     isMuted: boolean;
     volume: number;
-    cacheLimitMb: number;
     gatewayUrl: string;
     defaultGatewayUrl: string;
-
-    cacheRoot: string;
-    defaultCacheRoot: string;
-    isRelocating: boolean;
 
     _hasHydrated: boolean;
 
@@ -32,18 +28,10 @@ interface SettingsState {
     setIsMuted: (isMuted: boolean) => void;
     setVolume: (volume: number) => void;
 
-    setCacheLimitMb: (limitMb: number) => Promise<void>;
-    initCacheLimitMb: () => Promise<void>;
-
     setGatewayUrl: (newUrl: string) => Promise<void>;
     resetGatewayUrl: () => Promise<void>;
     initGatewayUrl: () => Promise<void>;
     initDefaultGatewayUrl: () => Promise<void>;
-
-    setCacheRoot: (path: string) => Promise<boolean>;
-    resetCacheRoot: () => Promise<void>;
-    initCacheRoot: () => Promise<void>;
-    initDefaultCacheRoot: () => Promise<void>;
 
     setHasHydrated: (state: boolean) => void;
 }
@@ -62,12 +50,8 @@ export const useSettingsStore = create<SettingsState>()(
             isSidebarMinified: false,
             isMuted: false,
             volume: 50,
-            cacheLimitMb: 1024,
             gatewayUrl: "",
             defaultGatewayUrl: "",
-            cacheRoot: "",
-            defaultCacheRoot: "",
-            isRelocating: false,
 
             _hasHydrated: false,
 
@@ -91,24 +75,6 @@ export const useSettingsStore = create<SettingsState>()(
 
             setIsMuted: (isMuted) => set({ isMuted: isMuted }),
             setVolume: (volume) => set({ volume: volume }),
-
-            setCacheLimitMb: async (limitMb) => {
-                try {
-                    await invoke("set_cache_limit", { limitMb });
-                    set({ cacheLimitMb: limitMb });
-                } catch (error) {
-                    console.error("Failed to update cache limit in backend:", error);
-                }
-            },
-
-            initCacheLimitMb: async () => {
-                try {
-                    const limit = await invoke<number>("get_cache_limit");
-                    set({ cacheLimitMb: limit });
-                } catch (error) {
-                    console.error("Failed to fetch cache limit from backend:", error);
-                }
-            },
 
             setGatewayUrl: async (newUrl) => {
                 try {
@@ -138,58 +104,12 @@ export const useSettingsStore = create<SettingsState>()(
             },
 
             initDefaultGatewayUrl: async () => {
-                try {
-                    const url = await invoke<string>("get_default_gateway_url");
-                    set({ defaultGatewayUrl: url });
-                } catch (error) {
-                    console.error("Failed to fetch default gateway URL from backend:", error);
-                }
-            },
-
-            setCacheRoot: async (path) => {
-                set({ isRelocating: true });
-                try {
-                    await invoke("set_cache_root", { path });
-                    const root = await invoke<string>("get_cache_root");
-                    set({ cacheRoot: root });
-                    return true;
-                } catch (error) {
-                    console.error("Failed to set cache root:", error);
-                    return false;
-                } finally {
-                    set({ isRelocating: false });
-                }
-            },
-
-            resetCacheRoot: async () => {
-                set({ isRelocating: true });
-                try {
-                    await invoke("reset_cache_root");
-                    const root = await invoke<string>("get_cache_root");
-                    set({ cacheRoot: root });
-                } catch (error) {
-                    console.error("Failed to reset cache root:", error);
-                } finally {
-                    set({ isRelocating: false });
-                }
-            },
-
-            initCacheRoot: async () => {
-                try {
-                    const root = await invoke<string>("get_cache_root");
-                    set({ cacheRoot: root });
-                } catch (error) {
-                    console.error("Failed to fetch cache root:", error);
-                }
-            },
-
-            initDefaultCacheRoot: async () => {
-                try {
-                    const root = await invoke<string>("get_default_cache_root");
-                    set({ defaultCacheRoot: root });
-                } catch (error) {
-                    console.error("Failed to fetch default cache root:", error);
-                }
+                const url = await invokeTry<string>(
+                    "get_default_gateway_url",
+                    {},
+                    "Failed to fetch default gateway:",
+                );
+                if (url !== null) set({ defaultGatewayUrl: url });
             },
 
             setHasHydrated: (state) => set({ _hasHydrated: state }),
@@ -203,7 +123,6 @@ export const useSettingsStore = create<SettingsState>()(
                 isSidebarMinified: state.isSidebarMinified,
                 isMuted: state.isMuted,
                 volume: state.volume,
-                cacheLimitMb: state.cacheLimitMb,
                 gatewayUrl: state.gatewayUrl,
             }),
             storage: createJSONStorage(() => tauriStorage),
@@ -211,9 +130,6 @@ export const useSettingsStore = create<SettingsState>()(
                 state?.setHasHydrated(true);
                 state?.initGatewayUrl();
                 state?.initDefaultGatewayUrl();
-                state?.initCacheLimitMb();
-                state?.initCacheRoot();
-                state?.initDefaultCacheRoot();
             },
         },
     ),

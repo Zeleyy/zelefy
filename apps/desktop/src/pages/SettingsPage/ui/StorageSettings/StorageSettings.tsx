@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Button, Flex, formatBytes, Input } from "@zelefy/ui";
 import { useStorages } from "@/features/storage";
 import { SettingsSection } from "@/widgets/sections";
-import { useSettingsStore } from "@/shared/lib/stores";
+import { useCacheStore } from "@/shared/lib/stores";
 
 // const storages = [
 //     {
@@ -62,10 +62,10 @@ export const StorageSettings = () => {
 
     const storages = data ?? [];
 
-    const cacheRoot = useSettingsStore((state) => state.cacheRoot);
-    const defaultCacheRoot = useSettingsStore((state) => state.defaultCacheRoot);
-    const setCacheRoot = useSettingsStore((state) => state.setCacheRoot);
-    const resetCacheRoot = useSettingsStore((state) => state.resetCacheRoot);
+    const cacheRoot = useCacheStore((state) => state.cacheRoot);
+    const defaultCacheRoot = useCacheStore((state) => state.defaultCacheRoot);
+    const setCacheRoot = useCacheStore((state) => state.setCacheRoot);
+    const resetCacheRoot = useCacheStore((state) => state.resetCacheRoot);
 
     const handleBrowseFolder = async (storageId?: number, currentPath?: string) => {
         try {

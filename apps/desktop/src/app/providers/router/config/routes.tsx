@@ -2,10 +2,19 @@ import { Navigate, type RouteObject } from "react-router";
 import { MainLayout } from "@/app/layouts";
 import { HomePage } from "@/pages/HomePage";
 
+const HydrateFallback = () => (
+    <div
+        style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
+    >
+        Loading...
+    </div>
+);
+
 export const routes: RouteObject[] = [
     {
         path: "/",
         element: <MainLayout />,
+        HydrateFallback: HydrateFallback,
         children: [
             {
                 index: true,

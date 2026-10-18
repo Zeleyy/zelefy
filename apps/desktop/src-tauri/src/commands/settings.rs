@@ -26,15 +26,3 @@ pub fn reset_gateway_url(state: State<'_, AppState>) -> String {
     *url = DEFAULT_GATEWAY_URL.to_string();
     url.clone()
 }
-
-#[tauri::command]
-pub fn get_cache_limit(state: State<'_, AppState>) -> u32 {
-    *state.cache_limit_mb.blocking_lock()
-}
-
-#[tauri::command]
-pub fn set_cache_limit(state: State<'_, AppState>, limit_mb: u32) -> Result<(), String> {
-    let mut limit = state.cache_limit_mb.blocking_lock();
-    *limit = limit_mb;
-    Ok(())
-}
