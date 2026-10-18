@@ -1,0 +1,19 @@
+[package]
+name = "audio-core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bytemuck = "1.25.2"
+symphonia = { version = "0.6.1", default-features = false, features = [
+    "mp3",
+    "flac",
+    "wav",
+    "ogg",
+    "vorbis",
+    "pcm",
+] }
+thiserror = { workspace = true }
+
+[features]
+default = []
