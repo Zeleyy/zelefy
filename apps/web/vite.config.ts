@@ -3,7 +3,7 @@ import { ViteMinifyPlugin } from "vite-plugin-minify";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-    plugins: [react(), ViteMinifyPlugin({})],
+    plugins: [react({ compiler: true }), ViteMinifyPlugin({})],
 
     resolve: {
         alias: [{ find: "@", replacement: "/src" }],

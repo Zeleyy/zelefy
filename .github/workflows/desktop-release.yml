@@ -10,6 +10,8 @@ jobs:
         permissions:
             contents: write
         runs-on: windows-latest
+        env:
+            RELEASE_NAME: ""
 
         steps:
             - name: Checkout repository
@@ -23,7 +25,7 @@ jobs:
             - name: Install Node.js & setup pnpm cache
               uses: actions/setup-node@v7
               with:
-                  node-version: 24
+                  node-version: 26
                   cache: "pnpm"
 
             - name: Install Rust stable
@@ -39,6 +41,12 @@ jobs:
             - name: Install frontend dependencies
               run: pnpm install --frozen-lockfile
 
+            - name: Prepare Release Name
+              shell: bash
+              run: |
+                  CLEAN_VERSION="${GITHUB_REF_NAME#desktop-v}"
+                  echo "RELEASE_NAME=Zelefy Desktop v${CLEAN_VERSION}" >> $GITHUB_ENV
+
             - name: Build Tauri App & Create GitHub Release
               uses: tauri-apps/tauri-action@v1
               env:
@@ -47,7 +55,7 @@ jobs:
                   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
               with:
                   tagName: ${{ github.ref_name }}
-                  releaseName: "Zelefy Desktop ${{ github.ref_name }}"
+                  releaseName: ${{ env.RELEASE_NAME }}
                   releaseDraft: false
                   prerelease: false
                   projectPath: "./apps/desktop"

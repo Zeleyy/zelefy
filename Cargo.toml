@@ -12,7 +12,7 @@ resolver = "2"
 
 [workspace.dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.151"
+serde_json = "1.0.154"
 uuid = { version = "1.28.0", features = ["serde", "v4"] }
 chrono = { version = "0.4.45", features = ["serde"] }
 bytes = "1.12.1"
@@ -22,7 +22,7 @@ const_format = "0.2.36"
 dotenvy = "0.15.7"
 envy = "0.4.2"
 
-tokio = { version = "1.53.2", features = ["full"] }
+tokio = { version = "1.53.3", features = ["full"] }
 
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
