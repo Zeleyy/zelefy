@@ -1,15 +1,3 @@
-CREATE TABLE storage_types (
-    storage_type_id INTEGER PRIMARY KEY,
-    storage_type TEXT NOT NULL UNIQUE
-);
-
-INSERT INTO
-    storage_types (storage_type_id, storage_type)
-VALUES
-    (0, 'cache'),
-    (1, 'library');
-
--- 
 CREATE TABLE track_statuses (
     status_id INTEGER PRIMARY KEY,
     status_name TEXT NOT NULL UNIQUE
@@ -27,11 +15,9 @@ VALUES
 CREATE TABLE storages (
     storage_id INTEGER PRIMARY KEY AUTOINCREMENT,
     path TEXT NOT NULL UNIQUE,
-    storage_type_id INTEGER NOT NULL,
     is_primary BOOLEAN NOT NULL DEFAULT 0,
     max_size_bytes INTEGER,
-    created_at INTEGER NOT NULL,
-    FOREIGN KEY (storage_type_id) REFERENCES storage_types (storage_type_id) ON DELETE RESTRICT
+    created_at INTEGER NOT NULL
 );
 
 -- 

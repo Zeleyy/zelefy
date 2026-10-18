@@ -2,14 +2,12 @@ import styles from "./StorageDashboard.module.scss";
 import { useNavigate } from "react-router";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
-import { StorageType } from "@/shared/types";
 import { useStorages } from "@/features/storage";
 
 // const _storages: StorageWithStats[] = [
 //     {
 //         storageId: 1,
 //         path: "C:/Users/User/AppData/Local/zelefy/cache",
-//         storageType: StorageType.Cache,
 //         isPrimary: false,
 //         maxSizeBytes: 2_147_483_648,
 //         usedSizeBytes: 734_003_200,
@@ -19,7 +17,6 @@ import { useStorages } from "@/features/storage";
 //     {
 //         storageId: 2,
 //         path: "C:/Users/User/Music/zelefy-library",
-//         storageType: StorageType.Library,
 //         isPrimary: true,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 326_841_139,
@@ -29,7 +26,6 @@ import { useStorages } from "@/features/storage";
 //     {
 //         storageId: 3,
 //         path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
-//         storageType: StorageType.Library,
 //         isPrimary: false,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 120_500_100,
@@ -39,7 +35,6 @@ import { useStorages } from "@/features/storage";
 //     {
 //         storageId: 4,
 //         path: "E:/Flac_Collection",
-//         storageType: StorageType.Library,
 //         isPrimary: false,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 5_368_709_120,
@@ -49,7 +44,6 @@ import { useStorages } from "@/features/storage";
 //     {
 //         storageId: 5,
 //         path: "F:/DJ_Sets",
-//         storageType: StorageType.Library,
 //         isPrimary: false,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 1_073_741_824,
@@ -58,6 +52,7 @@ import { useStorages } from "@/features/storage";
 //     },
 // ];
 
+// @TODO: переработать после удаления кеша
 export const StorageDashboard = () => {
     const navigate = useNavigate();
     const { data } = useStorages();
@@ -80,17 +75,7 @@ export const StorageDashboard = () => {
 
             <div className={styles.storageGrid}>
                 {visibleStorages.map((storage) => {
-                    const isCache = storage.storageType === StorageType.Cache;
-                    const isLibrary = storage.storageType === StorageType.Library;
-                    const isPrimaryLibrary = isLibrary && storage.isPrimary;
-
-                    const progressWidth =
-                        isCache && storage.maxSizeBytes
-                            ? Math.min(
-                                  100,
-                                  Math.round((storage.usedSizeBytes / storage.maxSizeBytes) * 100),
-                              )
-                            : 100;
+                    const isPrimaryLibrary = storage.isPrimary;
 
                     return (
                         <Flex
@@ -104,44 +89,33 @@ export const StorageDashboard = () => {
                                 <span className={styles.cardTitle} title={storage.path}>
                                     <span
                                         className={clsx(styles.dot, {
-                                            [styles.dotCache]: isCache,
                                             [styles.dotImported]: isPrimaryLibrary,
-                                            [styles.dotExternal]: isLibrary && !storage.isPrimary,
+                                            [styles.dotExternal]: !storage.isPrimary,
                                         })}
                                     />
                                     <span className={styles.titleText}>
-                                        {isCache
-                                            ? "Кэш стриминга"
-                                            : isPrimaryLibrary
-                                              ? "Библиотека (Основная)"
-                                              : storage.path.split("/").pop() || storage.path}
+                                        {isPrimaryLibrary
+                                            ? "Библиотека (Основная)"
+                                            : storage.path.split("/").pop() || storage.path}
                                     </span>
                                 </span>
                                 <span className={styles.cardMetrics}>
                                     {formatBytes(storage.usedSizeBytes)}
-                                    {isCache && storage.maxSizeBytes ? (
-                                        <span className={styles.subText}>
-                                            {" "}
-                                            / {formatBytes(storage.maxSizeBytes)}
-                                        </span>
-                                    ) : (
-                                        <span className={styles.subText}>
-                                            {" "}
-                                            ({storage.filesCount} треков)
-                                        </span>
-                                    )}
+
+                                    <span className={styles.subText}>
+                                        {" "}
+                                        ({storage.filesCount} треков)
+                                    </span>
                                 </span>
                             </div>
 
                             <div className={styles.progressBarTrack}>
                                 <div
                                     className={clsx({
-                                        [styles.progressSegmentCache]: isCache,
                                         [styles.progressSegmentImported]: isPrimaryLibrary,
-                                        [styles.progressSegmentExternal]:
-                                            isLibrary && !storage.isPrimary,
+                                        [styles.progressSegmentExternal]: !storage.isPrimary,
                                     })}
-                                    style={{ width: `${progressWidth}%` }}
+                                    // style={{ width: `${progressWidth}%` }}
                                 />
                             </div>
 
@@ -150,43 +124,20 @@ export const StorageDashboard = () => {
                                 justify="space-between"
                                 className={styles.cardFooter}
                             >
-                                {isCache ? (
-                                    <>
-                                        <span>
-                                            Свободно:
-                                            {" " +
-                                                formatBytes(
-                                                    (storage.maxSizeBytes ?? 0) -
-                                                        storage.usedSizeBytes,
-                                                )}
-                                        </span>
-                                        <Button
-                                            variant="ghost"
-                                            size="small"
-                                            noPadding
-                                            className={styles.actionBtn}
-                                        >
-                                            Лимит
-                                        </Button>
-                                    </>
+                                <span className={styles.pathText} title={storage.path}>
+                                    {storage.path}
+                                </span>
+                                {storage.isPrimary ? (
+                                    <span className={styles.badgePrimary}>Primary</span>
                                 ) : (
-                                    <>
-                                        <span className={styles.pathText} title={storage.path}>
-                                            {storage.path}
-                                        </span>
-                                        {storage.isPrimary ? (
-                                            <span className={styles.badgePrimary}>Primary</span>
-                                        ) : (
-                                            <Button
-                                                variant="ghost"
-                                                size="small"
-                                                noPadding
-                                                className={styles.actionBtn}
-                                            >
-                                                Отключить
-                                            </Button>
-                                        )}
-                                    </>
+                                    <Button
+                                        variant="ghost"
+                                        size="small"
+                                        noPadding
+                                        className={styles.actionBtn}
+                                    >
+                                        Отключить
+                                    </Button>
                                 )}
                             </Flex>
                         </Flex>

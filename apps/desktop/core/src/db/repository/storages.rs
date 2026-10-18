@@ -1,7 +1,7 @@
 use chrono::Utc;
 use rusqlite::{Connection, params, params_from_iter, types::Value};
 
-use crate::models::storages::{NewStorage, Storage, StorageType, UpdateStorage};
+use crate::models::storages::{NewStorage, Storage, UpdateStorage};
 
 pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
     let mut stmt = conn.prepare(
@@ -9,14 +9,12 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
             SELECT
                 storage_id
                 , path
-                , storage_type_id
                 , is_primary
                 , max_size_bytes
                 , created_at
             FROM storages
             ORDER BY
-                storage_type_id ASC
-                , is_primary DESC
+                is_primary DESC
                 , created_at ASC
         "#,
     )?;
@@ -25,10 +23,9 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
         Ok(Storage {
             storage_id: row.get(0)?,
             path: row.get(1)?,
-            storage_type: row.get(2)?,
-            is_primary: row.get(3)?,
-            max_size_bytes: row.get(4)?,
-            created_at: row.get(5)?,
+            is_primary: row.get(2)?,
+            max_size_bytes: row.get(3)?,
+            created_at: row.get(4)?,
         })
     })?;
 
@@ -38,7 +35,6 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
 pub fn get_by(
     conn: &Connection,
     path: Option<String>,
-    storage_type: Option<StorageType>,
     is_primary: Option<bool>,
 ) -> rusqlite::Result<Vec<Storage>> {
     let mut where_parts: Vec<String> = Vec::new();
@@ -47,11 +43,6 @@ pub fn get_by(
     if let Some(p) = path {
         where_parts.push("path = ?".to_string());
         values.push(Value::Text(p));
-    }
-
-    if let Some(st) = storage_type {
-        where_parts.push("storage_type_id = ?".to_string());
-        values.push(Value::Integer(st as i64));
     }
 
     if let Some(ip) = is_primary {
@@ -64,7 +55,6 @@ pub fn get_by(
             SELECT
                 storage_id
                 , path
-                , storage_type_id
                 , is_primary
                 , max_size_bytes
                 , created_at
@@ -83,10 +73,9 @@ pub fn get_by(
         Ok(Storage {
             storage_id: row.get(0)?,
             path: row.get(1)?,
-            storage_type: row.get(2)?,
-            is_primary: row.get::<_, i64>(3)? != 0,
-            max_size_bytes: row.get(4)?,
-            created_at: row.get(5)?,
+            is_primary: row.get::<_, i64>(2)? != 0,
+            max_size_bytes: row.get(3)?,
+            created_at: row.get(4)?,
         })
     })?;
 
@@ -96,13 +85,12 @@ pub fn get_by(
 pub fn create(conn: &Connection, new: &NewStorage) -> rusqlite::Result<i64> {
     conn.query_row(
         r#"
-            INSERT INTO storages (path, storage_type_id, is_primary, max_size_bytes, created_at)
+            INSERT INTO storages (path, is_primary, max_size_bytes, created_at)
             VALUES (?1, ?2, ?3, ?4, ?5)
             RETURNING storage_id
         "#,
         params![
             new.path,
-            new.storage_type as u8,
             new.is_primary,
             new.max_size_bytes,
             Utc::now().timestamp(),

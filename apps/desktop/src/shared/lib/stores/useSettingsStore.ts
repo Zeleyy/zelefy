@@ -18,6 +18,10 @@ interface SettingsState {
     gatewayUrl: string;
     defaultGatewayUrl: string;
 
+    cacheRoot: string;
+    defaultCacheRoot: string;
+    isRelocating: boolean;
+
     _hasHydrated: boolean;
 
     setTheme: (theme: Theme) => void;
@@ -35,6 +39,11 @@ interface SettingsState {
     resetGatewayUrl: () => Promise<void>;
     initGatewayUrl: () => Promise<void>;
     initDefaultGatewayUrl: () => Promise<void>;
+
+    setCacheRoot: (path: string) => Promise<boolean>;
+    resetCacheRoot: () => Promise<void>;
+    initCacheRoot: () => Promise<void>;
+    initDefaultCacheRoot: () => Promise<void>;
 
     setHasHydrated: (state: boolean) => void;
 }
@@ -56,6 +65,9 @@ export const useSettingsStore = create<SettingsState>()(
             cacheLimitMb: 1024,
             gatewayUrl: "",
             defaultGatewayUrl: "",
+            cacheRoot: "",
+            defaultCacheRoot: "",
+            isRelocating: false,
 
             _hasHydrated: false,
 
@@ -133,6 +145,53 @@ export const useSettingsStore = create<SettingsState>()(
                     console.error("Failed to fetch default gateway URL from backend:", error);
                 }
             },
+
+            setCacheRoot: async (path) => {
+                set({ isRelocating: true });
+                try {
+                    await invoke("set_cache_root", { path });
+                    const root = await invoke<string>("get_cache_root");
+                    set({ cacheRoot: root });
+                    return true;
+                } catch (error) {
+                    console.error("Failed to set cache root:", error);
+                    return false;
+                } finally {
+                    set({ isRelocating: false });
+                }
+            },
+
+            resetCacheRoot: async () => {
+                set({ isRelocating: true });
+                try {
+                    await invoke("reset_cache_root");
+                    const root = await invoke<string>("get_cache_root");
+                    set({ cacheRoot: root });
+                } catch (error) {
+                    console.error("Failed to reset cache root:", error);
+                } finally {
+                    set({ isRelocating: false });
+                }
+            },
+
+            initCacheRoot: async () => {
+                try {
+                    const root = await invoke<string>("get_cache_root");
+                    set({ cacheRoot: root });
+                } catch (error) {
+                    console.error("Failed to fetch cache root:", error);
+                }
+            },
+
+            initDefaultCacheRoot: async () => {
+                try {
+                    const root = await invoke<string>("get_default_cache_root");
+                    set({ defaultCacheRoot: root });
+                } catch (error) {
+                    console.error("Failed to fetch default cache root:", error);
+                }
+            },
+
             setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
         {
@@ -153,6 +212,8 @@ export const useSettingsStore = create<SettingsState>()(
                 state?.initGatewayUrl();
                 state?.initDefaultGatewayUrl();
                 state?.initCacheLimitMb();
+                state?.initCacheRoot();
+                state?.initDefaultCacheRoot();
             },
         },
     ),

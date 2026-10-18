@@ -2,16 +2,15 @@ import styles from "./StorageSettings.module.scss";
 import { Trans, useTranslation } from "react-i18next";
 import { open } from "@tauri-apps/plugin-dialog";
 import clsx from "clsx";
-import { Button, formatBytes, Input } from "@zelefy/ui";
+import { Button, Flex, formatBytes, Input } from "@zelefy/ui";
 import { useStorages } from "@/features/storage";
 import { SettingsSection } from "@/widgets/sections";
-import { StorageType } from "@/shared/types";
+import { useSettingsStore } from "@/shared/lib/stores";
 
 // const storages = [
 //     {
 //         storageId: 1,
 //         path: "C:/Users/User/AppData/Local/zelefy/cache",
-//         storageType: StorageType.Cache,
 //         isPrimary: false,
 //         maxSizeBytes: 2_147_483_648,
 //         usedSizeBytes: 734_003_200,
@@ -21,7 +20,6 @@ import { StorageType } from "@/shared/types";
 //     {
 //         storageId: 2,
 //         path: "C:/Users/User/Music/zelefy-library",
-//         storageType: StorageType.Library,
 //         isPrimary: true,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 326_841_139,
@@ -31,7 +29,6 @@ import { StorageType } from "@/shared/types";
 //     {
 //         storageId: 3,
 //         path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
-//         storageType: StorageType.Library,
 //         isPrimary: false,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 120_500_100,
@@ -41,7 +38,6 @@ import { StorageType } from "@/shared/types";
 //     {
 //         storageId: 4,
 //         path: "E:/Flac_Collection",
-//         storageType: StorageType.Library,
 //         isPrimary: false,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 5_368_709_120,
@@ -51,7 +47,6 @@ import { StorageType } from "@/shared/types";
 //     {
 //         storageId: 5,
 //         path: "F:/DJ_Sets",
-//         storageType: StorageType.Library,
 //         isPrimary: false,
 //         maxSizeBytes: null,
 //         usedSizeBytes: 1_073_741_824,
@@ -60,11 +55,17 @@ import { StorageType } from "@/shared/types";
 //     },
 // ];
 
+// @TODO: переработать после удаления кеша
 export const StorageSettings = () => {
     const { t } = useTranslation();
     const { data } = useStorages();
 
     const storages = data ?? [];
+
+    const cacheRoot = useSettingsStore((state) => state.cacheRoot);
+    const defaultCacheRoot = useSettingsStore((state) => state.defaultCacheRoot);
+    const setCacheRoot = useSettingsStore((state) => state.setCacheRoot);
+    const resetCacheRoot = useSettingsStore((state) => state.resetCacheRoot);
 
     const handleBrowseFolder = async (storageId?: number, currentPath?: string) => {
         try {
@@ -82,6 +83,26 @@ export const StorageSettings = () => {
         }
     };
 
+    const handleBrowseCacheFolder = async (currentPath: string) => {
+        try {
+            const selected = await open({
+                directory: true,
+                multiple: false,
+                defaultPath: currentPath,
+            });
+
+            if (selected && typeof selected === "string") {
+                console.log(`Выбран новый путь для кеша:`, selected);
+                const ok = await setCacheRoot(selected);
+                if (!ok) {
+                    alert("ошибка");
+                }
+            }
+        } catch (error) {
+            console.error("Ошибка при выборе папки:", error);
+        }
+    };
+
     return (
         <>
             <h1>{t("settings.storage.title")}</h1>
@@ -92,9 +113,7 @@ export const StorageSettings = () => {
             >
                 <div className={styles.storageSettingsList}>
                     {storages.map((storage) => {
-                        const isCache = storage.storageType === StorageType.Cache;
-                        const isLibrary = storage.storageType === StorageType.Library;
-                        const isPrimaryLibrary = isLibrary && storage.isPrimary;
+                        const isPrimaryLibrary = storage.isPrimary;
 
                         return (
                             <div key={storage.storageId} className={styles.storageRow}>
@@ -102,17 +121,11 @@ export const StorageSettings = () => {
                                     <div className={styles.rowTitleWrapper}>
                                         <span
                                             className={clsx(styles.dot, {
-                                                [styles.dotCache]: isCache,
                                                 [styles.dotImported]: isPrimaryLibrary,
-                                                [styles.dotExternal]:
-                                                    isLibrary && !storage.isPrimary,
+                                                [styles.dotExternal]: !storage.isPrimary,
                                             })}
                                         />
-                                        {isCache ? (
-                                            <span className={styles.label}>
-                                                {t("settings.storage.types.cache")}
-                                            </span>
-                                        ) : isPrimaryLibrary ? (
+                                        {isPrimaryLibrary ? (
                                             <>
                                                 <span className={styles.label}>
                                                     {t("settings.storage.types.library")}
@@ -127,7 +140,7 @@ export const StorageSettings = () => {
                                     </div>
 
                                     <span className={styles.metrics}>
-                                        {isCache && storage.maxSizeBytes ? (
+                                        {storage.maxSizeBytes ? (
                                             <Trans
                                                 i18nKey="settings.storage.metrics.cacheUsage"
                                                 values={{
@@ -191,6 +204,28 @@ export const StorageSettings = () => {
                         </div>
                     </div>
                 </div>
+            </SettingsSection>
+
+            <SettingsSection title="Кеш">
+                <Flex align="center" gap="xs">
+                    <Input value={cacheRoot} readOnly />
+                    <Button
+                        onClick={() => {
+                            handleBrowseCacheFolder(cacheRoot);
+                        }}
+                    >
+                        {t("settings.storage.actions.browse")}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        disabled={cacheRoot === defaultCacheRoot}
+                        onClick={() => {
+                            resetCacheRoot();
+                        }}
+                    >
+                        {t("common.reset")}
+                    </Button>
+                </Flex>
             </SettingsSection>
         </>
     );
