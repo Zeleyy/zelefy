@@ -66,7 +66,7 @@ export const StorageSettings = () => {
 
     const storages = data ?? [];
 
-    const handleBrowseFolder = async (storageId: number, currentPath: string) => {
+    const handleBrowseFolder = async (storageId?: number, currentPath?: string) => {
         try {
             const selected = await open({
                 directory: true,
@@ -177,7 +177,12 @@ export const StorageSettings = () => {
                         );
                     })}
 
-                    <div className={clsx(styles.storageRow, styles.storageRowAction)}>
+                    <div
+                        className={clsx(styles.storageRow, styles.storageRowAction)}
+                        onClick={() => {
+                            handleBrowseFolder();
+                        }}
+                    >
                         <div className={styles.actionContent}>
                             <span className={styles.actionIcon}>+</span>
                             <span className={styles.actionText}>
