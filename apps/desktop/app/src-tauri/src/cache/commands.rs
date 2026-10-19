@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use tauri::State;
 
-use crate::state::cache::{AppCache, DEFAULT_CACHE_LIMIT_MB};
+use crate::cache::state::{AppCache, DEFAULT_CACHE_LIMIT_MB};
 
 #[tauri::command]
 pub fn get_cache_root(cache: tauri::State<'_, AppCache>) -> String {

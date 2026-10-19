@@ -1,45 +1,13 @@
+use desktop_core::storage::{resolve_data_root, DataDirs};
 use std::{
     path::{Path, PathBuf},
     sync::atomic::{AtomicBool, Ordering},
 };
 use tauri::async_runtime::Mutex;
 
-pub mod commands;
-pub mod config;
+use crate::cache::{load_config, save_config, CacheConfig};
 
-pub use config::*;
-
-const AUDIO_DIR: &str = "audio";
-const IMAGE_DIR: &str = "image";
-const WAVEFORM_DIR: &str = "waveform";
 pub const DEFAULT_CACHE_LIMIT_MB: u32 = 1024;
-
-pub struct CacheDirs {
-    pub audio: PathBuf,
-    pub image: PathBuf,
-    pub waveform: PathBuf,
-}
-
-impl CacheDirs {
-    pub fn under(root: &Path) -> Self {
-        Self {
-            audio: root.join(AUDIO_DIR),
-            image: root.join(IMAGE_DIR),
-            waveform: root.join(WAVEFORM_DIR),
-        }
-    }
-
-    fn all(&self) -> [&PathBuf; 3] {
-        [&self.audio, &self.image, &self.waveform]
-    }
-
-    fn create(&self) -> std::io::Result<()> {
-        for dir in self.all() {
-            std::fs::create_dir_all(dir)?;
-        }
-        Ok(())
-    }
-}
 
 pub struct AppCache {
     config_path: PathBuf,
@@ -61,7 +29,7 @@ impl AppCache {
             .cloned()
             .unwrap_or_else(|| default_root.clone());
 
-        CacheDirs::under(&active).create().ok();
+        DataDirs::under(&active).create().ok();
 
         Self {
             config_path,
@@ -74,8 +42,8 @@ impl AppCache {
         }
     }
 
-    pub fn cache_dirs(&self) -> CacheDirs {
-        CacheDirs::under(&self.active_root())
+    pub fn cache_dirs(&self) -> DataDirs {
+        DataDirs::under(&self.active_root())
     }
 
     fn update_config<F>(&self, f: F) -> Result<(), String>
@@ -97,7 +65,21 @@ impl AppCache {
         self.active_root.blocking_lock().clone()
     }
 
-    pub fn set_root(&self, new_root: PathBuf) -> Result<PathBuf, String> {
+    pub fn set_root(&self, chosen: PathBuf) -> Result<PathBuf, String> {
+        let new_root = resolve_data_root(&chosen, "cache");
+        std::fs::create_dir_all(&new_root).map_err(|e| format!("Cannot create cache root: {e}"))?;
+        self.apply_root(new_root)
+    }
+
+    pub fn default_root(&self) -> PathBuf {
+        self.default_root.clone()
+    }
+
+    pub fn reset_root(&self) -> Result<PathBuf, String> {
+        self.apply_root(self.default_root.clone())
+    }
+
+    fn apply_root(&self, new_root: PathBuf) -> Result<PathBuf, String> {
         if !is_usable_root(&new_root) {
             return Err("Path is not usable".into());
         }
@@ -107,7 +89,7 @@ impl AppCache {
         }
 
         let result = (|| {
-            CacheDirs::under(&new_root)
+            DataDirs::under(&new_root)
                 .create()
                 .map_err(|e| e.to_string())?;
             self.update_config(|cfg| {
@@ -121,14 +103,6 @@ impl AppCache {
 
         self.relocating.store(false, Ordering::SeqCst);
         result
-    }
-
-    pub fn default_root(&self) -> PathBuf {
-        self.default_root.clone()
-    }
-
-    pub fn reset_root(&self) -> Result<PathBuf, String> {
-        self.set_root(self.default_root.clone())
     }
 
     pub fn current_max_size_mb(&self) -> u32 {
@@ -156,16 +130,13 @@ impl AppCache {
     }
 }
 
-fn is_usable_root(path: &Path) -> bool {
-    if !path.is_dir() {
-        return false;
-    }
-    let probe = path.join(".write_probe");
-    match std::fs::write(&probe, b"") {
-        Ok(_) => {
-            let _ = std::fs::remove_file(&probe);
-            true
-        }
-        Err(_) => false,
-    }
+fn is_usable_root(root: &Path) -> bool {
+    root.is_dir() && probe_writable(root)
+}
+
+fn probe_writable(root: &Path) -> bool {
+    let probe = root.join(".write_probe");
+    let ok = std::fs::write(&probe, b"ok").is_ok();
+    let _ = std::fs::remove_file(&probe);
+    ok
 }

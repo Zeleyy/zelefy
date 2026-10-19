@@ -74,7 +74,7 @@ export const useCacheStore = create<CacheState>()((set) => ({
             );
             if (root === null) return false;
             set({ cacheRoot: root });
-            return root === path;
+            return true;
         } finally {
             set({ isRelocating: false });
         }

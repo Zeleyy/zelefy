@@ -1,11 +1,12 @@
-pub mod commands;
-pub mod state;
-
 use desktop_core::db::{init_db, DbState};
 use state::AppState;
 use tauri::Manager;
 
-use crate::state::cache::AppCache;
+pub mod cache;
+pub mod commands;
+pub mod state;
+
+use crate::cache::AppCache;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -53,14 +54,14 @@ pub fn run() {
             commands::get_available_endpoints,
             commands::get_all_storages,
             commands::add_user_library,
-            state::cache::commands::get_cache_root,
-            state::cache::commands::set_cache_root,
-            state::cache::commands::get_default_cache_root,
-            state::cache::commands::reset_cache_root,
-            state::cache::commands::get_cache_limit,
-            state::cache::commands::set_cache_limit,
-            state::cache::commands::get_default_cache_limit,
-            state::cache::commands::reset_cache_limit,
+            cache::commands::get_cache_root,
+            cache::commands::set_cache_root,
+            cache::commands::get_default_cache_root,
+            cache::commands::reset_cache_root,
+            cache::commands::get_cache_limit,
+            cache::commands::set_cache_limit,
+            cache::commands::get_default_cache_limit,
+            cache::commands::reset_cache_limit,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
