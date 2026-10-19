@@ -1,7 +1,7 @@
 packages:
     - "packages/shared-ts/*"
     - "apps/web"
-    - "apps/desktop"
+    - "apps/desktop/app"
 allowBuilds:
     "@parcel/watcher": true
     esbuild: true

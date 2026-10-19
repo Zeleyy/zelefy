@@ -1,5 +1,5 @@
 [workspace]
-members = ["src-tauri", "core"]
+members = ["app/src-tauri", "core"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -11,6 +11,7 @@ chrono = "0.4.45"
 strum = "0.28.0"
 
 zelefy_common = { path = "../../packages/shared-rs/common" }
+desktop-core = { path = "core" }
 
 [profile.release]
 strip = true

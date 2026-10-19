@@ -5,6 +5,7 @@ import process from "node:process";
 import path from "path";
 
 const host = process.env.TAURI_DEV_HOST;
+const packageDir = "../../../packages";
 
 export default defineConfig(() => ({
     plugins: [react({ compiler: true }), ViteMinifyPlugin({})],
@@ -15,19 +16,16 @@ export default defineConfig(() => ({
                 find: "@zelefy/ui/styles",
                 replacement: path.resolve(
                     import.meta.dirname,
-                    "../../packages/shared-ts/ui/src/styles/index.scss",
+                    packageDir + "/shared-ts/ui/src/styles/index.scss",
                 ),
             },
             {
                 find: "@zelefy/ui",
-                replacement: path.resolve(import.meta.dirname, "../../packages/shared-ts/ui/src"),
+                replacement: path.resolve(import.meta.dirname, packageDir + "/shared-ts/ui/src"),
             },
             {
                 find: "@zelefy/types",
-                replacement: path.resolve(
-                    import.meta.dirname,
-                    "../../packages/shared-ts/types/src",
-                ),
+                replacement: path.resolve(import.meta.dirname, packageDir + "/shared-ts/types/src"),
             },
             { find: "@", replacement: path.resolve(import.meta.dirname, "./src") },
         ],
@@ -38,7 +36,7 @@ export default defineConfig(() => ({
             scss: {
                 api: "modern-compiler",
                 loadPaths: [
-                    path.resolve(import.meta.dirname, "../../packages/shared-ts"),
+                    path.resolve(import.meta.dirname, packageDir + "/shared-ts"),
                     path.resolve(import.meta.dirname, "../../node_modules"),
                 ],
             },
