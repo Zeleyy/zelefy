@@ -17,3 +17,4 @@ zelefy_common = { workspace = true }
 thiserror = "2.0.21"
 strum = { workspace = true, features = ["derive"] }
 serde_repr = "0.1.21"
+dunce = "1.0.5"

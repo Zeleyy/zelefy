@@ -17,6 +17,7 @@ pub struct NewStorage {
     pub max_size_bytes: Option<i64>,
 }
 
+#[derive(Debug, Default)]
 pub struct UpdateStorage {
     pub path: Option<String>,
     pub is_primary: Option<bool>,

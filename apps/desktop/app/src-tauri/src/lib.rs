@@ -54,6 +54,8 @@ pub fn run() {
             commands::get_available_endpoints,
             commands::get_all_storages,
             commands::add_user_library,
+            commands::update_user_library,
+            commands::set_primary_library,
             cache::commands::get_cache_root,
             cache::commands::set_cache_root,
             cache::commands::get_default_cache_root,

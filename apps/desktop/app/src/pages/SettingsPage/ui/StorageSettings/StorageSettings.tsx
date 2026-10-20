@@ -1,64 +1,18 @@
 import styles from "./StorageSettings.module.scss";
 import { Trans, useTranslation } from "react-i18next";
-import { open } from "@tauri-apps/plugin-dialog";
 import clsx from "clsx";
 import { Button, Flex, formatBytes, Input } from "@zelefy/ui";
-import { useStorages } from "@/features/storage";
+import { useCreateLibrary, useStorages, useUpdateLibraryPath } from "@/features/storage";
 import { SettingsSection } from "@/widgets/sections";
 import { useCacheStore } from "@/shared/lib/stores";
-
-// const storages = [
-//     {
-//         storageId: 1,
-//         path: "C:/Users/User/AppData/Local/zelefy/cache",
-//         isPrimary: false,
-//         maxSizeBytes: 2_147_483_648,
-//         usedSizeBytes: 734_003_200,
-//         filesCount: 42,
-//         createdAt: 0,
-//     },
-//     {
-//         storageId: 2,
-//         path: "C:/Users/User/Music/zelefy-library",
-//         isPrimary: true,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 326_841_139,
-//         filesCount: 15,
-//         createdAt: 0,
-//     },
-//     {
-//         storageId: 3,
-//         path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
-//         isPrimary: false,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 120_500_100,
-//         filesCount: 8,
-//         createdAt: 0,
-//     },
-//     {
-//         storageId: 4,
-//         path: "E:/Flac_Collection",
-//         isPrimary: false,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 5_368_709_120,
-//         filesCount: 120,
-//         createdAt: 0,
-//     },
-//     {
-//         storageId: 5,
-//         path: "F:/DJ_Sets",
-//         isPrimary: false,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 1_073_741_824,
-//         filesCount: 30,
-//         createdAt: 0,
-//     },
-// ];
+import { selectDirectory } from "@/shared/lib/utils";
 
 // @TODO: переработать после удаления кеша
 export const StorageSettings = () => {
     const { t } = useTranslation();
     const { data } = useStorages();
+    const { mutate: createLibrary } = useCreateLibrary();
+    const { mutate: updateLibraryPath } = useUpdateLibraryPath();
 
     const storages = data ?? [];
 
@@ -68,39 +22,23 @@ export const StorageSettings = () => {
     const resetCacheRoot = useCacheStore((state) => state.resetCacheRoot);
 
     const handleBrowseFolder = async (storageId?: number, currentPath?: string) => {
-        try {
-            const selected = await open({
-                directory: true,
-                multiple: false,
-                defaultPath: currentPath,
-            });
+        const selected = await selectDirectory(currentPath);
+        if (!selected) return;
 
-            if (selected && typeof selected === "string") {
-                console.log(`Выбран новый путь для хранилища ${storageId}:`, selected);
-            }
-        } catch (error) {
-            console.error("Ошибка при выборе папки:", error);
+        if (storageId == null) {
+            createLibrary(selected);
+        } else {
+            updateLibraryPath({ storageId, path: selected });
         }
     };
 
     const handleBrowseCacheFolder = async (currentPath: string) => {
-        try {
-            const selected = await open({
-                directory: true,
-                multiple: false,
-                defaultPath: currentPath,
-            });
+        const selected = await selectDirectory(currentPath);
+        if (!selected) return;
 
-            if (selected && typeof selected === "string") {
-                console.log(`Выбран новый путь для кеша:`, selected);
-                const ok = await setCacheRoot(selected);
-                if (!ok) {
-                    alert("ошибка");
-                }
-            }
-        } catch (error) {
-            console.error("Ошибка при выборе папки:", error);
-        }
+        console.log("Выбран новый путь для кеша:", selected);
+        const ok = await setCacheRoot(selected);
+        if (!ok) alert("ошибка");
     };
 
     return (
@@ -122,7 +60,7 @@ export const StorageSettings = () => {
                                         <span
                                             className={clsx(styles.dot, {
                                                 [styles.dotImported]: isPrimaryLibrary,
-                                                [styles.dotExternal]: !storage.isPrimary,
+                                                [styles.dotExternal]: !isPrimaryLibrary,
                                             })}
                                         />
                                         {isPrimaryLibrary ? (
@@ -134,7 +72,9 @@ export const StorageSettings = () => {
                                             </>
                                         ) : (
                                             <span className={styles.label}>
-                                                {storage.path.split("/").pop() || storage.path}
+                                                {storage.path.match(
+                                                    /([^\\/]+)[\\/]zelefy-data[\\/]/,
+                                                )?.[1] + "\\" || storage.path}
                                             </span>
                                         )}
                                     </div>

@@ -86,7 +86,7 @@ pub fn create(conn: &Connection, new: &NewStorage) -> rusqlite::Result<i64> {
     conn.query_row(
         r#"
             INSERT INTO storages (path, is_primary, max_size_bytes, created_at)
-            VALUES (?1, ?2, ?3, ?4, ?5)
+            VALUES (?1, ?2, ?3, ?4)
             RETURNING storage_id
         "#,
         params![
@@ -147,5 +147,19 @@ pub fn delete(conn: &Connection, storage_id: i64) -> rusqlite::Result<()> {
         params![storage_id],
     )?;
 
+    Ok(())
+}
+
+pub fn clear_primary(conn: &Connection, except_id: Option<i64>) -> rusqlite::Result<()> {
+    match except_id {
+        Some(id) => conn.execute(
+            "UPDATE storages SET is_primary = 0 WHERE is_primary = 1 AND storage_id != ?1",
+            params![id],
+        )?,
+        None => conn.execute(
+            "UPDATE storages SET is_primary = 0 WHERE is_primary = 1",
+            [],
+        )?,
+    };
     Ok(())
 }
