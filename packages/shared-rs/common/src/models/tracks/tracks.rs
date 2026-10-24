@@ -17,6 +17,7 @@ pub struct Track {
     pub track_id: Uuid,
     pub user_id: Uuid,
 
+    pub metadata_artist: Option<String>,
     pub title: String,
     pub permalink: String,
     pub audio_url: Option<String>,
@@ -99,6 +100,7 @@ pub struct TrackWithStats {
     pub track_id: Uuid,
     pub user_id: Uuid,
 
+    pub metadata_artist: Option<String>,
     pub title: String,
     pub permalink: String,
     pub audio_url: Option<String>,
@@ -134,6 +136,7 @@ impl TrackWithStats {
             track_id: track.track_id,
             user_id: track.user_id,
 
+            metadata_artist: track.metadata_artist,
             title: track.title,
             permalink: track.permalink,
             audio_url: track.audio_url,
@@ -173,6 +176,7 @@ pub struct PublicTrack {
     pub track_id: Uuid,
     pub user_id: Uuid,
 
+    pub metadata_artist: Option<String>,
     pub title: String,
     pub permalink: String,
     pub audio_url: String,
@@ -198,17 +202,22 @@ impl From<TrackWithStats> for PublicTrack {
         Self {
             track_id: t.track_id,
             user_id: t.user_id,
+
+            metadata_artist: t.metadata_artist,
             title: t.title,
             permalink: t.permalink,
             audio_url: t.audio_url.unwrap_or_default(),
             cover_url: t.cover_url,
             waveform_url: t.waveform_url,
             duration_seconds: t.duration_seconds.unwrap_or_default(),
+
             genre: t.genre,
             description: t.description,
             bpm: t.bpm,
             key_signature: t.key_signature,
+
             created_at: t.created_at,
+
             plays_count: t.plays_count,
             likes_count: t.likes_count,
             reposts_count: t.reposts_count,

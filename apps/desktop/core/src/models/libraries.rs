@@ -2,33 +2,30 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Storage {
-    pub storage_id: i64,
+pub struct Library {
+    pub library_id: i64,
     pub path: String,
     pub is_primary: bool,
-    pub max_size_bytes: Option<i64>,
     pub created_at: i64,
 }
 
 #[derive(Deserialize)]
-pub struct NewStorage {
+pub struct NewLibrary {
     pub path: String,
     pub is_primary: bool,
-    pub max_size_bytes: Option<i64>,
 }
 
 #[derive(Debug, Default)]
-pub struct UpdateStorage {
+pub struct UpdateLibrary {
     pub path: Option<String>,
     pub is_primary: Option<bool>,
-    pub max_size_bytes: Option<Option<i64>>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct StorageWithStats {
+pub struct LibraryWithStats {
     #[serde(flatten)]
-    pub storage: Storage,
+    pub library: Library,
     pub used_size_bytes: i64,
     pub files_count: i64,
 }

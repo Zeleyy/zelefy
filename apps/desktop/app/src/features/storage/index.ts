@@ -1,1 +1,1 @@
-export { useCreateLibrary, useUpdateLibraryPath, useStorages } from "./hooks";
+export { useCreateLibrary, useUpdateLibraryPath, useLibraries } from "./hooks";

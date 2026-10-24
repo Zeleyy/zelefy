@@ -11,6 +11,7 @@ chrono = "0.4.45"
 strum = "0.28.0"
 
 zelefy_common = { path = "../../packages/shared-rs/common" }
+audio-core = { path = "../../packages/shared-rs/audio-core" }
 desktop-core = { path = "core" }
 
 [profile.release]

@@ -15,6 +15,7 @@ where
             SELECT
                 t.track_id
                 , t.user_id
+                , t.metadata_artist
                 , t.title
                 , t.permalink
                 , t.audio_url
@@ -57,6 +58,7 @@ where
             SELECT
                 t.track_id
                 , t.user_id
+                , t.metadata_artist
                 , t.title
                 , t.permalink
                 , t.audio_url
@@ -99,6 +101,7 @@ where
             SELECT
                 t.track_id
                 , t.user_id
+                , t.metadata_artist
                 , t.title
                 , t.permalink
                 , t.audio_url

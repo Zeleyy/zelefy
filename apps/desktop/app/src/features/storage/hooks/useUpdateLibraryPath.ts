@@ -5,11 +5,11 @@ import { toast } from "sonner";
 
 export const useUpdateLibraryPath = () => {
     return useMutation({
-        mutationFn: async ({ storageId, path }: { storageId: number; path: string }) => {
-            return await invoke<number>("update_user_library", { storageId, path });
+        mutationFn: async ({ libraryId, path }: { libraryId: number; path: string }) => {
+            return await invoke<number>("update_user_library", { libraryId, path });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["storage"] });
+            queryClient.invalidateQueries({ queryKey: ["library"] });
             toast.message("Библиотека успешно обновлена");
         },
     });

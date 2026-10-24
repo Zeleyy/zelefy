@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                t.track_id\n                , t.user_id\n                , t.title\n                , t.permalink\n                , t.audio_url\n                , t.cover_url\n                , t.waveform_url\n                , t.duration_seconds\n                , t.genre\n                , t.description\n                , t.bpm\n                , t.key_signature\n                , t.is_private\n                , t.status AS \"status: TrackStatus\"\n                , t.processing_error\n                , t.created_at\n                , t.updated_at\n                , ts.plays_count\n                , ts.likes_count\n                , ts.reposts_count\n                , ts.comments_count\n            FROM tracks t\n            JOIN track_stats ts ON ts.track_id = t.track_id\n            WHERE t.permalink = $1\n        ",
+  "query": "\n            SELECT\n                t.track_id\n                , t.user_id\n                , t.metadata_artist\n                , t.title\n                , t.permalink\n                , t.audio_url\n                , t.cover_url\n                , t.waveform_url\n                , t.duration_seconds\n                , t.genre\n                , t.description\n                , t.bpm\n                , t.key_signature\n                , t.is_private\n                , t.status AS \"status: TrackStatus\"\n                , t.processing_error\n                , t.created_at\n                , t.updated_at\n                , ts.plays_count\n                , ts.likes_count\n                , ts.reposts_count\n                , ts.comments_count\n            FROM playlist_tracks pt\n            JOIN tracks t ON t.track_id = pt.track_id\n            JOIN track_stats ts ON ts.track_id = t.track_id\n            WHERE pt.playlist_id = $1\n            ORDER BY pt.\"position\" ASC\n        ",
   "describe": {
     "columns": [
       {
@@ -27,6 +27,17 @@
       },
       {
         "ordinal": 2,
+        "name": "metadata_artist",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "tracks",
+            "name": "metadata_artist"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
         "name": "title",
         "type_info": "Varchar",
         "origin": {
@@ -37,7 +48,7 @@
         }
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "permalink",
         "type_info": {
           "Custom": {
@@ -53,7 +64,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "audio_url",
         "type_info": "Text",
         "origin": {
@@ -64,7 +75,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "cover_url",
         "type_info": "Text",
         "origin": {
@@ -75,7 +86,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "waveform_url",
         "type_info": "Text",
         "origin": {
@@ -86,7 +97,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "duration_seconds",
         "type_info": "Int4",
         "origin": {
@@ -97,7 +108,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "genre",
         "type_info": "Varchar",
         "origin": {
@@ -108,7 +119,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "description",
         "type_info": "Text",
         "origin": {
@@ -119,7 +130,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "bpm",
         "type_info": "Int4",
         "origin": {
@@ -130,7 +141,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "key_signature",
         "type_info": "Varchar",
         "origin": {
@@ -141,7 +152,7 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "is_private",
         "type_info": "Bool",
         "origin": {
@@ -152,7 +163,7 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "status: TrackStatus",
         "type_info": {
           "Custom": {
@@ -175,7 +186,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "processing_error",
         "type_info": "Text",
         "origin": {
@@ -186,7 +197,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -197,7 +208,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -208,7 +219,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "plays_count",
         "type_info": "Int8",
         "origin": {
@@ -219,7 +230,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "likes_count",
         "type_info": "Int4",
         "origin": {
@@ -230,7 +241,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "reposts_count",
         "type_info": "Int4",
         "origin": {
@@ -241,7 +252,7 @@
         }
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "comments_count",
         "type_info": "Int4",
         "origin": {
@@ -254,17 +265,13 @@
     ],
     "parameters": {
       "Left": [
-        {
-          "Custom": {
-            "name": "citext",
-            "kind": "Simple"
-          }
-        }
+        "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
+      true,
       false,
       false,
       true,
@@ -286,5 +293,5 @@
       false
     ]
   },
-  "hash": "2fec6b8002e0cf39b6007cea8540eebe3b58e37110f96a249e503b49330d506c"
+  "hash": "926f25ad4baa0b1b23a7a8f8c7009a9ee44395de3b7a6c8ea36ea4cc2eaaa080"
 }

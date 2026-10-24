@@ -1,5 +1,7 @@
 use std::path::{Path, PathBuf};
 
+use uuid::Uuid;
+
 const AUDIO_DIR: &str = "audio";
 const IMAGE_DIR: &str = "image";
 const WAVEFORM_DIR: &str = "waveform";
@@ -29,4 +31,27 @@ impl DataDirs {
         }
         Ok(())
     }
+}
+
+fn sharded(dir: &str, id: Uuid, ext: &str) -> PathBuf {
+    let name = id.simple().to_string();
+    PathBuf::from(dir)
+        .join(&name[..2])
+        .join(format!("{name}.{ext}"))
+}
+
+pub fn audio_rel_path(id: Uuid, ext: &str) -> PathBuf {
+    sharded(AUDIO_DIR, id, ext)
+}
+
+pub fn image_rel_path(id: Uuid, ext: &str) -> PathBuf {
+    sharded(IMAGE_DIR, id, ext)
+}
+
+pub fn waveform_rel_path(id: Uuid, ext: &str) -> PathBuf {
+    sharded(WAVEFORM_DIR, id, ext)
+}
+
+pub fn to_db_path(rel: &Path) -> String {
+    rel.to_string_lossy().replace('\\', "/")
 }

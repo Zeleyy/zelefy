@@ -1,24 +1,24 @@
-export interface Storage {
-    storageId: number;
+export interface Library {
+    libraryId: number;
     path: string;
     isPrimary: boolean;
     maxSizeBytes: number | null;
     createdAt: number;
 }
 
-export interface NewStorage {
+export interface NewLibrary {
     path: string;
     isPrimary: boolean;
     maxSizeBytes: number | null;
 }
 
-export interface UpdateStorage {
+export interface UpdateLibrary {
     path?: string;
     isPrimary?: boolean;
     maxSizeBytes?: number | null;
 }
 
-export interface StorageWithStats extends Storage {
+export interface LibraryWithStats extends Library {
     usedSizeBytes: number;
     filesCount: number;
 }

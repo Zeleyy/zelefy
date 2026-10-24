@@ -6,7 +6,7 @@ pub mod cache;
 pub mod commands;
 pub mod state;
 
-use crate::cache::AppCache;
+use crate::{cache::AppCache, commands::refresh_asset_scope};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -43,6 +43,10 @@ pub fn run() {
             app.manage(DbState::new(conn));
             app.manage(AppState::default());
 
+            if let Err(e) = refresh_asset_scope(app.handle()) {
+                eprintln!("asset scope: {e}");
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -52,7 +56,7 @@ pub fn run() {
             commands::get_default_gateway_url,
             commands::get_available_services,
             commands::get_available_endpoints,
-            commands::get_all_storages,
+            commands::get_all_libraries,
             commands::add_user_library,
             commands::update_user_library,
             commands::set_primary_library,
@@ -64,6 +68,8 @@ pub fn run() {
             cache::commands::set_cache_limit,
             cache::commands::get_default_cache_limit,
             cache::commands::reset_cache_limit,
+            commands::import_tracks,
+            commands::get_local_tracks,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -3,10 +3,11 @@ use rusqlite::{
     Row, ToSql,
     types::{FromSql, FromSqlError, ToSqlOutput},
 };
+use serde::Serialize;
 use uuid::Uuid;
 
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum TrackStatus {
     Processing = 0,
     Ready = 1,
@@ -33,9 +34,12 @@ impl FromSql for TrackStatus {
     }
 }
 
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct LocalTrack {
     pub track_id: i64,
     pub file_id: Option<i64>,
+    pub metadata_artist: Option<String>,
 
     pub remote_track_id: Option<Uuid>,
     pub profile_id: Option<i64>,
@@ -63,6 +67,8 @@ pub struct LocalTrack {
 
     pub created_at: DateTime<Utc>,
     pub updated_at: Option<DateTime<Utc>>,
+
+    pub file_size_bytes: Option<i64>,
 }
 
 impl LocalTrack {
@@ -77,6 +83,7 @@ impl LocalTrack {
         Ok(Self {
             track_id: row.get("track_id")?,
             file_id: row.get("file_id")?,
+            metadata_artist: row.get("metadata_artist")?,
             remote_track_id: row.get("remote_track_id")?,
             profile_id: row.get("profile_id")?,
             title: row.get("title")?,
@@ -98,6 +105,7 @@ impl LocalTrack {
             comments_count: row.get("comments_count")?,
             created_at,
             updated_at,
+            file_size_bytes: row.get("file_size_bytes")?,
         })
     }
 }
@@ -106,8 +114,10 @@ pub struct NewLocalTrack {
     pub file_id: i64,
     pub title: String,
     pub permalink: String,
+    pub metadata_artist: Option<String>,
     pub duration_seconds: Option<i64>,
     pub genre: Option<String>,
     pub description: Option<String>,
     pub is_private: bool,
+    pub waveform_path: Option<String>,
 }

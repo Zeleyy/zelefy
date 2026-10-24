@@ -1,18 +1,40 @@
 use chrono::Utc;
-use rusqlite::{Connection, params, params_from_iter, types::Value};
+use rusqlite::{Connection, OptionalExtension, params, params_from_iter, types::Value};
 
-use crate::models::storages::{NewStorage, Storage, UpdateStorage};
+use crate::models::libraries::{Library, NewLibrary, UpdateLibrary};
 
-pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
+pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library> {
+    conn.query_one(
+        r#"
+            SELECT
+                library_id
+                , path
+                , is_primary
+                , created_at
+            FROM libraries
+            WHERE library_id = ?1
+        "#,
+        params![library_id],
+        |row| {
+            Ok(Library {
+                library_id: row.get(0)?,
+                path: row.get(1)?,
+                is_primary: row.get(2)?,
+                created_at: row.get(3)?,
+            })
+        },
+    )
+}
+
+pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Library>> {
     let mut stmt = conn.prepare(
         r#"
             SELECT
-                storage_id
+                library_id
                 , path
                 , is_primary
-                , max_size_bytes
                 , created_at
-            FROM storages
+            FROM libraries
             ORDER BY
                 is_primary DESC
                 , created_at ASC
@@ -20,12 +42,11 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Storage>> {
     )?;
 
     let rows = stmt.query_map([], |row| {
-        Ok(Storage {
-            storage_id: row.get(0)?,
+        Ok(Library {
+            library_id: row.get(0)?,
             path: row.get(1)?,
             is_primary: row.get(2)?,
-            max_size_bytes: row.get(3)?,
-            created_at: row.get(4)?,
+            created_at: row.get(3)?,
         })
     })?;
 
@@ -36,7 +57,7 @@ pub fn get_by(
     conn: &Connection,
     path: Option<String>,
     is_primary: Option<bool>,
-) -> rusqlite::Result<Vec<Storage>> {
+) -> rusqlite::Result<Vec<Library>> {
     let mut where_parts: Vec<String> = Vec::new();
     let mut values: Vec<Value> = Vec::new();
 
@@ -53,12 +74,11 @@ pub fn get_by(
     let mut sql = String::from(
         r#"
             SELECT
-                storage_id
+                library_id
                 , path
                 , is_primary
-                , max_size_bytes
                 , created_at
-            FROM storages
+            FROM libraries
         "#,
     );
 
@@ -70,11 +90,10 @@ pub fn get_by(
     let mut stmt = conn.prepare(&sql)?;
 
     let rows = stmt.query_map(params_from_iter(values), |row| {
-        Ok(Storage {
-            storage_id: row.get(0)?,
+        Ok(Library {
+            library_id: row.get(0)?,
             path: row.get(1)?,
             is_primary: row.get::<_, i64>(2)? != 0,
-            max_size_bytes: row.get(3)?,
             created_at: row.get(4)?,
         })
     })?;
@@ -82,24 +101,19 @@ pub fn get_by(
     rows.collect()
 }
 
-pub fn create(conn: &Connection, new: &NewStorage) -> rusqlite::Result<i64> {
+pub fn create(conn: &Connection, new: &NewLibrary) -> rusqlite::Result<i64> {
     conn.query_row(
         r#"
-            INSERT INTO storages (path, is_primary, max_size_bytes, created_at)
-            VALUES (?1, ?2, ?3, ?4)
-            RETURNING storage_id
+            INSERT INTO libraries (path, is_primary, created_at)
+            VALUES (?1, ?2, ?3)
+            RETURNING library_id
         "#,
-        params![
-            new.path,
-            new.is_primary,
-            new.max_size_bytes,
-            Utc::now().timestamp(),
-        ],
+        params![new.path, new.is_primary, Utc::now().timestamp(),],
         |row| row.get(0),
     )
 }
 
-pub fn update(conn: &Connection, storage_id: i64, update: &UpdateStorage) -> rusqlite::Result<()> {
+pub fn update(conn: &Connection, library_id: i64, update: &UpdateLibrary) -> rusqlite::Result<()> {
     let mut set_parts: Vec<String> = Vec::new();
     let mut values: Vec<Value> = Vec::new();
 
@@ -113,24 +127,16 @@ pub fn update(conn: &Connection, storage_id: i64, update: &UpdateStorage) -> rus
         values.push(Value::Integer(is_primary as i64));
     }
 
-    if let Some(max_size) = update.max_size_bytes {
-        set_parts.push("max_size_bytes = ?".to_string());
-        values.push(match max_size {
-            Some(v) => Value::Integer(v),
-            None => Value::Null,
-        });
-    }
-
     if set_parts.is_empty() {
         return Ok(());
     }
 
     let sql = format!(
-        "UPDATE storages SET {} WHERE storage_id = ?",
+        "UPDATE libraries SET {} WHERE library_id = ?",
         set_parts.join(", ")
     );
 
-    values.push(Value::Integer(storage_id));
+    values.push(Value::Integer(library_id));
 
     let mut stmt = conn.prepare(&sql)?;
     stmt.execute(params_from_iter(values))?;
@@ -138,26 +144,43 @@ pub fn update(conn: &Connection, storage_id: i64, update: &UpdateStorage) -> rus
     Ok(())
 }
 
-pub fn delete(conn: &Connection, storage_id: i64) -> rusqlite::Result<()> {
+pub fn delete(conn: &Connection, library_id: i64) -> rusqlite::Result<()> {
     conn.execute(
         r#"
-            DELETE FROM storages
-            WHERE storage_id = ?1
+            DELETE FROM libraries
+            WHERE library_id = ?1
         "#,
-        params![storage_id],
+        params![library_id],
     )?;
 
     Ok(())
 }
 
+pub fn get_primary(conn: &Connection) -> rusqlite::Result<Option<Library>> {
+    conn.query_row(
+        "SELECT library_id, path, is_primary, created_at
+         FROM libraries WHERE is_primary = 1 LIMIT 1",
+        [],
+        |row| {
+            Ok(Library {
+                library_id: row.get(0)?,
+                path: row.get(1)?,
+                is_primary: row.get(2)?,
+                created_at: row.get(3)?,
+            })
+        },
+    )
+    .optional()
+}
+
 pub fn clear_primary(conn: &Connection, except_id: Option<i64>) -> rusqlite::Result<()> {
     match except_id {
         Some(id) => conn.execute(
-            "UPDATE storages SET is_primary = 0 WHERE is_primary = 1 AND storage_id != ?1",
+            "UPDATE libraries SET is_primary = 0 WHERE is_primary = 1 AND library_id != ?1",
             params![id],
         )?,
         None => conn.execute(
-            "UPDATE storages SET is_primary = 0 WHERE is_primary = 1",
+            "UPDATE libraries SET is_primary = 0 WHERE is_primary = 1",
             [],
         )?,
     };

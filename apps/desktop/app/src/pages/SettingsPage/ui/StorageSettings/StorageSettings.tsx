@@ -2,7 +2,7 @@ import styles from "./StorageSettings.module.scss";
 import { Trans, useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { Button, Flex, formatBytes, Input } from "@zelefy/ui";
-import { useCreateLibrary, useStorages, useUpdateLibraryPath } from "@/features/storage";
+import { useCreateLibrary, useLibraries, useUpdateLibraryPath } from "@/features/storage";
 import { SettingsSection } from "@/widgets/sections";
 import { useCacheStore } from "@/shared/lib/stores";
 import { selectDirectory } from "@/shared/lib/utils";
@@ -10,7 +10,7 @@ import { selectDirectory } from "@/shared/lib/utils";
 // @TODO: переработать после удаления кеша
 export const StorageSettings = () => {
     const { t } = useTranslation();
-    const { data } = useStorages();
+    const { data } = useLibraries();
     const { mutate: createLibrary } = useCreateLibrary();
     const { mutate: updateLibraryPath } = useUpdateLibraryPath();
 
@@ -21,14 +21,14 @@ export const StorageSettings = () => {
     const setCacheRoot = useCacheStore((state) => state.setCacheRoot);
     const resetCacheRoot = useCacheStore((state) => state.resetCacheRoot);
 
-    const handleBrowseFolder = async (storageId?: number, currentPath?: string) => {
+    const handleBrowseFolder = async (libraryId?: number, currentPath?: string) => {
         const selected = await selectDirectory(currentPath);
         if (!selected) return;
 
-        if (storageId == null) {
+        if (libraryId == null) {
             createLibrary(selected);
         } else {
-            updateLibraryPath({ storageId, path: selected });
+            updateLibraryPath({ libraryId, path: selected });
         }
     };
 
@@ -54,7 +54,7 @@ export const StorageSettings = () => {
                         const isPrimaryLibrary = storage.isPrimary;
 
                         return (
-                            <div key={storage.storageId} className={styles.storageRow}>
+                            <div key={storage.libraryId} className={styles.storageRow}>
                                 <div className={styles.rowInfo}>
                                     <div className={styles.rowTitleWrapper}>
                                         <span
@@ -111,7 +111,7 @@ export const StorageSettings = () => {
                                         variant="primary"
                                         size="small"
                                         onClick={() =>
-                                            handleBrowseFolder(storage.storageId, storage.path)
+                                            handleBrowseFolder(storage.libraryId, storage.path)
                                         }
                                     >
                                         {t("settings.storage.actions.browse")}

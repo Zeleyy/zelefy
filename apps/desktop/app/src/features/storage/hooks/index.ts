@@ -1,3 +1,3 @@
 export { useCreateLibrary } from "./useCreateLibrary";
-export { useStorages } from "./useStorages";
+export { useLibraries } from "./useLibraries";
 export { useUpdateLibraryPath } from "./useUpdateLibraryPath";

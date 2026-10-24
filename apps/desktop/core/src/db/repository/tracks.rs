@@ -1,39 +1,48 @@
-use rusqlite::{Connection, OptionalExtension, params};
+use rusqlite::{Connection, params};
 use zelefy_common::tracks::TrackWithStats;
 
 use crate::models::tracks::{LocalTrack, NewLocalTrack};
 
-pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Option<LocalTrack>> {
+pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<LocalTrack> {
     conn.query_row(
         r#"
-            SELECT 
-                track_id, file_id, remote_track_id, profile_id,
-                title, permalink, audio_url, cover_url, waveform_url, duration_seconds,
-                genre, description, bpm, key_signature, is_private,
-                status_id, processing_error,
-                plays_count, likes_count, reposts_count, comments_count,
-                created_at, updated_at
-            FROM local_tracks
+            SELECT t.*, f.file_size_bytes
+            FROM local_tracks t
+            JOIN local_files f ON f.file_id = t.file_id
             WHERE track_id = ?1
         "#,
         params![track_id],
         LocalTrack::row_to_track,
     )
-    .optional()
 }
 
-pub fn insert_local(conn: &Connection, track: &NewLocalTrack) -> rusqlite::Result<i64> {
+pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<LocalTrack>> {
+    let mut stmt = conn.prepare(
+        r#"
+            SELECT t.*, f.file_size_bytes
+            FROM local_tracks t
+            JOIN local_files f ON f.file_id = t.file_id
+        "#,
+    )?;
+
+    let rows = stmt.query_map([], LocalTrack::row_to_track)?;
+
+    rows.collect()
+}
+
+pub fn create_local(conn: &Connection, track: &NewLocalTrack) -> rusqlite::Result<i64> {
     conn.execute(
         r#"
             INSERT INTO local_tracks (
-                file_id, title, permalink, duration_seconds, 
+                file_id, title, permalink, metadata_artist, duration_seconds, 
                 genre, description, is_private, created_at
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
             "#,
         params![
             track.file_id,
             track.title,
             track.permalink,
+            track.metadata_artist,
             track.duration_seconds,
             track.genre,
             track.description,

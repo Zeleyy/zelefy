@@ -1,6 +1,6 @@
 export {
-    type Storage,
-    type NewStorage,
-    type UpdateStorage,
-    type StorageWithStats,
-} from "./storages";
+    type Library,
+    type NewLibrary,
+    type UpdateLibrary,
+    type LibraryWithStats,
+} from "./libraries";

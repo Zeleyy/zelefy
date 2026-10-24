@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO tracks (\n                user_id\n                , permalink\n                , title\n            )\n            VALUES ($1, $2, $3)\n            RETURNING\n                track_id\n                , user_id\n                , title\n                , permalink\n                , audio_url\n                , cover_url\n                , waveform_url\n                , duration_seconds\n                , genre\n                , description\n                , bpm\n                , key_signature\n                , is_private\n                , status AS \"status: TrackStatus\"\n                , processing_error\n                , created_at\n                , updated_at\n        ",
+  "query": "\n            SELECT\n                t.track_id\n                , t.user_id\n                , t.metadata_artist\n                , t.title\n                , t.permalink\n                , t.audio_url\n                , t.cover_url\n                , t.waveform_url\n                , t.duration_seconds\n                , t.genre\n                , t.description\n                , t.bpm\n                , t.key_signature\n                , t.is_private\n                , t.status AS \"status: TrackStatus\"\n                , t.processing_error\n                , t.created_at\n                , t.updated_at\n                , ts.plays_count\n                , ts.likes_count\n                , ts.reposts_count\n                , ts.comments_count\n            FROM tracks t\n            JOIN track_stats ts ON ts.track_id = t.track_id\n            WHERE t.track_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -27,6 +27,17 @@
       },
       {
         "ordinal": 2,
+        "name": "metadata_artist",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "tracks",
+            "name": "metadata_artist"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
         "name": "title",
         "type_info": "Varchar",
         "origin": {
@@ -37,7 +48,7 @@
         }
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "permalink",
         "type_info": {
           "Custom": {
@@ -53,7 +64,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "audio_url",
         "type_info": "Text",
         "origin": {
@@ -64,7 +75,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "cover_url",
         "type_info": "Text",
         "origin": {
@@ -75,7 +86,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "waveform_url",
         "type_info": "Text",
         "origin": {
@@ -86,7 +97,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "duration_seconds",
         "type_info": "Int4",
         "origin": {
@@ -97,7 +108,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "genre",
         "type_info": "Varchar",
         "origin": {
@@ -108,7 +119,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "description",
         "type_info": "Text",
         "origin": {
@@ -119,7 +130,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "bpm",
         "type_info": "Int4",
         "origin": {
@@ -130,7 +141,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "key_signature",
         "type_info": "Varchar",
         "origin": {
@@ -141,7 +152,7 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "is_private",
         "type_info": "Bool",
         "origin": {
@@ -152,7 +163,7 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "status: TrackStatus",
         "type_info": {
           "Custom": {
@@ -175,7 +186,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "processing_error",
         "type_info": "Text",
         "origin": {
@@ -186,7 +197,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -197,7 +208,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -206,39 +217,81 @@
             "name": "updated_at"
           }
         }
+      },
+      {
+        "ordinal": 18,
+        "name": "plays_count",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "track_stats",
+            "name": "plays_count"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
+        "name": "likes_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "track_stats",
+            "name": "likes_count"
+          }
+        }
+      },
+      {
+        "ordinal": 20,
+        "name": "reposts_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "track_stats",
+            "name": "reposts_count"
+          }
+        }
+      },
+      {
+        "ordinal": 21,
+        "name": "comments_count",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "track_stats",
+            "name": "comments_count"
+          }
+        }
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        {
-          "Custom": {
-            "name": "citext",
-            "kind": "Simple"
-          }
-        },
-        "Varchar"
+        "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
-      false,
-      false,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
       true,
       false,
       false,
       true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
       false,
       false
     ]
   },
-  "hash": "92be3407167fba7fca2586f2a691baf0ecfb3ab670901f3c3287590f5c391728"
+  "hash": "1b6b22545846b451d670381718c3b2064e0672a2594c855e2e089ece51425ec5"
 }

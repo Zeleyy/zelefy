@@ -26,6 +26,7 @@ where
             RETURNING
                 track_id
                 , user_id
+                , metadata_artist
                 , title
                 , permalink
                 , audio_url

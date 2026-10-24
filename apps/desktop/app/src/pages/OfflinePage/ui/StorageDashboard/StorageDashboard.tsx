@@ -2,11 +2,11 @@ import styles from "./StorageDashboard.module.scss";
 import { useNavigate } from "react-router";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
-import { useStorages } from "@/features/storage";
+import { useLibraries } from "@/features/storage";
 
 // const _storages: StorageWithStats[] = [
 //     {
-//         storageId: 1,
+//         libraryId: 1,
 //         path: "C:/Users/User/AppData/Local/zelefy/cache",
 //         isPrimary: false,
 //         maxSizeBytes: 2_147_483_648,
@@ -15,7 +15,7 @@ import { useStorages } from "@/features/storage";
 //         createdAt: 0,
 //     },
 //     {
-//         storageId: 2,
+//         libraryId: 2,
 //         path: "C:/Users/User/Music/zelefy-library",
 //         isPrimary: true,
 //         maxSizeBytes: null,
@@ -24,7 +24,7 @@ import { useStorages } from "@/features/storage";
 //         createdAt: 0,
 //     },
 //     {
-//         storageId: 3,
+//         libraryId: 3,
 //         path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
 //         isPrimary: false,
 //         maxSizeBytes: null,
@@ -33,7 +33,7 @@ import { useStorages } from "@/features/storage";
 //         createdAt: 0,
 //     },
 //     {
-//         storageId: 4,
+//         libraryId: 4,
 //         path: "E:/Flac_Collection",
 //         isPrimary: false,
 //         maxSizeBytes: null,
@@ -42,7 +42,7 @@ import { useStorages } from "@/features/storage";
 //         createdAt: 0,
 //     },
 //     {
-//         storageId: 5,
+//         libraryId: 5,
 //         path: "F:/DJ_Sets",
 //         isPrimary: false,
 //         maxSizeBytes: null,
@@ -55,7 +55,7 @@ import { useStorages } from "@/features/storage";
 // @TODO: переработать после удаления кеша
 export const StorageDashboard = () => {
     const navigate = useNavigate();
-    const { data } = useStorages();
+    const { data } = useLibraries();
 
     const storages = data ?? [];
 
@@ -79,7 +79,7 @@ export const StorageDashboard = () => {
 
                     return (
                         <Flex
-                            key={storage.storageId}
+                            key={storage.libraryId}
                             direction="column"
                             justify="space-between"
                             gap="xs"

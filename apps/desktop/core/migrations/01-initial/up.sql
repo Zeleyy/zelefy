@@ -12,11 +12,10 @@ VALUES
     (3, 'published');
 
 -- 
-CREATE TABLE storages (
-    storage_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE libraries (
+    library_id INTEGER PRIMARY KEY AUTOINCREMENT,
     path TEXT NOT NULL UNIQUE,
     is_primary BOOLEAN NOT NULL DEFAULT 0,
-    max_size_bytes INTEGER,
     created_at INTEGER NOT NULL
 );
 
@@ -58,24 +57,25 @@ CREATE INDEX idx_profile_social_links_profile ON profile_social_links (profile_i
 -- 
 CREATE TABLE local_files (
     file_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    storage_id INTEGER,
+    library_id INTEGER,
     file_path TEXT NOT NULL UNIQUE,
     is_link BOOLEAN NOT NULL DEFAULT 0,
     file_hash TEXT,
     file_size_bytes INTEGER NOT NULL,
     last_accessed_at INTEGER NOT NULL,
     created_at INTEGER NOT NULL,
-    FOREIGN KEY (storage_id) REFERENCES storages (storage_id) ON DELETE CASCADE
+    FOREIGN KEY (library_id) REFERENCES libraries (library_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_local_files_hash ON local_files (file_hash);
 
-CREATE INDEX idx_local_files_storage ON local_files (storage_id);
+CREATE INDEX idx_local_files_library ON local_files (library_id);
 
 -- 
 CREATE TABLE local_tracks (
     track_id INTEGER PRIMARY KEY AUTOINCREMENT,
     file_id INTEGER NULL UNIQUE,
+    metadata_artist TEXT NULL,
     -- 
     remote_track_id TEXT UNIQUE,
     profile_id INTEGER NULL,
@@ -85,6 +85,7 @@ CREATE TABLE local_tracks (
     audio_url TEXT,
     cover_url TEXT,
     waveform_url TEXT,
+    waveform_path TEXT,
     duration_seconds INTEGER,
     -- 
     genre TEXT,

@@ -24,6 +24,7 @@ CREATE TYPE track_status AS ENUM('processing', 'ready', 'failed', 'published');
 CREATE TABLE tracks (
     track_id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
+    metadata_artist varchar(150) NULL,
     title varchar(150) NOT NULL,
     permalink citext NOT NULL,
     audio_url text NULL,
@@ -124,3 +125,12 @@ $$ LANGUAGE 'plpgsql';
 CREATE TRIGGER trigger_update_track_likes_count
 AFTER INSERT OR DELETE ON track_likes FOR EACH ROW
 EXECUTE FUNCTION update_track_likes_count ();
+
+CREATE TABLE profile_projection (
+    user_id uuid PRIMARY KEY,
+    permalink citext NOT NULL,
+    display_name varchar(100) NOT NULL,
+    updated_at timestamptz NOT NULL
+);
+
+CREATE UNIQUE INDEX profile_projection_permalink_idx ON profile_projection (permalink);

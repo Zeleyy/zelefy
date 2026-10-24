@@ -8,4 +8,6 @@ pub enum AudioError {
     NoAudioTrack,
     #[error("Неподдерживаемый формат аудио буфера")]
     UnsupportedBuffer,
+    #[error("Не удалось прочитать метаданные")]
+    Metadata,
 }

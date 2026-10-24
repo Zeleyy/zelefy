@@ -36,14 +36,24 @@
 }
 
 .trackList {
+    --tracklist-columns: 20px minmax(0, 1fr) 60px 50px 40px;
+    --tracklist-padding-x: var(--spacing-md);
+
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2xs);
 
-    .listHeader {
+    .header,
+    .row {
         display: grid;
-        grid-template-columns: 40px 2fr 1.5fr 110px 100px 80px 40px;
-        padding: var(--spacing-xs) var(--spacing-md);
+        grid-template-columns: var(--tracklist-columns);
+        align-items: center;
+        padding: var(--spacing-xs) var(--tracklist-padding-x);
+        column-gap: var(--spacing-sm);
+        box-sizing: border-box;
+    }
+
+    .header {
         color: var(--text-muted);
         font-size: var(--font-size-xs);
         text-transform: uppercase;
@@ -51,100 +61,123 @@
         border-bottom: 1px solid var(--border-subtle);
     }
 
-    .trackRow {
-        display: grid;
-        grid-template-columns: 40px 2fr 1.5fr 110px 100px 80px 40px;
-        align-items: center;
-        padding: var(--spacing-xs) var(--spacing-md);
-        background-color: transparent;
+    .row {
         border-radius: var(--radius-sm);
+        position: relative;
         transition: background-color 0.15s ease;
+        overflow: hidden;
+        cursor: pointer;
 
         &:hover {
             background-color: var(--bg-surface);
 
-            .actionsCell .iconBtn {
+            .actions {
                 opacity: 1;
+                pointer-events: auto;
+                transform: translateX(0);
             }
         }
+    }
 
-        .index {
-            color: var(--text-muted);
-            font-size: var(--font-size-sm);
+    .center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .index {
+        color: var(--text-muted);
+        font-size: var(--font-size-sm);
+        text-align: center;
+    }
+
+    .track {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        min-width: 0;
+    }
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .title,
+    .artist {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+
+    .title {
+        font-size: var(--font-size-sm);
+        color: var(--text-primary);
+    }
+
+    .artist {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+    }
+
+    .type {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .badge {
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        text-transform: uppercase;
+        border: 1px solid transparent;
+
+        &.badgeCache {
+            background-color: var(--primary-subtle-bg);
+            color: var(--primary);
+            border-color: var(--primary-subtle-border);
         }
 
-        .mainInfo {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-
-            .meta {
-                display: flex;
-                flex-direction: column;
-
-                .title {
-                    font-size: var(--font-size-sm);
-                    color: var(--text-primary);
-                }
-
-                .artist {
-                    font-size: var(--font-size-xs);
-                    color: var(--text-secondary);
-                }
-            }
+        &.badgeCopied {
+            background-color: var(--accent-subtle-bg);
+            color: var(--accent);
+            border-color: var(--accent-subtle-border);
         }
 
-        .album,
-        .size,
-        .duration {
-            font-size: var(--font-size-sm);
-            color: var(--text-secondary);
+        &.badgeLinked {
+            background-color: var(--success-subtle-bg);
+            color: var(--success);
+            border-color: var(--success-subtle-border);
         }
+    }
 
-        .badgeCell {
-            display: flex;
-            align-items: center;
+    .size,
+    .duration {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+    }
 
-            .badge {
-                padding: 2px 8px;
-                border-radius: var(--radius-sm);
-                font-size: var(--font-size-xs);
-                font-weight: var(--font-weight-semibold);
-                text-transform: uppercase;
+    .actions {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
+        background: linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--bg-primary) 5%, transparent),
+            var(--bg-primary) 40%
+        );
+        inset: 0 0 0 auto;
+        padding: 0 var(--spacing-md) 0 var(--spacing-xl);
+        transform: translateX(10%);
 
-                &Cache {
-                    background-color: var(--primary-subtle-bg);
-                    color: var(--primary);
-                    border: 1px solid var(--primary-subtle-border);
-                }
-
-                &Copied {
-                    background-color: var(--accent-subtle-bg);
-                    color: var(--accent);
-                    border: 1px solid var(--accent-subtle-border);
-                }
-
-                &Linked {
-                    background-color: var(--success-subtle-bg);
-                    color: var(--success);
-                    border: 1px solid var(--success-subtle-border);
-                }
-            }
-        }
-
-        .actionsCell {
-            display: flex;
-            justify-content: flex-end;
-
-            .iconBtn {
-                opacity: 0;
-                transition: opacity 0.15s ease;
-
-                &:hover {
-                    color: var(--danger);
-                    background-color: transparent;
-                }
-            }
-        }
+        transition:
+            transform 0.1s,
+            opacity 0.1s;
     }
 }

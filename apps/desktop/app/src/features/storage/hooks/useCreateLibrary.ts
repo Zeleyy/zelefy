@@ -9,7 +9,7 @@ export const useCreateLibrary = () => {
             return await invoke<number>("add_user_library", { path });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["storage"] });
+            queryClient.invalidateQueries({ queryKey: ["library"] });
             toast.message("Библиотека успешно добавлена");
         },
     });

@@ -17,6 +17,7 @@ export interface TrackStats {
 interface BaseTrack {
     trackId: string;
     userId: string;
+    metadataArtist: string | null;
     permalink: string;
     coverUrl: string | null;
     waveformUrl: string | null;
