@@ -112,11 +112,8 @@ export const WaveformBar = ({
                 </Slider.Track>
             </Slider.Root>
 
-            <Flex
-                direction="column"
-                style={{ height, flexShrink: 0, paddingLeft: "var(--spacing-sm)" }}
-            >
-                <Flex align="flex-end" style={{ height: baseY }}>
+            <Flex direction="column" style={{ height }} className={styles.timeBlock}>
+                <Flex align="flex-end" style={{ height: baseY }} className={styles.time}>
                     {formatTime(time)}
                 </Flex>
                 <Flex align="flex-start" style={{ height: bottomMax }}>

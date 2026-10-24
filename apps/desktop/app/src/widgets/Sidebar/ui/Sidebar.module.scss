@@ -2,7 +2,7 @@
     padding: var(--spacing-xs);
     border-right: 1px solid var(--border-subtle);
     width: 196px;
-    transition: width var(--transition-normal, 0.2s ease);
+    transition: width var(--transition-fast, 0.2s ease);
 
     &--minify {
         width: 57px;

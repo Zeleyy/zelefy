@@ -5,6 +5,7 @@ import { Button, GradientImage, Icon } from "../../primitives";
 export type CoverSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 export interface CoverProps {
+    className?: string;
     src?: string;
     size?: CoverSize;
     alt?: string;
@@ -16,6 +17,7 @@ export interface CoverProps {
 export const Cover = ({
     src,
     size = "md",
+    className,
     alt = "Track cover",
     showPlayOverlay = false,
     isPlaying = false,
@@ -23,7 +25,7 @@ export const Cover = ({
 }: CoverProps) => {
     return (
         <GradientImage
-            className={clsx(styles.cover, styles[`cover--${size}`])}
+            className={clsx(styles.cover, styles[`cover--${size}`], className)}
             src={src}
             seed={alt}
             aspectRatio="1/1"

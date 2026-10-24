@@ -35,7 +35,7 @@ interface PlayerState {
 export const usePlayerStore = create<PlayerState>((set, get) => ({
     currentTrack: null,
     isPlaying: false,
-    currentTime: 105,
+    currentTime: 0,
 
     queue: [],
     currentIndex: 0,

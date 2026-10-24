@@ -60,7 +60,7 @@ export const PlayerBar = () => {
                                         <span className={styles.title}>
                                             {displayTrack?.title ?? "No track selected"}
                                         </span>
-                                        <span>Artist</span>
+                                        <span>{displayTrack?.metadataArtist}</span>
                                     </div>
                                     <Button variant="ghost" radius="full" square>
                                         <Icon name="player-heart" width={16} height={16} />

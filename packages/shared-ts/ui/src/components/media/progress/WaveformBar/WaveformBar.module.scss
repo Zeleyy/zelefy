@@ -33,6 +33,17 @@
     pointer-events: none;
 }
 
+.timeBlock {
+    text-align: right;
+    padding-left: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
+}
+
+.time {
+    font-weight: var(--font-weight-semibold);
+}
+
 .line {
     position: absolute;
     left: 0;
