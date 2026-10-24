@@ -19,6 +19,8 @@ export { SpinnerLoader, type SpinnerLoaderProps } from "./loading";
 export {
     ProgressBar,
     type ProgressBarProps,
+    WaveformBar,
+    type WaveformBarProps,
     VolumeControl,
     type VolumeControlProps,
     Cover,

@@ -1,0 +1,43 @@
+.waveformBar {
+    width: 100%;
+    position: relative;
+    user-select: none;
+}
+
+.bars {
+    transform-box: view-box;
+    animation: grow 300ms ease-out;
+}
+
+@keyframes grow {
+    from {
+        transform: scaleY(0);
+        opacity: 0;
+    }
+}
+
+.sliderThumb {
+    display: block;
+    position: relative;
+    width: 0;
+    outline: none;
+}
+
+.thumbVisual {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background-color: var(--text-primary);
+    pointer-events: none;
+}
+
+.line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--text-primary);
+    pointer-events: none;
+}

@@ -1,4 +1,6 @@
 export type IconName =
+    | "action-delete"
+    | "action-save"
     | "common-cloud"
     | "common-collapse"
     | "common-database"

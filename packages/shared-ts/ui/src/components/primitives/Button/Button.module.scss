@@ -54,7 +54,7 @@
 
         &:hover:not(:disabled) {
             background-color: var(--btn-color, var(--primary));
-            color: var(--neutral-900);
+            color: var(--btn-color-hover, var(--neutral-900));
         }
     }
 
