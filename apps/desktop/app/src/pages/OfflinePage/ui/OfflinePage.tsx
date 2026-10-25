@@ -6,42 +6,16 @@ import { useNavigate } from "react-router";
 import { selectAudio } from "@/shared/lib/utils/browse";
 import { useImportTracks, useLocalTracks } from "@/features/track";
 import clsx from "clsx";
-
-// const tracks = [
-//     {
-//         id: 1,
-//         title: "Sansara",
-//         artist: "Zeleyy",
-//         type: "Cache",
-//         typeLetter: "C",
-//         size: 7_969_177.6,
-//         duration: 242,
-//     },
-//     {
-//         id: 2,
-//         title: "In Poor Taste",
-//         artist: "George_GJD, Kasane Teto",
-//         type: "Copied",
-//         typeLetter: "F",
-//         size: 6_291_456,
-//         duration: 198,
-//     },
-//     {
-//         id: 3,
-//         title: "Nightcore - Poison",
-//         artist: "NCFan",
-//         type: "Linked",
-//         typeLetter: "L",
-//         size: 4_508_876.8,
-//         duration: 138,
-//     },
-// ];
+import { TrackFileType, type LocalTrackResponse } from "@/shared/types";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { usePlayerStore } from "@/shared/lib/stores";
 
 export const OfflinePage = () => {
     const [activeTab, setActiveTab] = useState<"all" | "imported" | "cache">("all");
     const navigate = useNavigate();
     const { mutate: importTracks, isPending, progress } = useImportTracks();
     const { data } = useLocalTracks();
+    const playTrack = usePlayerStore((s) => s.playTrack);
 
     const tracks = data ?? [];
 
@@ -56,6 +30,46 @@ export const OfflinePage = () => {
         } catch (error) {
             console.error("Не удалось создать хранилища:", error);
         }
+    };
+
+    const handlePlayTrack = (track: LocalTrackResponse) => {
+        const audioPath =
+            track.trackFiles[TrackFileType.audio].library.path +
+            "/" +
+            track.trackFiles[TrackFileType.audio].path;
+
+        const coverPath =
+            track.trackFiles[TrackFileType.cover].library.path +
+            "/" +
+            track.trackFiles[TrackFileType.cover].path;
+
+        const waveformPath =
+            track.trackFiles[TrackFileType.waveform].library.path +
+            "/" +
+            track.trackFiles[TrackFileType.waveform].path;
+
+        playTrack({
+            trackId: String(track.trackId),
+            userId: "",
+            metadataArtist: track.metadataArtist,
+            permalink: track.title,
+            title: track.title,
+            audioUrl: audioPath,
+            coverUrl: convertFileSrc(coverPath),
+            waveformUrl: waveformPath,
+            durationSeconds: track.durationSeconds,
+
+            genre: null,
+            description: null,
+            bpm: null,
+            keySignature: null,
+            createdAt: "",
+
+            playsCount: 0,
+            likesCount: 0,
+            repostsCount: 0,
+            commentsCount: 0,
+        });
     };
 
     return (
@@ -117,58 +131,74 @@ export const OfflinePage = () => {
                     <span className={styles.center}>Время</span>
                 </div>
 
-                {tracks.map((track, i) => (
-                    <div key={track.trackId} className={styles.row}>
-                        <span className={styles.index}>{i + 1}</span>
+                {tracks.map((track, i) => {
+                    const coverPath =
+                        track.trackFiles[TrackFileType.cover].library.path +
+                        "/" +
+                        track.trackFiles[TrackFileType.cover].path;
 
-                        <div className={styles.track}>
-                            <Cover alt={track.permalink} size="xs" />
-                            <div className={styles.info}>
-                                <span className={styles.title}>{track.title}</span>
-                                <span className={styles.artist}>{track.metadataArtist}</span>
+                    const isLinked = track.trackFiles[TrackFileType.cover].library === null;
+
+                    return (
+                        <div
+                            key={track.trackId}
+                            className={styles.row}
+                            onClick={() => handlePlayTrack(track)}
+                        >
+                            <span className={styles.index}>{i + 1}</span>
+
+                            <div className={styles.track}>
+                                <Cover
+                                    alt={track.title}
+                                    src={convertFileSrc(coverPath)}
+                                    size="xs"
+                                />
+                                <div className={styles.info}>
+                                    <span className={styles.title}>{track.title}</span>
+                                    <span className={styles.artist}>{track.metadataArtist}</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className={styles.type}>
-                            <span
-                                className={clsx(
-                                    styles.badge,
-                                    // styles[`badge${track.type}`]
-                                    styles.badgeCopied,
-                                )}
-                            >
-                                {/* {track.typeLetter} */}F
+                            <div className={styles.type}>
+                                <span
+                                    className={clsx(styles.badge, {
+                                        [styles.badgeLinked]: isLinked,
+                                        [styles.badgeCopied]: !isLinked,
+                                    })}
+                                >
+                                    {isLinked ? "L" : "F"}
+                                </span>
+                            </div>
+
+                            <span className={clsx(styles.center, styles.size)}>
+                                {formatBytes(track.trackFiles[TrackFileType.audio].sizeBytes)}
                             </span>
+                            <span className={clsx(styles.center, styles.duration)}>
+                                {formatTime(track.durationSeconds ?? 0)}
+                            </span>
+
+                            <Flex align="center" gap="2xs" className={styles.actions}>
+                                <Button
+                                    variant="outline"
+                                    colorScheme={{
+                                        color: "var(--text-primary)",
+                                        colorHover: "var(--bg-primary)",
+                                    }}
+                                    square
+                                >
+                                    <Icon name="action-save" size={13} />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    colorScheme={{ color: "var(--danger)" }}
+                                    square
+                                >
+                                    <Icon name="action-delete" size={13} />
+                                </Button>
+                            </Flex>
                         </div>
-
-                        <span className={clsx(styles.center, styles.size)}>
-                            {formatBytes(track.fileSizeBytes)}
-                        </span>
-                        <span className={clsx(styles.center, styles.duration)}>
-                            {formatTime(track.durationSeconds ?? 0)}
-                        </span>
-
-                        <Flex align="center" gap="2xs" className={styles.actions}>
-                            <Button
-                                variant="outline"
-                                colorScheme={{
-                                    color: "var(--text-primary)",
-                                    colorHover: "var(--bg-primary)",
-                                }}
-                                square
-                            >
-                                <Icon name="action-save" size={13} />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                colorScheme={{ color: "var(--danger)" }}
-                                square
-                            >
-                                <Icon name="action-delete" size={13} />
-                            </Button>
-                        </Flex>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </Flex>
     );

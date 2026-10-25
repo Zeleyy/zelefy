@@ -28,3 +28,5 @@ export {
     Avatar,
     type AvatarProps,
 } from "./media";
+
+export { TrackHero, type TrackHeroProps } from "./sections";

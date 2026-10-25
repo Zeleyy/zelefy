@@ -6,6 +6,9 @@
         "module": "esnext",
         "skipLibCheck": true,
         "types": ["node"],
+        "paths": {
+            "@zelefy/types": ["../shared-ts/types/index.ts"]
+        },
 
         /* Bundler mode */
         "moduleResolution": "bundler",

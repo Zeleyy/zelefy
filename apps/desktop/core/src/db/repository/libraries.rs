@@ -15,14 +15,7 @@ pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library
             WHERE library_id = ?1
         "#,
         params![library_id],
-        |row| {
-            Ok(Library {
-                library_id: row.get(0)?,
-                path: row.get(1)?,
-                is_primary: row.get(2)?,
-                created_at: row.get(3)?,
-            })
-        },
+        |row| Library::row_to_library(row, None),
     )
 }
 
@@ -41,14 +34,7 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Library>> {
         "#,
     )?;
 
-    let rows = stmt.query_map([], |row| {
-        Ok(Library {
-            library_id: row.get(0)?,
-            path: row.get(1)?,
-            is_primary: row.get(2)?,
-            created_at: row.get(3)?,
-        })
-    })?;
+    let rows = stmt.query_map([], |row| Library::row_to_library(row, None))?;
 
     rows.collect()
 }
@@ -90,12 +76,7 @@ pub fn get_by(
     let mut stmt = conn.prepare(&sql)?;
 
     let rows = stmt.query_map(params_from_iter(values), |row| {
-        Ok(Library {
-            library_id: row.get(0)?,
-            path: row.get(1)?,
-            is_primary: row.get::<_, i64>(2)? != 0,
-            created_at: row.get(4)?,
-        })
+        Library::row_to_library(row, None)
     })?;
 
     rows.collect()
@@ -161,14 +142,7 @@ pub fn get_primary(conn: &Connection) -> rusqlite::Result<Option<Library>> {
         "SELECT library_id, path, is_primary, created_at
          FROM libraries WHERE is_primary = 1 LIMIT 1",
         [],
-        |row| {
-            Ok(Library {
-                library_id: row.get(0)?,
-                path: row.get(1)?,
-                is_primary: row.get(2)?,
-                created_at: row.get(3)?,
-            })
-        },
+        |row| Library::row_to_library(row, None),
     )
     .optional()
 }

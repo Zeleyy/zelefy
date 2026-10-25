@@ -1,12 +1,12 @@
 use std::{
     fs::{self, File},
     io::BufReader,
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use audio_core::{
     decoder::{WaveformOptions, decode_waveform},
-    metadata::{AudioMetadata, read_metadata},
+    metadata::{AudioMetadata, cover_ext, read_metadata},
     processor::to_bin_bytes,
 };
 use rusqlite::Connection;
@@ -17,11 +17,10 @@ use crate::{
     db::{DbState, repository},
     models::{
         libraries::Library,
-        local_files::NewLocalFile,
-        tracks::{LocalTrack, NewLocalTrack},
+        tracks::{LocalTrackResponse, NewTrack, NewTrackFile, TrackFileType},
     },
-    services::{errors::CoreError, utils::slugify},
-    storage::dirs::{audio_rel_path, to_db_path, waveform_rel_path},
+    services::{errors::CoreError, tracks::load_track},
+    storage::dirs::{audio_rel_path, image_rel_path, to_db_path, waveform_rel_path},
 };
 
 const AUDIO_EXTENSIONS: &[&str] = &["mp3", "flac", "wav", "ogg", "opus", "m4a", "aac"];
@@ -29,8 +28,14 @@ const AUDIO_EXTENSIONS: &[&str] = &["mp3", "flac", "wav", "ogg", "opus", "m4a", 
 #[derive(Serialize)]
 #[serde(tag = "status", rename_all = "camelCase")]
 pub enum ImportOutcome {
-    Imported { path: String, track: LocalTrack },
-    Failed { path: String, error: String },
+    Imported {
+        path: String,
+        track: LocalTrackResponse,
+    },
+    Failed {
+        path: String,
+        error: String,
+    },
 }
 
 pub fn import_tracks(
@@ -59,54 +64,161 @@ pub fn import_tracks(
     Ok(out)
 }
 
-struct TrackInfo {
-    title: String,
-    duration_seconds: Option<i64>,
-    genre: Option<String>,
-    artist: Option<String>,
-    waveform_path: Option<String>,
+struct StoredFile {
+    kind: TrackFileType,
+    path: String,
+    size: i64,
 }
 
-fn import_one(db: &DbState, library: &Library, path: &str) -> Result<LocalTrack, CoreError> {
+struct TrackInfo {
+    title: String,
+    duration_seconds: i64,
+    genre: Option<String>,
+    artist: Option<String>,
+    files: Vec<StoredFile>,
+}
+
+fn import_one(
+    db: &DbState,
+    library: &Library,
+    path: &str,
+) -> Result<LocalTrackResponse, CoreError> {
     let src = Path::new(path);
-    let file = std::fs::File::open(src)?;
-    let track_id = Uuid::new_v4();
-
     let ext = audio_extension(src)?;
+    let id = Uuid::new_v4();
+    let root = Path::new(&library.path);
     let meta = read_file_metadata(src);
-    let waveform = decode_waveform(file, WaveformOptions::default())
-        .map_err(CoreError::AudioProcessingError)?;
-    let waveform_bytes = to_bin_bytes(&waveform.peaks);
+    let mut written = Written::default();
+    let mut files = Vec::new();
 
-    let waveform_rel = waveform_rel_path(track_id, "bin");
-    let waveform_dest = Path::new(&library.path).join(&waveform_rel);
+    let audio_rel = audio_rel_path(id, &ext);
+    let audio_dest = root.join(&audio_rel);
+    written.track(audio_dest.clone());
+    let size = copy_file(src, &audio_dest)?;
+    files.push(StoredFile {
+        kind: TrackFileType::Audio,
+        path: to_db_path(&audio_rel),
+        size,
+    });
 
-    create_file_with_data(&waveform_dest, &waveform_bytes)?;
+    if let Some(bytes) = make_waveform(src) {
+        let rel = waveform_rel_path(id, "bin");
+        files.push(save_asset(
+            root,
+            &mut written,
+            TrackFileType::Waveform,
+            rel,
+            &bytes,
+        )?);
+    }
+
+    if let Some(c) = &meta.cover {
+        let rel = image_rel_path(id, cover_ext(c));
+        files.push(save_asset(
+            root,
+            &mut written,
+            TrackFileType::Cover,
+            rel,
+            &c.data,
+        )?);
+    }
 
     let info = TrackInfo {
         title: meta
             .title
             .filter(|t| !t.trim().is_empty())
             .unwrap_or_else(|| file_title(src)),
-        duration_seconds: meta.duration_secs.map(|d| d.round() as i64),
+        duration_seconds: meta.duration_secs.round() as i64,
         genre: meta.genre,
         artist: meta.artist,
-        waveform_path: Some(to_db_path(&waveform_rel)),
+        files,
     };
 
-    let audio_rel = audio_rel_path(track_id, &ext);
-    let audio_dest = Path::new(&library.path).join(&audio_rel);
+    let track = register(db, library.library_id, info)?;
+    written.keep();
+    Ok(track)
+}
 
-    let size = copy_file(src, &audio_dest)?;
+fn save_asset(
+    root: &Path,
+    written: &mut Written,
+    kind: TrackFileType,
+    rel: PathBuf,
+    data: &[u8],
+) -> Result<StoredFile, CoreError> {
+    let dest = root.join(&rel);
+    written.track(dest.clone());
+    create_file_with_data(&dest, data)?;
+    Ok(StoredFile {
+        kind,
+        path: to_db_path(&rel),
+        size: data.len() as i64,
+    })
+}
 
-    match register(db, library.library_id, to_db_path(&audio_rel), size, info) {
-        Ok(track) => Ok(track),
-        Err(e) => {
-            let _ = fs::remove_file(&audio_dest);
-            let _ = fs::remove_file(&waveform_dest);
-            Err(e)
+fn register(
+    db: &DbState,
+    library_id: i64,
+    info: TrackInfo,
+) -> Result<LocalTrackResponse, CoreError> {
+    let mut conn = lock(db);
+    let tx = conn.transaction()?;
+
+    let track_id = repository::tracks::tracks::create(
+        &tx,
+        &NewTrack {
+            title: info.title,
+            metadata_artist: info.artist,
+            duration_seconds: info.duration_seconds,
+            genre: info.genre,
+            ..Default::default()
+        },
+    )?;
+
+    for f in info.files {
+        repository::tracks::track_files::create(
+            &tx,
+            &NewTrackFile {
+                track_id,
+                track_file_type: f.kind,
+                library_id: Some(library_id),
+                path: f.path,
+                is_link: false,
+                size_bytes: f.size,
+                hash: None,
+            },
+        )?;
+    }
+
+    let response = load_track(&tx, track_id)?;
+    tx.commit()?;
+    Ok(response)
+}
+
+#[derive(Default)]
+struct Written(Vec<PathBuf>);
+
+impl Written {
+    fn track(&mut self, p: PathBuf) {
+        self.0.push(p);
+    }
+    fn keep(mut self) {
+        self.0.clear();
+    }
+}
+
+impl Drop for Written {
+    fn drop(&mut self) {
+        for p in &self.0 {
+            let _ = fs::remove_file(p);
         }
     }
+}
+
+fn make_waveform(src: &Path) -> Option<Vec<u8>> {
+    let file = File::open(src).ok()?;
+    let wave = decode_waveform(file, WaveformOptions::default()).ok()?;
+    Some(to_bin_bytes(&wave.peaks))
 }
 
 fn audio_extension(src: &Path) -> Result<String, CoreError> {
@@ -147,51 +259,12 @@ fn copy_file(src: &Path, dest: &Path) -> Result<i64, CoreError> {
     Ok(size as i64)
 }
 
-fn create_file_with_data(src: &Path, data: &Vec<u8>) -> Result<(), CoreError> {
+fn create_file_with_data(src: &Path, data: &[u8]) -> Result<(), CoreError> {
     if let Some(dir) = src.parent() {
         fs::create_dir_all(dir)?;
     }
     fs::write(src, data)?;
     Ok(())
-}
-
-fn register(
-    db: &DbState,
-    library_id: i64,
-    file_path: String,
-    size: i64,
-    info: TrackInfo,
-) -> Result<LocalTrack, CoreError> {
-    let file = NewLocalFile {
-        library_id: Some(library_id),
-        file_path,
-        is_link: false,
-        file_hash: None,
-        file_size_bytes: size,
-    };
-
-    let mut conn = lock(db);
-    let tx = conn.transaction()?;
-
-    let file_id = repository::local_files::create(&tx, &file)?;
-    let track_id = repository::tracks::create_local(
-        &tx,
-        &NewLocalTrack {
-            file_id,
-            permalink: slugify(&info.title),
-            metadata_artist: info.artist,
-            title: info.title,
-            duration_seconds: info.duration_seconds,
-            genre: info.genre,
-            description: None,
-            is_private: false,
-            waveform_path: info.waveform_path,
-        },
-    )?;
-    let track = repository::tracks::get_by_id(&tx, track_id)?;
-
-    tx.commit()?;
-    Ok(track)
 }
 
 fn resolve_library(conn: &Connection, library_id: Option<i64>) -> Result<Library, CoreError> {

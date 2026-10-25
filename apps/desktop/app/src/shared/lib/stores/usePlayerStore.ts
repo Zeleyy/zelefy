@@ -48,6 +48,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     seek: (time) => set({ currentTime: time }),
 
     playTrack: (track, newQueue) => {
+        if (track.trackId === get().currentTrack?.trackId) {
+            return;
+        }
+
         const queue = newQueue ?? get().queue;
         let index = queue.findIndex((t) => t.trackId === track.trackId);
 

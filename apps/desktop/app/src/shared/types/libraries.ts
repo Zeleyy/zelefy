@@ -2,7 +2,6 @@ export interface Library {
     libraryId: number;
     path: string;
     isPrimary: boolean;
-    maxSizeBytes: number | null;
     createdAt: number;
 }
 

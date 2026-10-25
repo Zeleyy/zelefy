@@ -1,6 +1,6 @@
 use desktop_core::{
     db::DbState,
-    models::tracks::LocalTrack,
+    models::tracks::LocalTrackResponse,
     services::{self, tracks::ImportOutcome},
 };
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -23,7 +23,7 @@ pub async fn import_tracks(
 }
 
 #[tauri::command]
-pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrack>, String> {
+pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse>, String> {
     let mut conn = db.conn.lock().unwrap_or_else(|e| e.into_inner());
     services::tracks::get_local_tracks(&mut conn).map_err(|e| e.to_string())
 }
