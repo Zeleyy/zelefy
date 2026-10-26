@@ -83,7 +83,6 @@
                 "libraryFallback": "Папка библиотеки"
             },
             "metrics": {
-                "cacheUsage": "Занято: <strong>{{used}}</strong> / {{max}}",
                 "tracksCount": "<strong>{{count}}</strong> треков ({{size}})",
                 "tracks_one": "<strong>{{count}}</strong> трек ({{size}})",
                 "tracks_few": "<strong>{{count}}</strong> трека ({{size}})",

@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import type { PublicTrack } from "@zelefy/types";
+import type { PlayerTrack } from "@zelefy/types";
 
 export type RepeatMode = "off" | "queue" | "track";
 
 interface PlayerState {
-    currentTrack: PublicTrack | null;
+    currentTrack: PlayerTrack | null;
     isPlaying: boolean;
     currentTime: number;
 
-    queue: PublicTrack[];
+    queue: PlayerTrack[];
     currentIndex: number;
 
     isShuffle: boolean;
@@ -18,13 +18,13 @@ interface PlayerState {
     togglePlay: () => void;
     seek: (time: number) => void;
 
-    playTrack: (track: PublicTrack, queue?: PublicTrack[]) => void;
+    playTrack: (track: PlayerTrack, queue?: PlayerTrack[]) => void;
 
     nextTrack: () => void;
     previousTrack: () => void;
 
-    setQueue: (queue: PublicTrack[]) => void;
-    addToQueue: (track: PublicTrack) => void;
+    setQueue: (queue: PlayerTrack[]) => void;
+    addToQueue: (track: PlayerTrack) => void;
 
     toggleShuffle: () => void;
     toggleRepeat: () => void;

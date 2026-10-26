@@ -83,7 +83,6 @@
                 "libraryFallback": "Library folder"
             },
             "metrics": {
-                "cacheUsage": "Used: <strong>{{used}}</strong> / {{max}}",
                 "tracksCount_one": "<strong>{{count}}</strong> track ({{size}})",
                 "tracksCount_other": "<strong>{{count}}</strong> tracks ({{size}})"
             },

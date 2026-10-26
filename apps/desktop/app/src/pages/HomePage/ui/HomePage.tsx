@@ -14,7 +14,7 @@ export const HomePage = () => {
 
     const track = usePlayerStore((state) => state.currentTrack);
 
-    const { data } = useWaveform(track?.waveformUrl);
+    const { data } = useWaveform(track?.waveformSrc);
 
     const [lastTrack, setLastTrack] = useState(track);
     if (track && track !== lastTrack) setLastTrack(track);
@@ -23,17 +23,6 @@ export const HomePage = () => {
     const currentTime = usePlayerStore((state) => state.currentTime);
     const seek = usePlayerStore((state) => state.seek);
 
-    const [dragTime, setDragTime] = useState<number | null>(null);
-
-    const displayTime = dragTime ?? currentTime;
-
-    const handleSeekCommit = (newTime: number) => {
-        if (seek) {
-            seek(newTime);
-        }
-        setDragTime(null);
-    };
-
     return (
         <>
             <h1>{t("home.title")}</h1>
@@ -41,11 +30,10 @@ export const HomePage = () => {
             <TrackHero
                 track={displayTrack ?? undefined}
                 isPlaying={isPlaying}
-                currentTime={displayTime}
+                currentTime={currentTime}
                 waveformData={data}
                 onTogglePlay={togglePlay}
-                onTimeChange={setDragTime}
-                onSeekCommit={handleSeekCommit}
+                onSeek={seek}
                 onLikeClick={() => {
                     /* Логика лайка */
                 }}
@@ -62,26 +50,25 @@ export const HomePage = () => {
                 onClick={() =>
                     playTrack({
                         trackId: "",
-                        userId: "",
-                        permalink: "string",
+                        // permalink: "string",
 
                         metadataArtist: "A-One",
                         title: "A-One - U.N. Owen Was Her? feat. HIKO",
-                        audioUrl: "",
+                        audioSrc: "",
                         durationSeconds: 204,
-                        coverUrl: null,
-                        waveformUrl: "",
+                        coverSrc: null,
+                        waveformSrc: "",
 
                         genre: null,
-                        description: null,
-                        bpm: null,
-                        keySignature: null,
-                        createdAt: "",
+                        // description: null,
+                        // bpm: null,
+                        // keySignature: null,
+                        // createdAt: "",
 
-                        playsCount: 0,
+                        // playsCount: 0,
                         likesCount: 0,
-                        repostsCount: 0,
-                        commentsCount: 0,
+                        // repostsCount: 0,
+                        // commentsCount: 0,
                     })
                 }
             >

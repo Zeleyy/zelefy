@@ -50,11 +50,11 @@ export const StorageSettings = () => {
                 description={t("settings.storage.section.description")}
             >
                 <div className={styles.storageSettingsList}>
-                    {storages.map((storage) => {
-                        const isPrimaryLibrary = storage.isPrimary;
+                    {storages.map((library) => {
+                        const isPrimaryLibrary = library.isPrimary;
 
                         return (
-                            <div key={storage.libraryId} className={styles.storageRow}>
+                            <div key={library.libraryId} className={styles.storageRow}>
                                 <div className={styles.rowInfo}>
                                     <div className={styles.rowTitleWrapper}>
                                         <span
@@ -72,38 +72,27 @@ export const StorageSettings = () => {
                                             </>
                                         ) : (
                                             <span className={styles.label}>
-                                                {storage.path.match(
+                                                {library.path.match(
                                                     /([^\\/]+)[\\/]zelefy-data[\\/]/,
-                                                )?.[1] + "\\" || storage.path}
+                                                )?.[1] + "\\" || library.path}
                                             </span>
                                         )}
                                     </div>
 
                                     <span className={styles.metrics}>
-                                        {storage.maxSizeBytes ? (
-                                            <Trans
-                                                i18nKey="settings.storage.metrics.cacheUsage"
-                                                values={{
-                                                    used: formatBytes(storage.usedSizeBytes, 0),
-                                                    max: formatBytes(storage.maxSizeBytes, 0),
-                                                }}
-                                                components={{ strong: <strong /> }}
-                                            />
-                                        ) : (
-                                            <Trans
-                                                i18nKey="settings.storage.metrics.tracksCount"
-                                                count={storage.filesCount}
-                                                values={{
-                                                    size: formatBytes(storage.usedSizeBytes),
-                                                }}
-                                                components={{ strong: <strong /> }}
-                                            />
-                                        )}
+                                        <Trans
+                                            i18nKey="settings.storage.metrics.tracksCount"
+                                            count={library.filesCount}
+                                            values={{
+                                                size: formatBytes(library.usedSizeBytes),
+                                            }}
+                                            components={{ strong: <strong /> }}
+                                        />
                                     </span>
                                 </div>
 
                                 <div className={styles.rowPathControl}>
-                                    <Input value={storage.path} readOnly />
+                                    <Input value={library.path} readOnly />
                                 </div>
 
                                 <div className={styles.rowActions}>
@@ -111,7 +100,7 @@ export const StorageSettings = () => {
                                         variant="primary"
                                         size="small"
                                         onClick={() =>
-                                            handleBrowseFolder(storage.libraryId, storage.path)
+                                            handleBrowseFolder(library.libraryId, library.path)
                                         }
                                     >
                                         {t("settings.storage.actions.browse")}

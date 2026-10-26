@@ -1,6 +1,15 @@
 import styles from "./PlayerBar.module.scss";
 import { useState } from "react";
-import { Button, Cover, Flex, formatTime, Icon, ProgressBar, VolumeControl } from "@zelefy/ui";
+import {
+    Button,
+    Cover,
+    Flex,
+    formatTime,
+    Icon,
+    ProgressBar,
+    useSeekProgress,
+    VolumeControl,
+} from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
 import clsx from "clsx";
 
@@ -29,16 +38,11 @@ export const PlayerBar = () => {
     const currentTime = usePlayerStore((state) => state.currentTime);
     const seek = usePlayerStore((state) => state.seek);
 
-    const [dragTime, setDragTime] = useState<number | null>(null);
-
-    const displayTime = dragTime ?? currentTime;
-
-    const handleSeekCommit = (newTime: number) => {
-        if (seek) {
-            seek(newTime);
-        }
-        setDragTime(null);
-    };
+    const { displayTime, handleTimeChange, handleSeekCommit } = useSeekProgress(
+        currentTime,
+        track?.durationSeconds,
+        seek,
+    );
 
     return (
         <div
@@ -52,7 +56,7 @@ export const PlayerBar = () => {
                             <div className={styles.mainControls}>
                                 <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
                                     <Cover
-                                        src={displayTrack?.coverUrl ?? undefined}
+                                        src={displayTrack?.coverSrc ?? undefined}
                                         alt={displayTrack?.title ?? "No track selected"}
                                         size="sm"
                                     />
@@ -189,7 +193,7 @@ export const PlayerBar = () => {
                                 <ProgressBar
                                     time={displayTime}
                                     duration={displayTrack?.durationSeconds ?? 0}
-                                    onChange={setDragTime}
+                                    onChange={handleTimeChange}
                                     onChangeEnd={handleSeekCommit}
                                 />
                             </div>

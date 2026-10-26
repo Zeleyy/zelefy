@@ -1,13 +1,13 @@
 import styles from "./OfflinePage.module.scss";
 import { useState } from "react";
+import { useNavigate } from "react-router";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import clsx from "clsx";
 import { Button, Cover, Flex, formatBytes, formatTime, Icon, Input } from "@zelefy/ui";
 import { StorageDashboard } from "./StorageDashboard";
-import { useNavigate } from "react-router";
 import { selectAudio } from "@/shared/lib/utils/browse";
 import { useImportTracks, useLocalTracks } from "@/features/track";
-import clsx from "clsx";
 import { TrackFileType, type LocalTrackResponse } from "@/shared/types";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import { usePlayerStore } from "@/shared/lib/stores";
 
 export const OfflinePage = () => {
@@ -50,25 +50,25 @@ export const OfflinePage = () => {
 
         playTrack({
             trackId: String(track.trackId),
-            userId: "",
+            // userId: "",
             metadataArtist: track.metadataArtist,
-            permalink: track.title,
+            // permalink: track.title,
             title: track.title,
-            audioUrl: audioPath,
-            coverUrl: convertFileSrc(coverPath),
-            waveformUrl: waveformPath,
+            audioSrc: audioPath,
+            coverSrc: convertFileSrc(coverPath),
+            waveformSrc: waveformPath,
             durationSeconds: track.durationSeconds,
 
             genre: null,
-            description: null,
-            bpm: null,
-            keySignature: null,
-            createdAt: "",
+            // description: null,
+            // bpm: null,
+            // keySignature: null,
+            // createdAt: "",
 
-            playsCount: 0,
+            // playsCount: 0,
             likesCount: 0,
-            repostsCount: 0,
-            commentsCount: 0,
+            // repostsCount: 0,
+            // commentsCount: 0,
         });
     };
 
@@ -185,6 +185,9 @@ export const OfflinePage = () => {
                                         colorHover: "var(--bg-primary)",
                                     }}
                                     square
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
                                 >
                                     <Icon name="action-save" size={13} />
                                 </Button>
@@ -192,6 +195,9 @@ export const OfflinePage = () => {
                                     variant="outline"
                                     colorScheme={{ color: "var(--danger)" }}
                                     square
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
                                 >
                                     <Icon name="action-delete" size={13} />
                                 </Button>

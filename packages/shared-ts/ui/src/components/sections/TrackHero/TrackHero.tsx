@@ -1,14 +1,16 @@
 import styles from "./TrackHero.module.scss";
+import type { PlayerTrack } from "@zelefy/types";
 import { Cover, WaveformBar } from "../../media";
 import { Button, Flex, Icon } from "../../primitives";
-import type { PublicTrack } from "@zelefy/types";
+import { useSeekProgress } from "../../../utils";
 
 export interface TrackHeroProps {
-    track?: PublicTrack | null;
+    track?: PlayerTrack | null;
     isPlaying?: boolean;
     currentTime?: number;
     waveformData?: Uint8Array;
     onTogglePlay?: () => void;
+    onSeek?: (time: number) => void;
     onTimeChange?: (time: number) => void;
     onSeekCommit?: (time: number) => void;
     onLikeClick?: () => void;
@@ -19,16 +21,19 @@ export interface TrackHeroProps {
 export const TrackHero = ({
     track,
     isPlaying = false,
-    currentTime = 0,
+    currentTime = 1,
     waveformData,
     onTogglePlay,
-    onTimeChange,
-    onSeekCommit,
+    onSeek,
     onLikeClick,
     onSaveClick,
     className,
 }: TrackHeroProps) => {
-    const duration = track?.durationSeconds ?? 1;
+    const { displayTime, safeDuration, handleTimeChange, handleSeekCommit } = useSeekProgress(
+        currentTime,
+        track?.durationSeconds,
+        onSeek,
+    );
 
     return (
         <Flex
@@ -71,10 +76,10 @@ export const TrackHero = ({
                 {waveformData && waveformData.length > 0 ? (
                     <WaveformBar
                         data={waveformData}
-                        time={currentTime}
-                        duration={duration}
-                        onChange={onTimeChange}
-                        onChangeEnd={onSeekCommit}
+                        time={displayTime}
+                        duration={safeDuration}
+                        onChange={handleTimeChange}
+                        onChangeEnd={handleSeekCommit}
                         className={styles.track__waveform}
                     />
                 ) : null}
@@ -97,7 +102,7 @@ export const TrackHero = ({
             </Flex>
 
             <Cover
-                src={track?.coverUrl ?? undefined}
+                src={track?.coverSrc ?? undefined}
                 alt={track?.title ?? "No track selected"}
                 size="xl"
                 className={styles.track__cover}
