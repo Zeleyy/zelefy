@@ -12,6 +12,8 @@ export {
     Icon,
     type IconProps,
     type IconName,
+    Select,
+    type SelectProps,
 } from "./primitives";
 
 export { SpinnerLoader, type SpinnerLoaderProps } from "./loading";

@@ -1,0 +1,262 @@
+$select-border: var(--border-subtle);
+$select-border-hover: var(--primary);
+$select-border-focus: var(--primary);
+$select-bg: var(--bg-surface);
+$select-text: var(--text-primary);
+$select-placeholder: var(--text-secondary);
+$select-disabled-text: var(--text-muted);
+$select-option-hover: var(--bg-surface-hover);
+$select-option-selected: var(--bg-secondary);
+$select-font-size: var(--font-size-sm);
+$select-transition: var(--transition-fast);
+
+.select {
+    position: relative;
+    width: 100%;
+    font-size: $select-font-size;
+    color: $select-text;
+}
+
+.select > button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    width: 100%;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: $select-bg;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition:
+        border-color $select-transition,
+        box-shadow $select-transition,
+        background-color $select-transition;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &::after {
+        content: "";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        width: 8px;
+        height: 8px;
+        border-right: 2px solid $select-border-hover;
+        border-bottom: 2px solid $select-border-hover;
+        transform: translateY(-70%) rotate(45deg);
+        pointer-events: none;
+        transition: transform $select-transition;
+    }
+
+    &:hover:not(:disabled) {
+        border-color: var(--primary);
+    }
+
+    &:focus-visible {
+        outline: none;
+        border-color: $select-border-focus;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    &:disabled {
+        color: $select-disabled-text;
+        border-color: $select-border;
+
+        &::after {
+            border-color: $select-disabled-text;
+        }
+    }
+}
+
+.selectOpen > button::after {
+    transform: translateY(-30%) rotate(-135deg);
+}
+
+.placeholder > button {
+    color: $select-placeholder;
+}
+
+.error > button {
+    border-color: var(--danger);
+
+    &:focus-visible {
+        border-color: var(--danger);
+        box-shadow: 0 0 0 3px rgba(240, 68, 56, 0.15);
+    }
+}
+
+.options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 260px;
+    padding: var(--spacing-2xs);
+    background: $select-bg;
+    border: 1px solid $select-border;
+    border-radius: var(--radius-md);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    display: none;
+
+    &::-webkit-scrollbar {
+        max-width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--border-subtle);
+        border-radius: 10px;
+
+        &:hover {
+            background-color: var(--primary);
+        }
+    }
+}
+
+.options--show {
+    display: block;
+    animation: selectFadeIn 120ms ease;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color $select-transition;
+
+    &:hover {
+        background: $select-option-hover;
+    }
+
+    &--active,
+    &--selected {
+        background: $select-option-selected;
+
+        &::after {
+            content: "";
+            margin-left: auto;
+            width: 4px;
+            height: 8px;
+            border-right: 2px solid $select-border-focus;
+            border-bottom: 2px solid $select-border-focus;
+            transform: rotate(45deg);
+        }
+    }
+
+    &--disabled {
+        color: $select-disabled-text;
+        cursor: default;
+
+        &:hover {
+            background: transparent;
+        }
+    }
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2xs);
+    flex: 1;
+    min-width: 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 2px 8px;
+    background: $select-option-selected;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    color: $select-border-focus;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chipRemove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.6;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.searchInput {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+
+    &::placeholder {
+        color: $select-placeholder;
+    }
+}
+
+.clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: $select-border-hover;
+    color: var(--text-primary);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity $select-transition;
+
+    &:hover {
+        background: $select-text;
+    }
+}
+
+.select:hover .clear {
+    opacity: 1;
+}
+
+.noOptions {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    color: $select-placeholder;
+    cursor: default;
+}
+
+@keyframes selectFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
