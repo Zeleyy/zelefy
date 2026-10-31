@@ -1,7 +1,16 @@
 .track {
-    background-color: var(--bg-surface);
+    background-color: var(--bg-secondary);
     padding: var(--spacing-lg);
     border-radius: var(--radius-lg);
+    background-image:
+        linear-gradient(
+            color-mix(in srgb, var(--bg-secondary) 80%, transparent),
+            color-mix(in srgb, var(--bg-secondary) 80%, transparent)
+        ),
+        var(--cover-url, none);
+    background-size: cover;
+    background-position: center;
+    height: 328px;
 
     &__body {
         flex: 1 1 auto;
@@ -20,15 +29,11 @@
         flex-shrink: 0;
     }
 
-    &__title {
-        margin: 0;
+    &__title,
+    &__artist {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    &__cover {
-        transition: height width 0.3s;
     }
 
     &__likeButton {
@@ -40,5 +45,22 @@
 @container (max-width: 1000px) {
     .track__title {
         font-size: var(--font-size-2xl);
+    }
+}
+
+@container (max-width: 900px) {
+    .track {
+        background-image:
+            linear-gradient(
+                color-mix(in srgb, var(--bg-secondary) 35%, transparent),
+                color-mix(in srgb, var(--bg-secondary) 35%, transparent)
+            ),
+            var(--cover-url, none);
+        gap: 0;
+    }
+
+    .track__cover {
+        visibility: hidden;
+        width: 0;
     }
 }

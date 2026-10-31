@@ -98,7 +98,7 @@ export const WaveformBar = ({
                             </defs>
 
                             <g className={styles.bars} style={{ transformOrigin: `0 ${baseY}px` }}>
-                                <g fill="var(--text-muted)">
+                                <g fill="var(--text-secondary)">
                                     <WaveformPaths top={top} bottom={bottom} />
                                 </g>
                                 <g fill="var(--primary)" clipPath={`url(#${clipId})`}>

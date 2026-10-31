@@ -3,6 +3,7 @@ import type { PlayerTrack } from "@zelefy/types";
 import { Cover, WaveformBar } from "../../media";
 import { Button, Flex, Icon } from "../../primitives";
 import { useSeekProgress } from "../../../utils";
+import type { CSSProperties } from "react";
 
 export interface TrackHeroProps {
     track?: PlayerTrack | null;
@@ -41,6 +42,7 @@ export const TrackHero = ({
             align="stretch"
             gap="xl"
             className={`${styles.track} ${className ?? ""}`}
+            style={{ "--cover-url": `url(${track?.coverSrc})` } as CSSProperties}
         >
             <Flex
                 direction="column"
@@ -69,7 +71,9 @@ export const TrackHero = ({
                         <h2 className={styles.track__title}>
                             {track?.title ?? "No track selected"}
                         </h2>
-                        <p>{track?.metadataArtist ?? "Unknown Artist"}</p>
+                        <p className={styles.track__artist}>
+                            {track?.metadataArtist ?? "Unknown Artist"}
+                        </p>
                     </Flex>
                 </Flex>
 
