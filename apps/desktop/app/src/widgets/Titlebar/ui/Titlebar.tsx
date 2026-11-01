@@ -1,22 +1,18 @@
 import styles from "./Titlebar.module.scss";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 import { Button, Flex, Icon, Input } from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";
-import { useBlurOnOutsideClick } from "../hooks";
+import { useBlurOnOutsideClick, useHistoryNavigation } from "../hooks";
 
 export const Titlebar = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const appWindow = getCurrentWindow();
     const currentTheme = useSettingsStore((state) => state.theme);
     const toggleTheme = useSettingsStore((state) => state.toggleTheme);
-    const currentIdx = (window.history.state?.idx as number) ?? 0;
-    const canGoBack = currentIdx > 0;
-    const canGoForward = currentIdx < window.history.length - 1;
 
     const handleTitlebarMouseDown = useBlurOnOutsideClick();
+    const { canGoBack, canGoForward, goBack, goForward } = useHistoryNavigation();
 
     return (
         <header
@@ -34,7 +30,7 @@ export const Titlebar = () => {
                     <Button
                         variant="ghost"
                         aria-label={t("titlebar.back")}
-                        onClick={() => navigate(-1)}
+                        onClick={goBack}
                         disabled={!canGoBack}
                         square
                     >
@@ -44,7 +40,7 @@ export const Titlebar = () => {
                     <Button
                         variant="ghost"
                         aria-label={t("titlebar.forward")}
-                        onClick={() => navigate(1)}
+                        onClick={goForward}
                         disabled={!canGoForward}
                         square
                     >
