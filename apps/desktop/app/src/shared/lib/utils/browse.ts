@@ -23,10 +23,10 @@ type DialogFilter = {
     extensions: string[];
 };
 
-export async function selectFiles(
+export const selectFiles = async (
     defaultPath?: string,
     filters: DialogFilter[] = [],
-): Promise<string[] | null> {
+): Promise<string[] | null> => {
     try {
         const selected = await open({
             directory: false,
@@ -39,7 +39,7 @@ export async function selectFiles(
         console.error("Ошибка при выборе файлов:", error);
         return null;
     }
-}
+};
 
 export const selectAudio = async (defaultPath?: string): Promise<string[] | null> => {
     return selectFiles(defaultPath, [

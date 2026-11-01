@@ -1,9 +1,9 @@
 import styles from "./MainLayout.module.scss";
 import { Outlet } from "react-router";
+import { Flex } from "@zelefy/ui";
 import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
 import { PlayerBar } from "@/widgets/PlayerBar";
-import { Flex } from "@zelefy/ui";
 
 export const MainLayout = () => {
     return (
