@@ -66,8 +66,12 @@
         padding-right: 32px;
     }
 
-    &--error {
+    &--error,
+    &--error:focus {
         border-color: var(--error-border);
+    }
+    &--error:focus {
+        box-shadow: 0 0 0 1px var(--error-border);
     }
 }
 

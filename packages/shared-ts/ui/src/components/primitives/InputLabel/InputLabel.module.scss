@@ -1,0 +1,21 @@
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+}
+
+.label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+
+    display: flex;
+    gap: var(--spacing-3xs);
+
+    &--disabled {
+        opacity: 0.6;
+    }
+}
+
+.required {
+    color: var(--danger);
+}

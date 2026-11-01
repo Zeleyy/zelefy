@@ -1,7 +1,9 @@
 export { Button, type ButtonProps } from "./Button";
 export { Flex, type FlexProps } from "./Flex";
 export { Input, type InputProps } from "./Input";
+export { InputLabel, type InputLabelProps } from "./InputLabel";
 export { Image, type ImageProps } from "./Image";
 export { GradientImage, type GradientImageProps } from "./GradientImage";
 export { Icon, type IconProps, type IconName } from "./Icon";
+export { Modal, type ModalProps } from "./Modal";
 export { Select, type SelectProps } from "./Select";

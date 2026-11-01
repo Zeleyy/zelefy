@@ -1,0 +1,29 @@
+.backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+.scroll {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    pointer-events: auto;
+}
+
+.popup {
+    position: relative;
+    margin: auto;
+    flex-shrink: 0;
+    background: var(--bg-secondary);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    min-width: 600px;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
