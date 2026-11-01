@@ -33,7 +33,7 @@ interface SettingsState {
     initGatewayUrl: () => Promise<void>;
     initDefaultGatewayUrl: () => Promise<void>;
 
-    setHasHydrated: (state: boolean) => void;
+    setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 type PersistedSettings = Pick<
@@ -112,7 +112,7 @@ export const useSettingsStore = create<SettingsState>()(
                 if (url !== null) set({ defaultGatewayUrl: url });
             },
 
-            setHasHydrated: (state) => set({ _hasHydrated: state }),
+            setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
         }),
         {
             name: "settings",

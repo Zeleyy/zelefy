@@ -22,4 +22,7 @@ pub enum CoreError {
 
     #[error("audio processing error: {0}")]
     AudioProcessingError(AudioError),
+
+    #[error("audio device error: {0}")]
+    AudioDevice(rodio::CpalError),
 }

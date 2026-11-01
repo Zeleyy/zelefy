@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter};
 
-use crate::models::tracks::{LocalTrackResponse, Track, TrackFileResponse, TrackFileType};
+use crate::models::tracks::{
+    LocalTrackResponse, Track, TrackFileResponse, TrackFileType, TrackFilesResponse,
+};
 
 pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Option<Track>> {
     conn.query_one(
@@ -83,7 +85,8 @@ pub fn get_all_local_with_files(conn: &Connection) -> rusqlite::Result<Vec<Local
     let result = tracks
         .into_iter()
         .map(|track| {
-            let track_files = files_map.remove(&track.track_id).unwrap_or_default();
+            let files = files_map.remove(&track.track_id).unwrap_or_default();
+            let track_files = TrackFilesResponse::from_rows(files);
             LocalTrackResponse { track, track_files }
         })
         .collect();

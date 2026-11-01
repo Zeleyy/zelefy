@@ -7,6 +7,7 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     position: sticky;
     bottom: 0;
     z-index: 10;
+    pointer-events: none;
 }
 
 .clip {
@@ -35,6 +36,7 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     width: max-content;
     max-width: 100%;
     background-color: var(--bg-primary);
+    pointer-events: all;
 }
 
 .mainControls {
@@ -58,13 +60,13 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
 .meta {
     display: flex;
     flex-direction: column;
-    min-width: 0;
-    max-width: 150px;
+    width: 150px;
     @include text-body-sm;
 
     letter-spacing: var(--letter-spacing-tight);
 }
 
+.author,
 .title {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -115,4 +117,5 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     position: relative;
+    user-select: none;
 }

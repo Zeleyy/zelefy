@@ -28,14 +28,6 @@
 
         overflow-x: auto;
         padding-bottom: var(--spacing-2xs);
-
-        &::-webkit-scrollbar {
-            height: 4px;
-        }
-        &::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb);
-            border-radius: var(--radius-full);
-        }
     }
 
     .storageCard {

@@ -1,6 +1,6 @@
 use rusqlite::{Connection, params};
 
-use crate::models::tracks::{TrackFile, TrackFileResponse};
+use crate::models::tracks::{TrackFile, TrackFileResponse, TrackFilesResponse};
 
 pub fn get_by_track_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Vec<TrackFile>> {
     let mut stmt = conn.prepare(
@@ -40,4 +40,12 @@ pub fn get_by_track_id_with_library(
     )?;
 
     rows.collect()
+}
+
+pub fn get_map_by_track_id(
+    conn: &Connection,
+    track_id: i64,
+) -> rusqlite::Result<TrackFilesResponse> {
+    let rows = get_by_track_id_with_library(conn, track_id)?;
+    Ok(TrackFilesResponse::from_rows(rows))
 }

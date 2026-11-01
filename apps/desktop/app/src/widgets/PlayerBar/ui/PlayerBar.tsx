@@ -1,5 +1,6 @@
 import styles from "./PlayerBar.module.scss";
 import { useState } from "react";
+import clsx from "clsx";
 import {
     Button,
     Cover,
@@ -11,7 +12,6 @@ import {
     VolumeControl,
 } from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
-import clsx from "clsx";
 
 export const PlayerBar = () => {
     const isMuted = useSettingsStore((state) => state.isMuted);
@@ -64,7 +64,9 @@ export const PlayerBar = () => {
                                         <span className={styles.title}>
                                             {displayTrack?.title ?? "No track selected"}
                                         </span>
-                                        <span>{displayTrack?.metadataArtist}</span>
+                                        <span className={styles.author}>
+                                            {displayTrack?.metadataArtist}
+                                        </span>
                                     </div>
                                     <Button variant="ghost" radius="full" square>
                                         <Icon name="player-heart" width={16} height={16} />

@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use rusqlite::Row;
 use serde::Serialize;
 
-use crate::models::tracks::TrackFileResponse;
+use crate::models::tracks::TrackFilesResponse;
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -56,5 +56,6 @@ pub struct NewTrack {
 pub struct LocalTrackResponse {
     #[serde(flatten)]
     pub track: Track,
-    pub track_files: Vec<TrackFileResponse>,
+    #[serde(flatten)]
+    pub track_files: TrackFilesResponse,
 }

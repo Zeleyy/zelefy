@@ -39,6 +39,10 @@ export interface TrackFileResponse extends TrackFile {
     library: Library;
 }
 
-export interface LocalTrackResponse extends Track {
-    trackFiles: TrackFileResponse[];
+export interface TrackFilesResponse {
+    audio: TrackFileResponse;
+    cover: TrackFileResponse | null;
+    waveform: TrackFileResponse | null;
 }
+
+export interface LocalTrackResponse extends Track, TrackFilesResponse {}

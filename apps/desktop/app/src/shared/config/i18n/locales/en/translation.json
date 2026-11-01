@@ -2,7 +2,13 @@
     "common": {
         "save": "Save",
         "reset": "Reset",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "default": "Default",
+        "cancel": "Cancel",
+        "in_development": "Coming soon"
+    },
+    "feature": {
+        "not_implemented": "Not available yet"
     },
     "language": {
         "current": "English",
@@ -33,6 +39,30 @@
     "home": {
         "title": "Home"
     },
+    "offline": {
+        "title": "Offline library",
+        "edit": {
+            "title": "Edit track",
+            "field": {
+                "label": {
+                    "title": "Track title",
+                    "metadataArtist": "Artist",
+                    "genre": "Genre",
+                    "bpm": "BPM",
+                    "keySignature": "Key signature",
+                    "description": "Description"
+                },
+                "placeholder": {
+                    "title": "Track title",
+                    "metadataArtist": "Artist",
+                    "genre": "Add genre",
+                    "bpm": "BPM",
+                    "keySignature": "Key signature",
+                    "description": "Describe your track"
+                }
+            }
+        }
+    },
     "settings": {
         "general": {
             "title": "General",
@@ -56,7 +86,10 @@
             "title": "Appearance"
         },
         "audio": {
-            "title": "Audio"
+            "title": "Audio",
+            "output": {
+                "title": "Audio output"
+            }
         },
         "network": {
             "title": "Network",

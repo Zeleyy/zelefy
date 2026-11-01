@@ -13,7 +13,7 @@ export const MainLayout = () => {
             <div className={styles.body}>
                 <Sidebar />
 
-                <div className={styles.main}>
+                <div className={styles.main} data-scrollbar>
                     <main className={styles.scrollContent}>
                         <Flex direction="column" gap="lg" size="page-md" container fullWidth>
                             <Outlet />
@@ -22,6 +22,8 @@ export const MainLayout = () => {
 
                     <PlayerBar />
                 </div>
+
+                <div id="modal-root" className={styles.modalRoot} />
             </div>
         </>
     );

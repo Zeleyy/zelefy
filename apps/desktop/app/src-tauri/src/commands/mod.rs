@@ -1,3 +1,4 @@
+pub mod audio;
 pub mod libraries;
 pub mod openapi;
 pub mod settings;

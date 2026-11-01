@@ -2,7 +2,13 @@
     "common": {
         "save": "Сохранить",
         "reset": "Сбросить",
-        "loading": "Загрузка..."
+        "loading": "Загрузка...",
+        "default": "По умолчанию",
+        "cancel": "Отмена",
+        "in_development": "В разработке"
+    },
+    "feature": {
+        "not_implemented": "Не реализовано"
     },
     "language": {
         "current": "Русский",
@@ -33,6 +39,30 @@
     "home": {
         "title": "Главная"
     },
+    "offline": {
+        "title": "Оффлайн библиотека",
+        "edit": {
+            "title": "Редактировать трек",
+            "field": {
+                "label": {
+                    "title": "Название трека",
+                    "metadataArtist": "Исполнитель",
+                    "genre": "Жанр",
+                    "bpm": "BPM",
+                    "keySignature": "Тональность",
+                    "description": "Описание"
+                },
+                "placeholder": {
+                    "title": "Название трека",
+                    "metadataArtist": "Исполнитель",
+                    "genre": "Добавь жанр",
+                    "bpm": "BPM",
+                    "keySignature": "Тональность",
+                    "description": "Опиши свой трек"
+                }
+            }
+        }
+    },
     "settings": {
         "general": {
             "title": "Общее",
@@ -56,7 +86,10 @@
             "title": "Оформление"
         },
         "audio": {
-            "title": "Звук"
+            "title": "Звук",
+            "output": {
+                "title": "Аудиовыход"
+            }
         },
         "network": {
             "title": "Сеть",

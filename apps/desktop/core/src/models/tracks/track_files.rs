@@ -113,3 +113,33 @@ impl TrackFileResponse {
         })
     }
 }
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TrackFilesResponse {
+    pub audio: Option<TrackFileResponse>,
+    pub cover: Option<TrackFileResponse>,
+    pub waveform: Option<TrackFileResponse>,
+}
+
+impl TrackFilesResponse {
+    pub fn from_rows(mut rows: Vec<TrackFileResponse>) -> Self {
+        let mut audio = None;
+        let mut cover = None;
+        let mut waveform = None;
+
+        for tf in rows.drain(..) {
+            match tf.track_file.track_file_type {
+                TrackFileType::Audio => audio = Some(tf),
+                TrackFileType::Cover => cover = Some(tf),
+                TrackFileType::Waveform => waveform = Some(tf),
+            }
+        }
+
+        Self {
+            audio,
+            cover,
+            waveform,
+        }
+    }
+}

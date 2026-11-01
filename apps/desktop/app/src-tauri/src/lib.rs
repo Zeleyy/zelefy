@@ -1,6 +1,9 @@
-use desktop_core::db::{init_db, DbState};
+use desktop_core::{
+    audio::state::AudioState,
+    db::{init_db, DbState},
+};
 use state::AppState;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 pub mod cache;
 pub mod commands;
@@ -42,6 +45,10 @@ pub fn run() {
             app.manage(cache);
             app.manage(DbState::new(conn));
             app.manage(AppState::default());
+            let handle = app.handle().clone();
+            app.manage(AudioState::new(move |event| {
+                let _ = handle.emit("player://event", event);
+            }));
 
             if let Err(e) = refresh_asset_scope(app.handle()) {
                 eprintln!("asset scope: {e}");
@@ -70,6 +77,12 @@ pub fn run() {
             cache::commands::reset_cache_limit,
             commands::import_tracks,
             commands::get_local_tracks,
+            commands::audio::player_load_local,
+            commands::audio::player_play,
+            commands::audio::player_pause,
+            commands::audio::player_seek,
+            commands::audio::player_set_volume,
+            commands::audio::player_list_devices,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
