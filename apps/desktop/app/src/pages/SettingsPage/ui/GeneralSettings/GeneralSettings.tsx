@@ -21,13 +21,13 @@ export const GeneralSettings = () => {
 
             <Flex direction="column" gap="sm">
                 <Flex justify="space-between" align="center">
-                    <span>{t("settings.general.updates.currentVersion")}:</span>
+                    <span>{t("settings.general.updates.current_version")}:</span>
                     <strong>{currentVersion || "..."}</strong>
                 </Flex>
 
                 {updateInfo && (
                     <Flex justify="space-between" align="center">
-                        <span>{t("settings.general.updates.latestVersion")}:</span>
+                        <span>{t("settings.general.updates.latest_version")}:</span>
                         <strong>{hasUpdate ? latestVersion : currentVersion}</strong>
                     </Flex>
                 )}
@@ -36,7 +36,7 @@ export const GeneralSettings = () => {
                     {!updateInfo && !isChecking && t("settings.general.updates.status.idle")}
                     {isChecking && t("settings.general.updates.status.checking")}
                     {updateInfo && hasUpdate && t("settings.general.updates.status.available")}
-                    {updateInfo && !hasUpdate && t("settings.general.updates.status.notAvailable")}
+                    {updateInfo && !hasUpdate && t("settings.general.updates.status.not_available")}
                 </div>
             </Flex>
             <Flex gap="md" align="center">

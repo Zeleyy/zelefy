@@ -4,12 +4,6 @@
     border-radius: var(--radius-sm);
     flex-shrink: 0;
 
-    &:hover {
-        .overlay {
-            opacity: 1;
-        }
-    }
-
     &--xs {
         width: 36px;
         height: 36px;
@@ -29,23 +23,5 @@
     &--xl {
         width: 280px;
         height: 280px;
-    }
-}
-
-.overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background-color: rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-
-    &--visible {
-        opacity: 1;
     }
 }

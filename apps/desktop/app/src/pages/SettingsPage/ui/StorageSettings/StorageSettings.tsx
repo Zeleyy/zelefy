@@ -128,7 +128,7 @@ export const StorageSettings = () => {
                         <div className={styles.actionContent}>
                             <span className={styles.actionIcon}>+</span>
                             <span className={styles.actionText}>
-                                {t("settings.storage.actions.addLibraryFolder")}
+                                {t("settings.storage.actions.add_library_folder")}
                             </span>
                         </div>
                     </div>

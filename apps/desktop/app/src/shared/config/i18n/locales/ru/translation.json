@@ -18,13 +18,13 @@
     "titlebar": {
         "back": "Назад",
         "forward": "Вперёд",
-        "searchPlaceholder": "Поиск...",
+        "search_placeholder": "Поиск...",
         "minimize": "Свернуть",
         "maximize": "Развернуть",
         "close": "Закрыть",
         "theme": {
-            "switchToLight": "Переключить на светлую тему",
-            "switchToDark": "Переключить на тёмную тему"
+            "switch_to_light": "Переключить на светлую тему",
+            "switch_to_dark": "Переключить на тёмную тему"
         }
     },
     "sidebar": {
@@ -43,22 +43,33 @@
         "title": "Оффлайн библиотека",
         "edit": {
             "title": "Редактировать трек",
+            "cover": {
+                "action": "Изменить обложку"
+            },
             "field": {
-                "label": {
-                    "title": "Название трека",
-                    "metadataArtist": "Исполнитель",
-                    "genre": "Жанр",
-                    "bpm": "BPM",
-                    "keySignature": "Тональность",
-                    "description": "Описание"
+                "title": {
+                    "label": "Название трека",
+                    "placeholder": "Название трека"
                 },
-                "placeholder": {
-                    "title": "Название трека",
-                    "metadataArtist": "Исполнитель",
-                    "genre": "Добавь жанр",
-                    "bpm": "BPM",
-                    "keySignature": "Тональность",
-                    "description": "Опиши свой трек"
+                "metadata_artist": {
+                    "label": "Исполнитель",
+                    "placeholder": "Исполнитель"
+                },
+                "genre": {
+                    "label": "Жанр",
+                    "placeholder": "Добавь жанр"
+                },
+                "bpm": {
+                    "label": "BPM",
+                    "placeholder": "BPM"
+                },
+                "key_signature": {
+                    "label": "Тональность",
+                    "placeholder": "Тональность"
+                },
+                "description": {
+                    "label": "Описание",
+                    "placeholder": "Опиши свой трек"
                 }
             }
         }
@@ -68,13 +79,13 @@
             "title": "Общее",
             "updates": {
                 "title": "Обновление приложения",
-                "currentVersion": "Текущая версия",
-                "latestVersion": "Последняя версия",
+                "current_version": "Текущая версия",
+                "latest_version": "Последняя версия",
                 "status": {
                     "idle": "Нажмите кнопку, чтобы проверить наличие обновлений",
                     "checking": "Проверка наличия обновлений...",
                     "available": "Доступно новое обновление!",
-                    "notAvailable": "У вас установлена последняя версия"
+                    "not_available": "У вас установлена последняя версия"
                 },
                 "actions": {
                     "check": "Проверить обновления",
@@ -96,7 +107,7 @@
             "connection": {
                 "title": "Подключение к серверу",
                 "description": "Укажите адрес хоста для подключения приложения к бэкенду",
-                "defaultHint": "Значение по умолчанию: {{url}}"
+                "default_hint": "Значение по умолчанию: {{url}}"
             },
             "services": {
                 "title": "Сервисы и эндпоинты",
@@ -113,21 +124,15 @@
             "types": {
                 "cache": "Кэш стриминга",
                 "library": "Библиотека",
-                "libraryFallback": "Папка библиотеки"
-            },
-            "metrics": {
-                "tracksCount": "<strong>{{count}}</strong> треков ({{size}})",
-                "tracks_one": "<strong>{{count}}</strong> трек ({{size}})",
-                "tracks_few": "<strong>{{count}}</strong> трека ({{size}})",
-                "tracks_many": "<strong>{{count}}</strong> треков ({{size}})"
+                "library_fallback": "Папка библиотеки"
             },
             "actions": {
                 "browse": "Обзор",
                 "options": "Опции",
-                "addLibraryFolder": "Добавить папку библиотеки"
+                "add_library_folder": "Добавить папку библиотеки"
             },
             "errors": {
-                "browseFailed": "Ошибка при выборе папки"
+                "browse_failed": "Ошибка при выборе папки"
             }
         }
     }

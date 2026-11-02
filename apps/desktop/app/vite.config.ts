@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { ViteMinifyPlugin } from "vite-plugin-minify";
 import process from "node:process";
@@ -7,7 +7,7 @@ import path from "path";
 const host = process.env.TAURI_DEV_HOST;
 const packageDir = "../../../packages";
 
-export default defineConfig(() => ({
+export default defineConfig((): UserConfig => ({
     plugins: [react({ compiler: true }), ViteMinifyPlugin({})],
 
     resolve: {
@@ -32,9 +32,9 @@ export default defineConfig(() => ({
     },
 
     css: {
+        transformer: "lightningcss",
         preprocessorOptions: {
             scss: {
-                api: "modern-compiler",
                 loadPaths: [
                     path.resolve(import.meta.dirname, packageDir + "/shared-ts"),
                     path.resolve(import.meta.dirname, "../../node_modules"),
@@ -45,7 +45,7 @@ export default defineConfig(() => ({
 
     build: {
         target: "esnext",
-        cssMinify: true,
+        cssMinify: "lightningcss",
         cssCodeSplit: true,
         chunkSizeWarningLimit: 1000,
         sourcemap: false,

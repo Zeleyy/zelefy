@@ -53,7 +53,7 @@ export const Titlebar = () => {
                 <Input
                     id="titlebar-search"
                     name="search"
-                    placeholder={t("titlebar.searchPlaceholder")}
+                    placeholder={t("titlebar.search_placeholder")}
                     leftIcon={<Icon name="common-search" width={17} height={17} />}
                 />
             </div>
@@ -65,8 +65,8 @@ export const Titlebar = () => {
                     onClick={toggleTheme}
                     aria-label={
                         currentTheme === "dark"
-                            ? t("titlebar.theme.switchToLight")
-                            : t("titlebar.theme.switchToDark")
+                            ? t("titlebar.theme.switch_to_light")
+                            : t("titlebar.theme.switch_to_dark")
                     }
                 >
                     <Icon

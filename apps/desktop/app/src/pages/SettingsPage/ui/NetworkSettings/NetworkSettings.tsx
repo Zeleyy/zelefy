@@ -84,7 +84,7 @@ export const NetworkSettings = () => {
 
                 {!isDefault && defaultGatewayUrl && (
                     <p>
-                        {t("settings.network.connection.defaultHint", { url: defaultGatewayUrl })}
+                        {t("settings.network.connection.default_hint", { url: defaultGatewayUrl })}
                     </p>
                 )}
             </SettingsSection>
