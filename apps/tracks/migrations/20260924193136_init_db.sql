@@ -30,7 +30,7 @@ CREATE TABLE tracks (
     audio_url text NULL,
     cover_url text NULL,
     waveform_url text NULL,
-    duration_seconds integer NULL,
+    duration_ms integer NULL,
     genre varchar(50) NULL,
     description text NULL,
     bpm integer NULL,

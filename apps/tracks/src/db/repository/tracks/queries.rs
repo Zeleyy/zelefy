@@ -21,7 +21,7 @@ where
                 , t.audio_url
                 , t.cover_url
                 , t.waveform_url
-                , t.duration_seconds
+                , t.duration_ms
                 , t.genre
                 , t.description
                 , t.bpm
@@ -64,7 +64,7 @@ where
                 , t.audio_url
                 , t.cover_url
                 , t.waveform_url
-                , t.duration_seconds
+                , t.duration_ms
                 , t.genre
                 , t.description
                 , t.bpm
@@ -107,7 +107,7 @@ where
                 , t.audio_url
                 , t.cover_url
                 , t.waveform_url
-                , t.duration_seconds
+                , t.duration_ms
                 , t.genre
                 , t.description
                 , t.bpm

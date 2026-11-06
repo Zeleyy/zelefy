@@ -32,7 +32,7 @@ where
                 , audio_url
                 , cover_url
                 , waveform_url
-                , duration_seconds
+                , duration_ms
                 , genre
                 , description
                 , bpm
@@ -86,7 +86,7 @@ where
     push_opt_nullable(&mut sep, "audio_url", update.audio_url);
     push_opt_nullable(&mut sep, "cover_url", update.cover_url);
     push_opt_nullable(&mut sep, "waveform_url", update.waveform_url);
-    push_opt_nullable(&mut sep, "duration_seconds", update.duration_seconds);
+    push_opt_nullable(&mut sep, "duration_ms", update.duration_ms);
     push_opt_nullable(&mut sep, "genre", update.genre);
     push_opt_nullable(&mut sep, "description", update.description);
     push_opt_nullable(&mut sep, "bpm", update.bpm);

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                t.track_id\n                , t.user_id\n                , t.metadata_artist\n                , t.title\n                , t.permalink\n                , t.audio_url\n                , t.cover_url\n                , t.waveform_url\n                , t.duration_seconds\n                , t.genre\n                , t.description\n                , t.bpm\n                , t.key_signature\n                , t.is_private\n                , t.status AS \"status: TrackStatus\"\n                , t.processing_error\n                , t.created_at\n                , t.updated_at\n                , ts.plays_count\n                , ts.likes_count\n                , ts.reposts_count\n                , ts.comments_count\n            FROM playlist_tracks pt\n            JOIN tracks t ON t.track_id = pt.track_id\n            JOIN track_stats ts ON ts.track_id = t.track_id\n            WHERE pt.playlist_id = $1\n            ORDER BY pt.\"position\" ASC\n        ",
+  "query": "\n            INSERT INTO tracks (\n                user_id\n                , permalink\n                , title\n            )\n            VALUES ($1, $2, $3)\n            RETURNING\n                track_id\n                , user_id\n                , metadata_artist\n                , title\n                , permalink\n                , audio_url\n                , cover_url\n                , waveform_url\n                , duration_ms\n                , genre\n                , description\n                , bpm\n                , key_signature\n                , is_private\n                , status AS \"status: TrackStatus\"\n                , processing_error\n                , created_at\n                , updated_at\n        ",
   "describe": {
     "columns": [
       {
@@ -98,12 +98,12 @@
       },
       {
         "ordinal": 8,
-        "name": "duration_seconds",
+        "name": "duration_ms",
         "type_info": "Int4",
         "origin": {
           "Table": {
             "table": "tracks",
-            "name": "duration_seconds"
+            "name": "duration_ms"
           }
         }
       },
@@ -217,55 +217,18 @@
             "name": "updated_at"
           }
         }
-      },
-      {
-        "ordinal": 18,
-        "name": "plays_count",
-        "type_info": "Int8",
-        "origin": {
-          "Table": {
-            "table": "track_stats",
-            "name": "plays_count"
-          }
-        }
-      },
-      {
-        "ordinal": 19,
-        "name": "likes_count",
-        "type_info": "Int4",
-        "origin": {
-          "Table": {
-            "table": "track_stats",
-            "name": "likes_count"
-          }
-        }
-      },
-      {
-        "ordinal": 20,
-        "name": "reposts_count",
-        "type_info": "Int4",
-        "origin": {
-          "Table": {
-            "table": "track_stats",
-            "name": "reposts_count"
-          }
-        }
-      },
-      {
-        "ordinal": 21,
-        "name": "comments_count",
-        "type_info": "Int4",
-        "origin": {
-          "Table": {
-            "table": "track_stats",
-            "name": "comments_count"
-          }
-        }
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        {
+          "Custom": {
+            "name": "citext",
+            "kind": "Simple"
+          }
+        },
+        "Varchar"
       ]
     },
     "nullable": [
@@ -286,12 +249,8 @@
       false,
       true,
       false,
-      false,
-      false,
-      false,
-      false,
       false
     ]
   },
-  "hash": "926f25ad4baa0b1b23a7a8f8c7009a9ee44395de3b7a6c8ea36ea4cc2eaaa080"
+  "hash": "0b6d1103017bf7d82c0e4cd652c96da2f3e7952818306d6bbb8e9ccacdb876b3"
 }
