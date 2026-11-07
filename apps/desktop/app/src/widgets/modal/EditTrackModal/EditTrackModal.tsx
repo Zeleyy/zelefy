@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import { Button, EditableCover, Flex, InputLabel, Modal } from "@zelefy/ui";
 import type { LocalTrackResponse } from "@/shared/types";
+import { useUpdateLocalTrack } from "@/features/track";
+import { selectImage, toSrc, trackFileSrc } from "@/shared/lib/utils";
 
 interface EditTrackModalProps {
     open: boolean;
@@ -27,6 +28,8 @@ const fields: {
 
 export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProps) => {
     const { t } = useTranslation();
+    const { mutate: updateLocalTrack } = useUpdateLocalTrack();
+    const [draftImagePath, setDraftImagePath] = useState<string | null>(null);
 
     const [draft, setDraft] = useState(() => ({
         title: track?.title ?? "",
@@ -40,9 +43,34 @@ export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProp
     const update = (name: EditableField) => (e: React.ChangeEvent<HTMLInputElement>) =>
         setDraft((d) => ({ ...d, [name]: e.target.value }));
 
-    const coverPath = track?.cover
-        ? convertFileSrc(track.cover.library.path + "/" + track.cover.path)
-        : null;
+    const handleBrowseImage = async () => {
+        const selected = await selectImage();
+        if (selected) setDraftImagePath(selected);
+    };
+
+    const handleSave = () => {
+        if (!track) return;
+
+        updateLocalTrack(
+            {
+                trackId: track.trackId,
+                update: {
+                    title: draft.title || undefined,
+                    metadataArtist: draft.metadataArtist || null,
+                    genre: draft.genre || null,
+                    bpm: draft.bpm ? Number(draft.bpm) : null,
+                    keySignature: draft.keySignature || null,
+                    description: draft.description || null,
+                    newCoverPath: draftImagePath || undefined,
+                },
+            },
+            {
+                onSuccess: () => onOpenChange(false),
+            },
+        );
+    };
+
+    const displayImage = toSrc(draftImagePath) ?? trackFileSrc(track?.cover);
 
     return (
         <Modal
@@ -54,19 +82,17 @@ export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProp
                     <Button variant="secondary" onClick={() => onOpenChange(false)}>
                         {t("common.cancel")}
                     </Button>
-                    <Button onClick={() => alert(t("common.in_development"))}>
-                        {t("common.save")}
-                    </Button>
+                    <Button onClick={handleSave}>{t("common.save")}</Button>
                 </Flex>
             }
         >
             <Flex as="form" gap="lg">
                 <EditableCover
-                    src={coverPath ?? undefined}
+                    src={displayImage ?? undefined}
                     alt={draft?.title}
                     size="xl"
                     action={t("offline.edit.cover.action")}
-                    onEditClick={() => alert(t("common.in_development"))}
+                    onEditClick={() => handleBrowseImage()}
                 />
 
                 <Flex direction="column" gap="md" fullWidth>

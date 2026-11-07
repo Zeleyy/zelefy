@@ -1,0 +1,117 @@
+.header {
+    &__title {
+        line-height: var(--line-height-tight);
+        font-size: var(--font-size-lg);
+    }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        min-width: 20px;
+        height: 20px;
+        padding: 0 var(--spacing-2xs);
+
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        background-color: var(--bg-surface);
+        border-radius: var(--radius-md);
+    }
+
+    &__clear {
+        gap: var(--spacing-xs);
+        font-size: var(--font-size-xs);
+    }
+}
+
+.queue {
+    &__row {
+        display: grid;
+        grid-template-columns: 16px minmax(0, 1fr) 36px auto;
+        align-items: center;
+        column-gap: var(--spacing-xs);
+        min-height: 60px;
+
+        background-color: var(--bg-secondary);
+        padding: var(--spacing-xs);
+        border-radius: var(--radius-md);
+        border: 1px solid transparent;
+
+        &:hover {
+            background-color: var(--bg-surface);
+            cursor: pointer;
+
+            .actions {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        &--active {
+            background-color: var(--primary-subtle-bg);
+
+            &:hover {
+                border: 1px solid var(--primary);
+                background-color: var(--primary-subtle-bg);
+            }
+
+            .queue__title {
+                color: var(--primary);
+            }
+        }
+    }
+
+    &__index {
+        color: var(--text-muted);
+        font-size: var(--font-size-sm);
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__track {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: var(--spacing-xs);
+        min-width: 0;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    &__title,
+    &__artist {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__title {
+        font-size: var(--font-size-sm);
+        color: var(--text-primary);
+    }
+
+    &__artist {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+    }
+
+    &__duration {
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-2xs);
+        justify-self: end;
+    }
+}

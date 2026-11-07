@@ -1,7 +1,10 @@
 use chrono::Utc;
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, params, params_from_iter, types::Value};
 
-use crate::models::tracks::NewTrackFile;
+use crate::{
+    db::utils::push_opt_nullable,
+    models::tracks::{NewTrackFile, UpdateTrackFile},
+};
 
 pub fn create(conn: &Connection, track_file: &NewTrackFile) -> rusqlite::Result<i64> {
     let now = Utc::now().timestamp();
@@ -35,4 +38,38 @@ pub fn create(conn: &Connection, track_file: &NewTrackFile) -> rusqlite::Result<
         ],
         |row| row.get(0),
     )
+}
+
+pub fn update(conn: &Connection, file_id: i64, update: &UpdateTrackFile) -> rusqlite::Result<()> {
+    let mut set_parts: Vec<String> = Vec::new();
+    let mut values: Vec<Value> = Vec::new();
+
+    if let Some(path) = update.path.clone() {
+        set_parts.push("path = ?".to_string());
+        values.push(Value::Text(path));
+    }
+
+    if let Some(size_bytes) = update.size_bytes.clone() {
+        set_parts.push("size_bytes = ?".to_string());
+        values.push(Value::Integer(size_bytes));
+    }
+
+    push_opt_nullable(&mut set_parts, &mut values, "library_id", update.library_id);
+    push_opt_nullable(&mut set_parts, &mut values, "hash", update.hash.clone());
+
+    if set_parts.is_empty() {
+        return Ok(());
+    }
+
+    let sql = format!(
+        "UPDATE track_files SET {} WHERE file_id = ?",
+        set_parts.join(", ")
+    );
+
+    values.push(Value::Integer(file_id));
+
+    let mut stmt = conn.prepare(&sql)?;
+    stmt.execute(params_from_iter(values))?;
+
+    Ok(())
 }

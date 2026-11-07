@@ -11,4 +11,8 @@ impl DbState {
             conn: Mutex::new(conn),
         }
     }
+
+    pub fn lock(&self) -> std::sync::MutexGuard<'_, Connection> {
+        self.conn.lock().unwrap_or_else(|e| e.into_inner())
+    }
 }

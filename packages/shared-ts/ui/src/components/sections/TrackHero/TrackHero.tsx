@@ -32,7 +32,7 @@ export const TrackHero = ({
 }: TrackHeroProps) => {
     const { displayTime, safeDuration, handleTimeChange, handleSeekCommit } = useSeekProgress(
         currentTime,
-        track?.durationSeconds,
+        track?.durationMs,
         onSeek,
     );
 
@@ -81,7 +81,7 @@ export const TrackHero = ({
                     <WaveformBar
                         data={waveformData}
                         time={displayTime}
-                        duration={safeDuration}
+                        duration={safeDuration / 1000}
                         onChange={handleTimeChange}
                         onChangeEnd={handleSeekCommit}
                         className={styles.track__waveform}

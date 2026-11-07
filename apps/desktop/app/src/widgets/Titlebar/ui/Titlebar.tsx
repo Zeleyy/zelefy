@@ -106,7 +106,7 @@ export const Titlebar = () => {
                     aria-label={t("titlebar.close")}
                     square
                 >
-                    <Icon name="window-close" width={16} height={16} />
+                    <Icon name="action-close" width={16} height={16} />
                 </Button>
             </Flex>
         </header>

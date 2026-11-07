@@ -23,10 +23,31 @@ type DialogFilter = {
     extensions: string[];
 };
 
-export const selectFiles = async (
-    defaultPath?: string,
-    filters: DialogFilter[] = [],
-): Promise<string[] | null> => {
+export const selectFile = async (defaultPath?: string, filters: DialogFilter[] = []) => {
+    try {
+        const selected = await open({
+            directory: false,
+            multiple: false,
+            defaultPath,
+            filters: [...filters, { name: "All", extensions: ["*"] }],
+        });
+        return selected;
+    } catch (error) {
+        console.error("Ошибка при выборе файла:", error);
+        return null;
+    }
+};
+
+export const selectImage = async (defaultPath?: string) => {
+    return selectFile(defaultPath, [
+        {
+            name: "Image",
+            extensions: [...IMAGE_EXTENSIONS],
+        },
+    ]);
+};
+
+export const selectFiles = async (defaultPath?: string, filters: DialogFilter[] = []) => {
     try {
         const selected = await open({
             directory: false,
@@ -41,7 +62,7 @@ export const selectFiles = async (
     }
 };
 
-export const selectAudio = async (defaultPath?: string): Promise<string[] | null> => {
+export const selectAudio = async (defaultPath?: string) => {
     return selectFiles(defaultPath, [
         {
             name: "Audio",
@@ -50,7 +71,7 @@ export const selectAudio = async (defaultPath?: string): Promise<string[] | null
     ]);
 };
 
-export const selectImages = async (defaultPath?: string): Promise<string[] | null> => {
+export const selectImages = async (defaultPath?: string) => {
     return selectFiles(defaultPath, [
         {
             name: "Images",

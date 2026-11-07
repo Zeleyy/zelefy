@@ -1,4 +1,5 @@
 export type IconName =
+    | "action-close"
     | "action-delete"
     | "action-edit"
     | "action-save"
@@ -22,6 +23,8 @@ export type IconName =
     | "player-audio-settings"
     | "player-equalizer"
     | "player-heart"
+    | "player-heart-filled"
+    | "player-list-end"
     | "player-pause"
     | "player-play"
     | "player-queue"
@@ -33,7 +36,6 @@ export type IconName =
     | "player-volume-high"
     | "player-volume-low"
     | "player-volume-mute"
-    | "window-close"
     | "window-maximize"
     | "window-minimize"
     | "zelefy";

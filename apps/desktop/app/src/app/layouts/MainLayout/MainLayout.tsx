@@ -23,6 +23,8 @@ export const MainLayout = () => {
                     <PlayerBar />
                 </div>
 
+                <div id="drawer-root" className={styles.drawerRoot} />
+
                 <div id="modal-root" className={styles.modalRoot} />
             </div>
         </>

@@ -31,7 +31,7 @@ interface BaseTrack {
 export interface Track extends BaseTrack {
     title: string | null;
     audioUrl: string | null;
-    durationSeconds: number | null;
+    durationMs: number | null;
     isPrivate: boolean;
     status: TrackStatus;
     processingError: string | null;
@@ -41,7 +41,7 @@ export interface Track extends BaseTrack {
 export interface PublicTrack extends BaseTrack, TrackStats {
     title: string;
     audioUrl: string;
-    durationSeconds: number;
+    durationMs: number;
 }
 
 export interface PlayerTrack {
@@ -51,7 +51,7 @@ export interface PlayerTrack {
     audioSrc: string;
     coverSrc: string | null;
     waveformSrc: string | null;
-    durationSeconds: number;
+    durationMs: number;
     genre?: string | null;
     likesCount?: number;
 }

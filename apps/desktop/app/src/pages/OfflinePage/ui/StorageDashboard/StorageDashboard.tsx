@@ -1,59 +1,13 @@
 import styles from "./StorageDashboard.module.scss";
 import { useNavigate } from "react-router";
+import { Trans, useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { Button, Flex, formatBytes } from "@zelefy/ui";
 import { useLibraries } from "@/features/storage";
 
-// const _storages: StorageWithStats[] = [
-//     {
-//         libraryId: 1,
-//         path: "C:/Users/User/AppData/Local/zelefy/cache",
-//         isPrimary: false,
-//         maxSizeBytes: 2_147_483_648,
-//         usedSizeBytes: 734_003_200,
-//         filesCount: 42,
-//         createdAt: 0,
-//     },
-//     {
-//         libraryId: 2,
-//         path: "C:/Users/User/Music/zelefy-library",
-//         isPrimary: true,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 326_841_139,
-//         filesCount: 15,
-//         createdAt: 0,
-//     },
-//     {
-//         libraryId: 3,
-//         path: "D:/Audio/Archive/asdf/asdfasfd/zelefy-library",
-//         isPrimary: false,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 120_500_100,
-//         filesCount: 8,
-//         createdAt: 0,
-//     },
-//     {
-//         libraryId: 4,
-//         path: "E:/Flac_Collection",
-//         isPrimary: false,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 5_368_709_120,
-//         filesCount: 120,
-//         createdAt: 0,
-//     },
-//     {
-//         libraryId: 5,
-//         path: "F:/DJ_Sets",
-//         isPrimary: false,
-//         maxSizeBytes: null,
-//         usedSizeBytes: 1_073_741_824,
-//         filesCount: 30,
-//         createdAt: 0,
-//     },
-// ];
-
 // @TODO: переработать после удаления кеша
 export const StorageDashboard = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { data } = useLibraries();
 
@@ -67,9 +21,13 @@ export const StorageDashboard = () => {
     return (
         <Flex as={"section"} direction="column" gap="md" className={styles.storageDashboard}>
             <Flex justify="space-between" align="center" className={styles.dashboardHeader}>
-                <span className={styles.storageTitle}>Хранилище приложения</span>
+                <span className={styles.storageTitle}>{t("offline.storage.title")}</span>
                 <div className={styles.totalInfo}>
-                    Всего занято: <strong>{formatBytes(totalUsedBytes, 2)}</strong>
+                    <Trans
+                        i18nKey="offline.storage.total_used"
+                        values={{ used: formatBytes(totalUsedBytes, 2) }}
+                        components={{ strong: <strong /> }}
+                    />
                 </div>
             </Flex>
 
@@ -95,7 +53,7 @@ export const StorageDashboard = () => {
                                     />
                                     <span className={styles.titleText}>
                                         {isPrimaryLibrary
-                                            ? "Библиотека (Основная)"
+                                            ? t("offline.storage.main_library")
                                             : storage.path.split("/").pop() || storage.path}
                                     </span>
                                 </span>
@@ -103,8 +61,10 @@ export const StorageDashboard = () => {
                                     {formatBytes(storage.usedSizeBytes)}
 
                                     <span className={styles.subText}>
-                                        {" "}
-                                        ({storage.filesCount} треков)
+                                        <Trans
+                                            i18nKey={"offline.storage.tracks_count"}
+                                            count={storage.filesCount}
+                                        />
                                     </span>
                                 </span>
                             </div>
@@ -115,7 +75,6 @@ export const StorageDashboard = () => {
                                         [styles.progressSegmentImported]: isPrimaryLibrary,
                                         [styles.progressSegmentExternal]: !storage.isPrimary,
                                     })}
-                                    // style={{ width: `${progressWidth}%` }}
                                 />
                             </div>
 

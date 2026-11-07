@@ -4,6 +4,7 @@ use zelefy_common::TrackStatus;
 
 pub struct RemoteTrack {
     pub track_id: i64,
+    pub server_id: i64,
     pub remote_id: Uuid,
     pub user_id: Uuid,
     pub profile_id: Option<i64>,

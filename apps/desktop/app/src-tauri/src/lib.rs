@@ -77,12 +77,15 @@ pub fn run() {
             cache::commands::reset_cache_limit,
             commands::import_tracks,
             commands::get_local_tracks,
+            commands::update_local_track,
+            commands::delete_local_track,
             commands::audio::player_load_local,
             commands::audio::player_play,
             commands::audio::player_pause,
             commands::audio::player_seek,
             commands::audio::player_set_volume,
             commands::audio::player_list_devices,
+            commands::audio::player_unload,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,0 +1,42 @@
+@use "@zelefy/ui/styles" as *;
+
+.backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+.popup {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 350px;
+    background: var(--bg-secondary);
+    padding: var(--spacing-md);
+    border-left: 1px solid var(--border-subtle);
+    outline: none;
+    z-index: 9000;
+
+    pointer-events: auto;
+    user-select: none;
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+
+    transition: transform 300ms;
+
+    &[data-starting-style],
+    &[data-ending-style] {
+        transform: translateX(100%);
+    }
+}
+
+.title {
+    @include text-h3;
+}

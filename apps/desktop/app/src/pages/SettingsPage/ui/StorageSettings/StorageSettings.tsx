@@ -36,7 +36,6 @@ export const StorageSettings = () => {
         const selected = await selectDirectory(currentPath);
         if (!selected) return;
 
-        console.log("Выбран новый путь для кеша:", selected);
         const ok = await setCacheRoot(selected);
         if (!ok) alert("ошибка");
     };
@@ -81,7 +80,7 @@ export const StorageSettings = () => {
 
                                     <span className={styles.metrics}>
                                         <Trans
-                                            i18nKey="settings.storage.metrics.tracksCount"
+                                            i18nKey="settings.storage.metrics.tracks_count"
                                             count={library.filesCount}
                                             values={{
                                                 size: formatBytes(library.usedSizeBytes),

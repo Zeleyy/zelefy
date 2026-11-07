@@ -12,6 +12,7 @@ import {
     VolumeControl,
 } from "@zelefy/ui";
 import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
+import { QueueDrawer } from "@/widgets/drawer";
 
 export const PlayerBar = () => {
     const isMuted = useSettingsStore((state) => state.isMuted);
@@ -38,171 +39,198 @@ export const PlayerBar = () => {
     const currentTime = usePlayerStore((state) => state.currentTime);
     const seek = usePlayerStore((state) => state.seek);
 
-    const { displayTime, handleTimeChange, handleSeekCommit } = useSeekProgress(
+    const { displayTime, safeDuration, handleTimeChange, handleSeekCommit } = useSeekProgress(
         currentTime,
-        track?.durationSeconds,
+        track?.durationMs,
         seek,
     );
 
+    const [isQueueOpen, setIsQueueOpen] = useState(false);
+
     return (
-        <div
-            className={clsx(styles.wrapper, { [styles["wrapper--show"]]: track })}
-            aria-hidden={!track}
-        >
-            <div className={styles.clip}>
-                <Flex align="center" justify="center" className={styles.inner}>
-                    <div className={styles.container}>
-                        <Flex direction="column" gap="md">
-                            <div className={styles.mainControls}>
-                                <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
-                                    <Cover
-                                        src={displayTrack?.coverSrc ?? undefined}
-                                        alt={displayTrack?.title ?? "No track selected"}
-                                        size="sm"
-                                    />
-                                    <div className={styles.meta}>
-                                        <span className={styles.title}>
-                                            {displayTrack?.title ?? "No track selected"}
-                                        </span>
-                                        <span className={styles.author}>
-                                            {displayTrack?.metadataArtist}
-                                        </span>
-                                    </div>
-                                    <Button variant="ghost" radius="full" square>
-                                        <Icon name="player-heart" width={16} height={16} />
-                                    </Button>
-                                </Flex>
-
-                                <div className={styles.divider} />
-
-                                <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
-                                    <Button
-                                        variant="ghost"
-                                        radius="full"
-                                        square
-                                        className={styles.optionalControl}
-                                        onClick={toggleShuffle}
-                                        colorScheme={
-                                            isShuffle
-                                                ? {
-                                                      color: "var(--primary)",
-                                                      colorHover: "var(--primary)",
-                                                  }
-                                                : undefined
-                                        }
-                                    >
-                                        <Icon name="player-shuffle" width={16} height={16} />
-                                    </Button>
-
-                                    <Button
-                                        variant="ghost"
-                                        radius="full"
-                                        square
-                                        onClick={previousTrack}
-                                    >
-                                        <Icon name="player-skip-prev" width={20} height={20} />
-                                    </Button>
-
-                                    <Button radius="full" size="large" square onClick={togglePlay}>
-                                        <Icon
-                                            name={isPlaying ? "player-pause" : "player-play"}
-                                            width={20}
-                                            height={20}
+        <>
+            <div
+                className={clsx(styles.wrapper, { [styles["wrapper--show"]]: track })}
+                aria-hidden={!track}
+            >
+                <div className={styles.clip}>
+                    <Flex align="center" justify="center" className={styles.inner}>
+                        <div className={styles.container}>
+                            <Flex direction="column" gap="md">
+                                <div className={styles.mainControls}>
+                                    <Flex align="center" gap="sm" className={styles.shrinkPrevent}>
+                                        <Cover
+                                            src={displayTrack?.coverSrc ?? undefined}
+                                            alt={displayTrack?.title ?? "No track selected"}
+                                            size="sm"
                                         />
-                                    </Button>
+                                        <div className={styles.meta}>
+                                            <span className={styles.title}>
+                                                {displayTrack?.title ?? "No track selected"}
+                                            </span>
+                                            <span className={styles.author}>
+                                                {displayTrack?.metadataArtist}
+                                            </span>
+                                        </div>
+                                        <Button variant="ghost" radius="full" square>
+                                            <Icon name="player-heart" width={16} height={16} />
+                                        </Button>
+                                    </Flex>
 
-                                    <Button
-                                        variant="ghost"
-                                        radius="full"
-                                        square
-                                        onClick={nextTrack}
-                                    >
-                                        <Icon name="player-skip-next" width={20} height={20} />
-                                    </Button>
+                                    <div className={styles.divider} />
 
-                                    <Button
-                                        variant="ghost"
-                                        radius="full"
-                                        square
-                                        className={styles.optionalControl}
-                                        onClick={toggleRepeat}
-                                        colorScheme={
-                                            repeatMode !== "off"
-                                                ? {
-                                                      color: "var(--primary)",
-                                                      colorHover: "var(--primary)",
-                                                  }
-                                                : undefined
-                                        }
-                                    >
-                                        <Icon
-                                            name={
-                                                repeatMode === "track"
-                                                    ? "player-repeat-one"
-                                                    : "player-repeat"
+                                    <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            className={styles.optionalControl}
+                                            onClick={toggleShuffle}
+                                            colorScheme={
+                                                isShuffle
+                                                    ? {
+                                                          color: "var(--primary)",
+                                                          colorHover: "var(--primary)",
+                                                      }
+                                                    : undefined
                                             }
-                                            width={16}
-                                            height={16}
+                                        >
+                                            <Icon name="player-shuffle" width={16} height={16} />
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            onClick={previousTrack}
+                                        >
+                                            <Icon name="player-skip-prev" width={20} height={20} />
+                                        </Button>
+
+                                        <Button
+                                            radius="full"
+                                            size="large"
+                                            square
+                                            onClick={togglePlay}
+                                        >
+                                            <Icon
+                                                name={isPlaying ? "player-pause" : "player-play"}
+                                                width={20}
+                                                height={20}
+                                            />
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            onClick={nextTrack}
+                                        >
+                                            <Icon name="player-skip-next" width={20} height={20} />
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            className={styles.optionalControl}
+                                            onClick={toggleRepeat}
+                                            colorScheme={
+                                                repeatMode !== "off"
+                                                    ? {
+                                                          color: "var(--primary)",
+                                                          colorHover: "var(--primary)",
+                                                      }
+                                                    : undefined
+                                            }
+                                        >
+                                            <Icon
+                                                name={
+                                                    repeatMode === "track"
+                                                        ? "player-repeat-one"
+                                                        : "player-repeat"
+                                                }
+                                                width={16}
+                                                height={16}
+                                            />
+                                        </Button>
+                                    </Flex>
+
+                                    <div className={styles.divider}></div>
+
+                                    <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            className={styles.secondaryControl}
+                                        >
+                                            <Icon
+                                                name="player-audio-settings"
+                                                width={16}
+                                                height={16}
+                                            />
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            className={styles.tertiaryControl}
+                                        >
+                                            <Icon name="player-equalizer" width={16} height={16} />
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            radius="full"
+                                            square
+                                            onClick={() => {
+                                                setIsQueueOpen(true);
+                                            }}
+                                        >
+                                            <Icon name="player-queue" width={16} height={16} />
+                                        </Button>
+
+                                        <VolumeControl
+                                            volume={volume}
+                                            isMuted={isMuted}
+                                            onChange={(newVolume) => {
+                                                setVolume(newVolume);
+                                                if (isMuted && newVolume > 0) {
+                                                    setIsMuted(false);
+                                                }
+                                            }}
+                                            onToggleMute={() => setIsMuted(!isMuted)}
                                         />
-                                    </Button>
-                                </Flex>
+                                    </Flex>
+                                </div>
 
-                                <div className={styles.divider}></div>
+                                <div className={styles.progressSection}>
+                                    <Flex justify="space-between">
+                                        <p>{formatTime(displayTime)}</p>
+                                        <span>{formatTime(safeDuration / 1000)}</span>
+                                    </Flex>
 
-                                <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
-                                    <Button
-                                        variant="ghost"
-                                        radius="full"
-                                        square
-                                        className={styles.secondaryControl}
-                                    >
-                                        <Icon name="player-audio-settings" width={16} height={16} />
-                                    </Button>
-
-                                    <Button
-                                        variant="ghost"
-                                        radius="full"
-                                        square
-                                        className={styles.tertiaryControl}
-                                    >
-                                        <Icon name="player-equalizer" width={16} height={16} />
-                                    </Button>
-
-                                    <Button variant="ghost" radius="full" square>
-                                        <Icon name="player-queue" width={16} height={16} />
-                                    </Button>
-
-                                    <VolumeControl
-                                        volume={volume}
-                                        isMuted={isMuted}
-                                        onChange={(newVolume) => {
-                                            setVolume(newVolume);
-                                            if (isMuted && newVolume > 0) {
-                                                setIsMuted(false);
-                                            }
-                                        }}
-                                        onToggleMute={() => setIsMuted(!isMuted)}
+                                    <ProgressBar
+                                        time={displayTime}
+                                        duration={safeDuration / 1000}
+                                        onChange={handleTimeChange}
+                                        onChangeEnd={handleSeekCommit}
                                     />
-                                </Flex>
-                            </div>
-
-                            <div className={styles.progressSection}>
-                                <Flex justify="space-between">
-                                    <p>{formatTime(displayTime)}</p>
-                                    <span>{formatTime(displayTrack?.durationSeconds ?? 0)}</span>
-                                </Flex>
-
-                                <ProgressBar
-                                    time={displayTime}
-                                    duration={displayTrack?.durationSeconds ?? 0}
-                                    onChange={handleTimeChange}
-                                    onChangeEnd={handleSeekCommit}
-                                />
-                            </div>
-                        </Flex>
-                    </div>
-                </Flex>
+                                </div>
+                            </Flex>
+                        </div>
+                    </Flex>
+                </div>
             </div>
-        </div>
+
+            <QueueDrawer
+                open={isQueueOpen}
+                onOpenChange={(open) => {
+                    setIsQueueOpen(open);
+                }}
+            />
+        </>
     );
 };

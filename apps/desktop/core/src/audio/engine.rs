@@ -14,6 +14,7 @@ pub enum Command {
     Seek(f64),
     SetVolume(f32),
     Stop,
+    Unload(Sender<()>),
 }
 
 #[derive(Clone, Serialize)]
@@ -114,6 +115,11 @@ fn run(rx: Receiver<Command>, emit: impl Fn(PlayerEvent)) {
             Ok(Command::Stop) => {
                 player = None;
                 ended_sent = true;
+            }
+            Ok(Command::Unload(ack)) => {
+                player = None;
+                ended_sent = true;
+                let _ = ack.send(());
             }
             Err(RecvTimeoutError::Timeout) => {}
             Err(RecvTimeoutError::Disconnected) => break,

@@ -7,7 +7,6 @@ import { usePlayerStore } from "@/shared/lib/stores";
 export const HomePage = () => {
     const { t } = useTranslation();
     const resetPlayer = usePlayerStore((state) => state.resetPlayer);
-    const playTrack = usePlayerStore((state) => state.playTrack);
 
     const isPlaying = usePlayerStore((state) => state.isPlaying);
     const togglePlay = usePlayerStore((state) => state.togglePlay);
@@ -44,35 +43,6 @@ export const HomePage = () => {
 
             <Button variant="primary" onClick={resetPlayer}>
                 Hide player
-            </Button>
-            <Button
-                variant="primary"
-                onClick={() =>
-                    playTrack({
-                        trackId: "",
-                        // permalink: "string",
-
-                        metadataArtist: "A-One",
-                        title: "A-One - U.N. Owen Was Her? feat. HIKO",
-                        audioSrc: "",
-                        durationSeconds: 204,
-                        coverSrc: null,
-                        waveformSrc: "",
-
-                        genre: null,
-                        // description: null,
-                        // bpm: null,
-                        // keySignature: null,
-                        // createdAt: "",
-
-                        // playsCount: 0,
-                        likesCount: 0,
-                        // repostsCount: 0,
-                        // commentsCount: 0,
-                    })
-                }
-            >
-                Show player
             </Button>
         </>
     );

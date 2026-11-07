@@ -52,8 +52,8 @@
     .track {
         background-image:
             linear-gradient(
-                color-mix(in srgb, var(--bg-secondary) 35%, transparent),
-                color-mix(in srgb, var(--bg-secondary) 35%, transparent)
+                color-mix(in srgb, var(--bg-secondary) 50%, transparent),
+                color-mix(in srgb, var(--bg-secondary) 50%, transparent)
             ),
             var(--cover-url, none);
         gap: 0;

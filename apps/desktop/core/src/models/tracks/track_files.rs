@@ -75,18 +75,6 @@ impl TrackFile {
     }
 }
 
-#[derive(Debug)]
-pub struct NewTrackFile {
-    pub track_id: i64,
-    pub track_file_type: TrackFileType,
-
-    pub library_id: Option<i64>,
-    pub path: String,
-    pub is_link: bool,
-    pub size_bytes: i64,
-    pub hash: Option<String>,
-}
-
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TrackFileResponse {
@@ -142,4 +130,24 @@ impl TrackFilesResponse {
             waveform,
         }
     }
+}
+
+#[derive(Debug)]
+pub struct NewTrackFile {
+    pub track_id: i64,
+    pub track_file_type: TrackFileType,
+
+    pub library_id: Option<i64>,
+    pub path: String,
+    pub is_link: bool,
+    pub size_bytes: i64,
+    pub hash: Option<String>,
+}
+
+#[derive(Debug, Default)]
+pub struct UpdateTrackFile {
+    pub library_id: Option<Option<i64>>,
+    pub path: Option<String>,
+    pub size_bytes: Option<i64>,
+    pub hash: Option<Option<String>>,
 }

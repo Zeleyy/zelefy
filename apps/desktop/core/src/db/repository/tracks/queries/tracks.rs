@@ -19,6 +19,42 @@ pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Option<Tr
     .optional()
 }
 
+pub fn get_local_by_id_with_files(
+    conn: &Connection,
+    track_id: i64,
+) -> rusqlite::Result<Option<LocalTrackResponse>> {
+    let Some(track) = get_by_id(conn, track_id)? else {
+        return Ok(None);
+    };
+
+    let mut stmt = conn.prepare(
+        r#"
+            SELECT
+                tf.file_id, tf.track_id, tf.track_file_type_id, tf.library_id, tf.path,
+                tf.is_link, tf.size_bytes, tf.hash, tf.last_accessed_at, tf.created_at
+                , l.library_id AS lib_library_id
+                , l.path AS lib_path
+                , l.is_primary AS lib_is_primary
+                , l.created_at AS lib_created_at
+            FROM track_files tf
+            LEFT JOIN libraries l ON tf.library_id = l.library_id
+            WHERE tf.track_id = ?1
+            ORDER BY tf.track_file_type_id ASC
+        "#,
+    )?;
+
+    let files_iter = stmt.query_map(
+        params![track_id],
+        TrackFileResponse::row_to_track_file_response,
+    )?;
+
+    let files = files_iter.collect::<rusqlite::Result<_>>()?;
+
+    let track_files = TrackFilesResponse::from_rows(files);
+
+    Ok(Some(LocalTrackResponse { track, track_files }))
+}
+
 pub fn get_all_local(conn: &Connection) -> rusqlite::Result<Vec<Track>> {
     let mut stmt = conn.prepare(
         r#"

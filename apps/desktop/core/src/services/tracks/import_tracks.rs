@@ -1,16 +1,15 @@
-use std::{
-    fs::{self, File},
-    io::BufReader,
-    path::{Path, PathBuf},
-};
-
 use audio_core::{
+    AUDIO_EXTENSIONS,
     decoder::{WaveformOptions, decode_waveform},
     metadata::{AudioMetadata, cover_ext, read_metadata},
     processor::to_bin_bytes,
 };
 use rusqlite::Connection;
 use serde::Serialize;
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
 use uuid::Uuid;
 
 use crate::{
@@ -21,9 +20,8 @@ use crate::{
     },
     services::{errors::CoreError, tracks::load_track},
     storage::dirs::{audio_rel_path, image_rel_path, to_db_path, waveform_rel_path},
+    utils::files::{Written, copy_file, create_file_with_data},
 };
-
-const AUDIO_EXTENSIONS: &[&str] = &["mp3", "flac", "wav", "ogg", "opus", "m4a", "aac"];
 
 #[derive(Serialize)]
 #[serde(tag = "status", rename_all = "camelCase")]
@@ -45,7 +43,7 @@ pub fn import_tracks(
     progress: impl Fn(usize, usize),
 ) -> Result<Vec<ImportOutcome>, CoreError> {
     let library = {
-        let conn = lock(db);
+        let conn = db.lock();
         resolve_library(&conn, library_id)?
     };
 
@@ -71,8 +69,9 @@ struct StoredFile {
 }
 
 struct TrackInfo {
+    local_uuid: Uuid,
     title: String,
-    duration_seconds: i64,
+    duration_ms: i64,
     genre: Option<String>,
     artist: Option<String>,
     files: Vec<StoredFile>,
@@ -85,15 +84,15 @@ fn import_one(
 ) -> Result<LocalTrackResponse, CoreError> {
     let src = Path::new(path);
     let ext = audio_extension(src)?;
-    let id = Uuid::new_v4();
+    let local_uuid = Uuid::new_v4();
     let root = Path::new(&library.path);
     let meta = read_file_metadata(src);
     let mut written = Written::default();
     let mut files = Vec::new();
 
-    let audio_rel = audio_rel_path(id, &ext);
+    let audio_rel = audio_rel_path(local_uuid, &ext);
     let audio_dest = root.join(&audio_rel);
-    written.track(audio_dest.clone());
+    written.file(audio_dest.clone());
     let size = copy_file(src, &audio_dest)?;
     files.push(StoredFile {
         kind: TrackFileType::Audio,
@@ -102,7 +101,7 @@ fn import_one(
     });
 
     if let Some(bytes) = make_waveform(src) {
-        let rel = waveform_rel_path(id, "bin");
+        let rel = waveform_rel_path(local_uuid, "bin");
         files.push(save_asset(
             root,
             &mut written,
@@ -113,7 +112,7 @@ fn import_one(
     }
 
     if let Some(c) = &meta.cover {
-        let rel = image_rel_path(id, cover_ext(c));
+        let rel = image_rel_path(local_uuid, cover_ext(c));
         files.push(save_asset(
             root,
             &mut written,
@@ -124,11 +123,12 @@ fn import_one(
     }
 
     let info = TrackInfo {
+        local_uuid,
         title: meta
             .title
             .filter(|t| !t.trim().is_empty())
             .unwrap_or_else(|| file_title(src)),
-        duration_seconds: meta.duration_secs.round() as i64,
+        duration_ms: meta.duration_ms,
         genre: meta.genre,
         artist: meta.artist,
         files,
@@ -147,7 +147,7 @@ fn save_asset(
     data: &[u8],
 ) -> Result<StoredFile, CoreError> {
     let dest = root.join(&rel);
-    written.track(dest.clone());
+    written.file(dest.clone());
     create_file_with_data(&dest, data)?;
     Ok(StoredFile {
         kind,
@@ -161,15 +161,16 @@ fn register(
     library_id: i64,
     info: TrackInfo,
 ) -> Result<LocalTrackResponse, CoreError> {
-    let mut conn = lock(db);
+    let mut conn = db.lock();
     let tx = conn.transaction()?;
 
     let track_id = repository::tracks::tracks::create(
         &tx,
         &NewTrack {
             title: info.title,
+            local_uuid: info.local_uuid,
             metadata_artist: info.artist,
-            duration_seconds: info.duration_seconds,
+            duration_ms: info.duration_ms,
             genre: info.genre,
             ..Default::default()
         },
@@ -193,26 +194,6 @@ fn register(
     let response = load_track(&tx, track_id)?;
     tx.commit()?;
     Ok(response)
-}
-
-#[derive(Default)]
-struct Written(Vec<PathBuf>);
-
-impl Written {
-    fn track(&mut self, p: PathBuf) {
-        self.0.push(p);
-    }
-    fn keep(mut self) {
-        self.0.clear();
-    }
-}
-
-impl Drop for Written {
-    fn drop(&mut self) {
-        for p in &self.0 {
-            let _ = fs::remove_file(p);
-        }
-    }
 }
 
 fn make_waveform(src: &Path) -> Option<Vec<u8>> {
@@ -249,24 +230,6 @@ fn file_title(src: &Path) -> String {
         .unwrap_or_else(|| "Untitled".into())
 }
 
-fn copy_file(src: &Path, dest: &Path) -> Result<i64, CoreError> {
-    if let Some(dir) = dest.parent() {
-        fs::create_dir_all(dir)?;
-    }
-    let size = fs::copy(src, dest).inspect_err(|_| {
-        let _ = fs::remove_file(dest);
-    })?;
-    Ok(size as i64)
-}
-
-fn create_file_with_data(src: &Path, data: &[u8]) -> Result<(), CoreError> {
-    if let Some(dir) = src.parent() {
-        fs::create_dir_all(dir)?;
-    }
-    fs::write(src, data)?;
-    Ok(())
-}
-
 fn resolve_library(conn: &Connection, library_id: Option<i64>) -> Result<Library, CoreError> {
     match library_id {
         Some(id) => repository::libraries::get_by_id(conn, id).map_err(|e| match e {
@@ -278,13 +241,9 @@ fn resolve_library(conn: &Connection, library_id: Option<i64>) -> Result<Library
     }
 }
 
-fn lock(db: &DbState) -> std::sync::MutexGuard<'_, Connection> {
-    db.conn.lock().unwrap_or_else(|e| e.into_inner())
-}
-
 fn read_file_metadata(path: &Path) -> AudioMetadata {
     File::open(path)
         .ok()
-        .and_then(|f| read_metadata(&mut BufReader::new(f)).ok())
+        .and_then(|f| read_metadata(f).ok())
         .unwrap_or_default()
 }

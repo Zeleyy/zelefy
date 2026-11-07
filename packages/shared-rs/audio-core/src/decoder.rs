@@ -17,7 +17,7 @@ use crate::errors::AudioError;
 pub struct Waveform {
     pub peaks: Vec<f32>,
     pub sample_rate: u32,
-    pub duration_secs: f32,
+    pub duration_ms: i64,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -117,12 +117,12 @@ where
         peaks.push(window_aggregate(&carry, opts.mode));
     }
 
-    let duration_secs = total_samples as f32 / sample_rate as f32;
+    let duration_ms = (total_samples as u128 * 1000 / sample_rate as u128) as i64;
 
     Ok(Waveform {
         peaks: compress_peaks(&peaks, opts.points),
         sample_rate,
-        duration_secs,
+        duration_ms,
     })
 }
 

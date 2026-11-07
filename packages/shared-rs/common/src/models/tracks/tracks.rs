@@ -23,7 +23,7 @@ pub struct Track {
     pub audio_url: Option<String>,
     pub cover_url: Option<String>,
     pub waveform_url: Option<String>,
-    pub duration_seconds: Option<i32>,
+    pub duration_ms: Option<i32>,
 
     pub genre: Option<String>,
     pub description: Option<String>,
@@ -64,7 +64,7 @@ pub struct UpdateTrack {
     pub audio_url: Option<Option<String>>,
     pub cover_url: Option<Option<String>>,
     pub waveform_url: Option<Option<String>>,
-    pub duration_seconds: Option<Option<i32>>,
+    pub duration_ms: Option<Option<i32>>,
 
     pub genre: Option<Option<String>>,
     pub description: Option<Option<String>>,
@@ -83,7 +83,7 @@ impl UpdateTrack {
             && self.audio_url.is_none()
             && self.cover_url.is_none()
             && self.waveform_url.is_none()
-            && self.duration_seconds.is_none()
+            && self.duration_ms.is_none()
             && self.genre.is_none()
             && self.description.is_none()
             && self.bpm.is_none()
@@ -106,7 +106,7 @@ pub struct TrackWithStats {
     pub audio_url: Option<String>,
     pub cover_url: Option<String>,
     pub waveform_url: Option<String>,
-    pub duration_seconds: Option<i32>,
+    pub duration_ms: Option<i32>,
 
     pub genre: Option<String>,
     pub description: Option<String>,
@@ -142,7 +142,7 @@ impl TrackWithStats {
             audio_url: track.audio_url,
             cover_url: track.cover_url,
             waveform_url: track.waveform_url,
-            duration_seconds: track.duration_seconds,
+            duration_ms: track.duration_ms,
 
             genre: track.genre,
             description: track.description,
@@ -182,7 +182,7 @@ pub struct PublicTrack {
     pub audio_url: String,
     pub cover_url: Option<String>,
     pub waveform_url: Option<String>,
-    pub duration_seconds: i32,
+    pub duration_ms: i32,
 
     pub genre: Option<String>,
     pub description: Option<String>,
@@ -209,7 +209,7 @@ impl From<TrackWithStats> for PublicTrack {
             audio_url: t.audio_url.unwrap_or_default(),
             cover_url: t.cover_url,
             waveform_url: t.waveform_url,
-            duration_seconds: t.duration_seconds.unwrap_or_default(),
+            duration_ms: t.duration_ms.unwrap_or_default(),
 
             genre: t.genre,
             description: t.description,

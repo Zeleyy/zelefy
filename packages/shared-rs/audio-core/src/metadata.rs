@@ -10,7 +10,7 @@ use crate::errors::AudioError;
 
 #[derive(Debug, Clone, Default)]
 pub struct AudioMetadata {
-    pub duration_secs: f32,
+    pub duration_ms: i64,
     pub title: Option<String>,
     pub artist: Option<String>,
     pub album: Option<String>,
@@ -44,7 +44,7 @@ pub fn read_metadata<R: Read + Seek>(reader: R) -> Result<AudioMetadata, AudioEr
         });
 
     Ok(AudioMetadata {
-        duration_secs: file.properties().duration().as_secs_f32(),
+        duration_ms: file.properties().duration().as_millis() as i64,
         title: tag.and_then(|t| t.title()).map(|s| s.into_owned()),
         artist: tag.and_then(|t| t.artist()).map(|s| s.into_owned()),
         album: tag.and_then(|t| t.album()).map(|s| s.into_owned()),

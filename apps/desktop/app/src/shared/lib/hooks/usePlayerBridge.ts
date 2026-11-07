@@ -47,6 +47,7 @@ export const usePlayerBridge = () => {
                         load(prev.trackId, true);
                     } else {
                         finished = true;
+                        after.setCurrentTime(prev.durationMs / 1000);
                     }
                 }
             }

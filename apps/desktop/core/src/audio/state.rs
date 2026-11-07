@@ -1,4 +1,8 @@
-use std::{path::PathBuf, sync::Mutex};
+use std::{
+    path::PathBuf,
+    sync::{Mutex, mpsc},
+    time::Duration,
+};
 
 use crate::services::errors::CoreError;
 
@@ -37,6 +41,11 @@ impl AudioState {
     }
     pub fn set_volume(&self, volume: f32) {
         self.engine.send(Command::SetVolume(volume));
+    }
+    pub fn unload(&self) {
+        let (tx, rx) = mpsc::channel();
+        self.engine.send(Command::Unload(tx));
+        let _ = rx.recv_timeout(Duration::from_millis(500));
     }
 
     pub fn active_output(&self) -> Option<String> {

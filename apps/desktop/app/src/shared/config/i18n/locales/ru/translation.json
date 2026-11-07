@@ -36,11 +36,40 @@
         "collapse": "Свернуть",
         "expand": "Развернуть"
     },
+    "queue": {
+        "title": "Очередь",
+        "clear": "Очистить очередь"
+    },
     "home": {
         "title": "Главная"
     },
     "offline": {
         "title": "Оффлайн библиотека",
+        "actions": {
+            "add": {
+                "files": "+ Добавить файлы"
+            }
+        },
+        "storage": {
+            "title": "Хранилище приложения",
+            "settings": "Настройки хранилища",
+            "total_used": "Всего занято: <strong>{{used}}</strong>",
+            "main_library": "Библиотека (Основная)",
+            "tracks_count": " ({{count}} треков)"
+        },
+        "controls": {
+            "search": {
+                "placeholder": "Поиск по названию или артисту..."
+            }
+        },
+        "list": {
+            "header": {
+                "track": "трек",
+                "type": "тип",
+                "weight": "вес",
+                "time": "время"
+            }
+        },
         "edit": {
             "title": "Редактировать трек",
             "cover": {
@@ -125,6 +154,9 @@
                 "cache": "Кэш стриминга",
                 "library": "Библиотека",
                 "library_fallback": "Папка библиотеки"
+            },
+            "metrics": {
+                "tracks_count": "<strong>{{count}}</strong> треков ({{size}})"
             },
             "actions": {
                 "browse": "Обзор",

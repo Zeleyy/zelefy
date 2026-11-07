@@ -57,6 +57,10 @@ pub fn player_seek(seconds: f64, s: State<AudioState>) {
 pub fn player_set_volume(volume: f32, s: State<AudioState>) {
     s.set_volume(volume)
 }
+#[tauri::command]
+pub fn player_unload(audio: State<'_, AudioState>) {
+    audio.unload();
+}
 
 #[tauri::command]
 pub async fn player_list_devices(s: State<'_, AudioState>) -> Result<Vec<AudioSink>, String> {

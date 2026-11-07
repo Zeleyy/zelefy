@@ -23,6 +23,12 @@
     padding: var(--spacing-md);
 }
 
+.drawerRoot {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
 .modalRoot {
     z-index: 100;
     position: absolute;

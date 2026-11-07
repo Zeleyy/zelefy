@@ -36,11 +36,40 @@
         "collapse": "Collapse",
         "expand": "Expand"
     },
+    "queue": {
+        "title": "Queue",
+        "clear": "Clear Queue"
+    },
     "home": {
         "title": "Home"
     },
     "offline": {
         "title": "Offline library",
+        "actions": {
+            "add": {
+                "files": "+ Add files"
+            }
+        },
+        "storage": {
+            "title": "Application storage",
+            "settings": "Storage settings",
+            "total_used": "Total used: <strong>{{used}}</strong>",
+            "main_library": "Library (main)",
+            "tracks_count": " ({{count}} tracks)"
+        },
+        "controls": {
+            "search": {
+                "placeholder": "Search by title or artist"
+            }
+        },
+        "list": {
+            "header": {
+                "track": "tracks",
+                "type": "type",
+                "weight": "weight",
+                "time": "time"
+            }
+        },
         "edit": {
             "title": "Edit track",
             "cover": {
@@ -125,6 +154,9 @@
                 "cache": "Streaming cache",
                 "library": "Library",
                 "library_fallback": "Library folder"
+            },
+            "metrics": {
+                "tracks_count": "<strong>{{count}}</strong> tracks ({{size}})"
             },
             "actions": {
                 "browse": "Browse",
