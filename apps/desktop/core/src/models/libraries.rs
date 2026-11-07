@@ -20,14 +20,11 @@ impl Library {
         let is_primary_col = format!("{}is_primary", p);
         let created_at_col = format!("{}created_at", p);
 
-        let created_at_ts: i64 = row.get(created_at_col.as_str())?;
-        let created_at = DateTime::from_timestamp(created_at_ts, 0).unwrap_or_else(|| Utc::now());
-
         Ok(Self {
             library_id: row.get(library_id_col.as_str())?,
             path: row.get(path_col.as_str())?,
             is_primary: row.get(is_primary_col.as_str())?,
-            created_at,
+            created_at: row.get(created_at_col.as_str())?,
         })
     }
 }

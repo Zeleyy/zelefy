@@ -36,6 +36,9 @@
         "collapse": "Collapse",
         "expand": "Expand"
     },
+    "tasks": {
+        "title": "Tasks"
+    },
     "queue": {
         "title": "Queue",
         "clear": "Clear Queue"

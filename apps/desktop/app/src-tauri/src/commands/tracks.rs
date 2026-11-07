@@ -5,6 +5,8 @@ use desktop_core::{
 };
 use tauri::{AppHandle, Emitter, Manager, State};
 
+use crate::jobs::JobsHandle;
+
 #[tauri::command]
 pub async fn import_tracks(
     app: AppHandle,
@@ -13,9 +15,13 @@ pub async fn import_tracks(
 ) -> Result<Vec<ImportOutcome>, String> {
     tauri::async_runtime::spawn_blocking(move || {
         let db = app.state::<DbState>();
-        services::tracks::import_tracks(&db, paths, library_id, |done, total| {
+        let jobs = app.state::<JobsHandle>();
+        let res = services::tracks::import_tracks(&db, paths, library_id, |done, total| {
+            jobs.wake();
             let _ = app.emit("import-progress", (done, total));
-        })
+        });
+        jobs.wake();
+        res
     })
     .await
     .map_err(|e| e.to_string())?

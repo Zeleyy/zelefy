@@ -1,6 +1,7 @@
 use desktop_core::{
     audio::state::AudioState,
     db::{init_db, DbState},
+    jobs,
 };
 use state::AppState;
 use tauri::{Emitter, Manager};
@@ -41,9 +42,15 @@ pub fn run() {
             let cache = AppCache::init(local_root.join("cache"), config_root.join("cache.json"));
             let db_path = data_root.join("zelefy.db");
             let conn = init_db(&db_path.to_string_lossy()).expect("Failed to initialize database");
+            let db = DbState::new(conn);
 
             app.manage(cache);
-            app.manage(DbState::new(conn));
+            app.manage(db.clone());
+            let handle = app.handle().clone();
+            let jobs = jobs::spawn_worker(db, move |e| {
+                let _ = handle.emit("job-updated", e);
+            });
+            app.manage(jobs);
             app.manage(AppState::default());
             let handle = app.handle().clone();
             app.manage(AudioState::new(move |event| {

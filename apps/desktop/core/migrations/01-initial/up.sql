@@ -30,6 +30,60 @@ CREATE TABLE servers (
     created_at INTEGER NOT NULL
 ) STRICT;
 
+CREATE TABLE job_kinds (
+    job_kind_id INTEGER PRIMARY KEY,
+    job_kind_name TEXT NOT NULL UNIQUE
+) STRICT;
+
+INSERT INTO
+    job_kinds (job_kind_id, job_kind_name)
+VALUES
+    (0, 'waveform');
+
+CREATE TABLE job_statuses (
+    job_status_id INTEGER PRIMARY KEY,
+    job_status_name TEXT NOT NULL UNIQUE
+) STRICT;
+
+INSERT INTO
+    job_statuses (job_status_id, job_status_name)
+VALUES
+    (0, 'pending'),
+    (1, 'running'),
+    (2, 'done'),
+    (3, 'failed'),
+    (4, 'cancelled');
+
+CREATE TABLE jobs (
+    job_id INTEGER PRIMARY KEY,
+    job_kind_id INTEGER NOT NULL REFERENCES job_kinds (job_kind_id) ON DELETE RESTRICT,
+    job_status_id INTEGER NOT NULL DEFAULT 0 REFERENCES job_statuses (job_status_id) ON DELETE RESTRICT,
+    -- 
+    payload TEXT NOT NULL DEFAULT '{}' CHECK (json_valid (payload)),
+    dedupe_key TEXT,
+    -- 
+    priority INTEGER NOT NULL DEFAULT 0,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    max_attempts INTEGER NOT NULL DEFAULT 3 CHECK (max_attempts >= 1),
+    error TEXT,
+    -- 
+    run_after INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    started_at INTEGER,
+    finished_at INTEGER
+) STRICT;
+
+CREATE INDEX idx_jobs_claim ON jobs (priority DESC, run_after, job_id)
+WHERE
+    job_status_id = 0;
+
+CREATE UNIQUE INDEX uq_jobs_dedupe_active ON jobs (job_kind_id, dedupe_key)
+WHERE
+    job_status_id IN (0, 1)
+    AND dedupe_key IS NOT NULL;
+
+CREATE INDEX idx_jobs_kind_status ON jobs (job_kind_id, job_status_id);
+
 -- 
 CREATE TABLE libraries (
     library_id INTEGER PRIMARY KEY AUTOINCREMENT,

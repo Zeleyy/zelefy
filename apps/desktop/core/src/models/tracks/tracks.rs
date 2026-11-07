@@ -25,9 +25,6 @@ pub struct Track {
 
 impl Track {
     pub fn row_to_track(row: &Row<'_>) -> rusqlite::Result<Self> {
-        let created_at_ts: i64 = row.get("created_at")?;
-        let created_at = DateTime::from_timestamp(created_at_ts, 0).unwrap_or_else(|| Utc::now());
-
         Ok(Self {
             track_id: row.get("track_id")?,
             local_uuid: row.get("local_uuid")?,
@@ -38,7 +35,7 @@ impl Track {
             bpm: row.get("bpm")?,
             key_signature: row.get("key_signature")?,
             description: row.get("description")?,
-            created_at,
+            created_at: row.get("created_at")?,
         })
     }
 }

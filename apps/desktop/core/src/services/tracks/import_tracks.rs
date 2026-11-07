@@ -1,8 +1,6 @@
 use audio_core::{
     AUDIO_EXTENSIONS,
-    decoder::{WaveformOptions, decode_waveform},
     metadata::{AudioMetadata, cover_ext, read_metadata},
-    processor::to_bin_bytes,
 };
 use rusqlite::Connection;
 use serde::Serialize;
@@ -15,11 +13,12 @@ use uuid::Uuid;
 use crate::{
     db::{DbState, repository},
     models::{
+        jobs::NewJob,
         libraries::Library,
         tracks::{LocalTrackResponse, NewTrack, NewTrackFile, TrackFileType},
     },
     services::{errors::CoreError, tracks::load_track},
-    storage::dirs::{audio_rel_path, image_rel_path, to_db_path, waveform_rel_path},
+    storage::dirs::{audio_rel_path, image_rel_path, to_db_path},
     utils::files::{Written, copy_file, create_file_with_data},
 };
 
@@ -99,17 +98,6 @@ fn import_one(
         path: to_db_path(&audio_rel),
         size,
     });
-
-    if let Some(bytes) = make_waveform(src) {
-        let rel = waveform_rel_path(local_uuid, "bin");
-        files.push(save_asset(
-            root,
-            &mut written,
-            TrackFileType::Waveform,
-            rel,
-            &bytes,
-        )?);
-    }
 
     if let Some(c) = &meta.cover {
         let rel = image_rel_path(local_uuid, cover_ext(c));
@@ -191,15 +179,11 @@ fn register(
         )?;
     }
 
+    repository::jobs::create(&tx, &NewJob::waveform(track_id))?;
+
     let response = load_track(&tx, track_id)?;
     tx.commit()?;
     Ok(response)
-}
-
-fn make_waveform(src: &Path) -> Option<Vec<u8>> {
-    let file = File::open(src).ok()?;
-    let wave = decode_waveform(file, WaveformOptions::default()).ok()?;
-    Some(to_bin_bytes(&wave.peaks))
 }
 
 fn audio_extension(src: &Path) -> Result<String, CoreError> {

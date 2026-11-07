@@ -77,16 +77,14 @@ export const TrackHero = ({
                     </Flex>
                 </Flex>
 
-                {waveformData && waveformData.length > 0 ? (
-                    <WaveformBar
-                        data={waveformData}
-                        time={displayTime}
-                        duration={safeDuration / 1000}
-                        onChange={handleTimeChange}
-                        onChangeEnd={handleSeekCommit}
-                        className={styles.track__waveform}
-                    />
-                ) : null}
+                <WaveformBar
+                    data={waveformData ?? new Uint8Array()}
+                    time={displayTime}
+                    duration={safeDuration / 1000}
+                    onChange={handleTimeChange}
+                    onChangeEnd={handleSeekCommit}
+                    className={styles.track__waveform}
+                />
 
                 <Flex gap="xs">
                     <Button

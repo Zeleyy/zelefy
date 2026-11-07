@@ -186,7 +186,7 @@ export const PlayerBar = () => {
                                             radius="full"
                                             square
                                             onClick={() => {
-                                                setIsQueueOpen(true);
+                                                setIsQueueOpen((prev) => !prev);
                                             }}
                                         >
                                             <Icon name="player-queue" width={16} height={16} />

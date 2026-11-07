@@ -12,6 +12,7 @@ export type IconName =
     | "common-headphones"
     | "common-home"
     | "common-library"
+    | "common-list-clock"
     | "common-moon"
     | "common-search"
     | "common-settings"

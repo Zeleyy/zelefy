@@ -53,13 +53,6 @@ pub struct TrackFile {
 
 impl TrackFile {
     pub fn row_to_track_file(row: &Row<'_>) -> rusqlite::Result<Self> {
-        let created_at_ts: i64 = row.get("created_at")?;
-        let created_at = DateTime::from_timestamp(created_at_ts, 0).unwrap_or_else(|| Utc::now());
-
-        let last_accessed_at_ts: i64 = row.get("last_accessed_at")?;
-        let last_accessed_at =
-            DateTime::from_timestamp(last_accessed_at_ts, 0).unwrap_or_else(|| Utc::now());
-
         Ok(Self {
             file_id: row.get("file_id")?,
             track_id: row.get("track_id")?,
@@ -69,8 +62,8 @@ impl TrackFile {
             is_link: row.get("is_link")?,
             size_bytes: row.get("size_bytes")?,
             hash: row.get("hash")?,
-            last_accessed_at,
-            created_at,
+            last_accessed_at: row.get("last_accessed_at")?,
+            created_at: row.get("created_at")?,
         })
     }
 }

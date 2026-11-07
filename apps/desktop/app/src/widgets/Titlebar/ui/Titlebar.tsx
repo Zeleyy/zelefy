@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Button, Flex, Icon, Input } from "@zelefy/ui";
 import { useSettingsStore } from "@/shared/lib/stores";
 import { useBlurOnOutsideClick, useHistoryNavigation } from "../hooks";
+import { TasksDrawer } from "@/widgets/drawer";
+import { useState } from "react";
 
 export const Titlebar = () => {
     const { t } = useTranslation();
@@ -14,101 +16,123 @@ export const Titlebar = () => {
     const handleTitlebarMouseDown = useBlurOnOutsideClick();
     const { canGoBack, canGoForward, goBack, goForward } = useHistoryNavigation();
 
+    const [isTasksOpen, setIsTasksOpen] = useState(false);
+
     return (
-        <header
-            className={styles.titlebar}
-            data-tauri-drag-region
-            onMouseDown={handleTitlebarMouseDown}
-        >
-            <Flex gap="xs" data-tauri-drag-region>
-                <div className={styles.brand} data-tauri-drag-region>
-                    <Icon name="zelefy" width={22} height={22} />
-                    <span>Zelefy Desktop</span>
+        <>
+            <header
+                className={styles.titlebar}
+                data-tauri-drag-region
+                onMouseDown={handleTitlebarMouseDown}
+            >
+                <Flex gap="xs" data-tauri-drag-region>
+                    <div className={styles.brand} data-tauri-drag-region>
+                        <Icon name="zelefy" width={22} height={22} />
+                        <span>Zelefy Desktop</span>
+                    </div>
+
+                    <Flex gap="2xs" data-tauri-drag-region>
+                        <Button
+                            variant="ghost"
+                            aria-label={t("titlebar.back")}
+                            onClick={goBack}
+                            disabled={!canGoBack}
+                            square
+                        >
+                            <Icon name="navigation-chevron-left" width={17} height={17} />
+                        </Button>
+
+                        <Button
+                            variant="ghost"
+                            aria-label={t("titlebar.forward")}
+                            onClick={goForward}
+                            disabled={!canGoForward}
+                            square
+                        >
+                            <Icon name="navigation-chevron-right" width={17} height={17} />
+                        </Button>
+                    </Flex>
+                </Flex>
+
+                <div className={styles.searchWrapper} data-tauri-drag-region>
+                    <Input
+                        id="titlebar-search"
+                        name="search"
+                        placeholder={t("titlebar.search_placeholder")}
+                        leftIcon={<Icon name="common-search" width={17} height={17} />}
+                    />
                 </div>
 
-                <Flex gap="2xs" data-tauri-drag-region>
+                <Flex gap="2xs" justify="center" align="center" data-tauri-drag-region>
                     <Button
                         variant="ghost"
-                        aria-label={t("titlebar.back")}
-                        onClick={goBack}
-                        disabled={!canGoBack}
+                        onClick={() => {
+                            setIsTasksOpen((prev) => !prev);
+                        }}
+                        aria-label={t("titlebar.jobs")}
                         square
                     >
-                        <Icon name="navigation-chevron-left" width={17} height={17} />
+                        <Icon name="common-list-clock" width={16} height={16} />
                     </Button>
 
                     <Button
                         variant="ghost"
-                        aria-label={t("titlebar.forward")}
-                        onClick={goForward}
-                        disabled={!canGoForward}
+                        square
+                        onClick={toggleTheme}
+                        aria-label={
+                            currentTheme === "dark"
+                                ? t("titlebar.theme.switch_to_light")
+                                : t("titlebar.theme.switch_to_dark")
+                        }
+                    >
+                        <Icon
+                            name={currentTheme === "dark" ? "common-sun" : "common-moon"}
+                            width={16}
+                            height={16}
+                        />
+                    </Button>
+
+                    <div className={styles.divider} data-tauri-drag-region />
+
+                    <Button
+                        variant="ghost"
+                        onClick={() => appWindow.minimize()}
+                        aria-label={t("titlebar.minimize")}
                         square
                     >
-                        <Icon name="navigation-chevron-right" width={17} height={17} />
+                        <Icon name="window-minimize" width={15} height={15} />
+                    </Button>
+
+                    <Button
+                        variant="ghost"
+                        onClick={() => appWindow.toggleMaximize()}
+                        aria-label={t("titlebar.maximize")}
+                        square
+                    >
+                        <Icon name="window-maximize" width={12} height={12} />
+                    </Button>
+
+                    <Button
+                        variant="ghost"
+                        onClick={() => appWindow.close()}
+                        colorScheme={{
+                            colorHover: "white",
+                            bgColorHover: "var(--danger)",
+                        }}
+                        aria-label={t("titlebar.close")}
+                        square
+                    >
+                        <Icon name="action-close" width={16} height={16} />
                     </Button>
                 </Flex>
-            </Flex>
+            </header>
 
-            <div className={styles.searchWrapper} data-tauri-drag-region>
-                <Input
-                    id="titlebar-search"
-                    name="search"
-                    placeholder={t("titlebar.search_placeholder")}
-                    leftIcon={<Icon name="common-search" width={17} height={17} />}
-                />
-            </div>
-
-            <Flex gap="2xs" justify="center" align="center" data-tauri-drag-region>
-                <Button
-                    variant="ghost"
-                    square
-                    onClick={toggleTheme}
-                    aria-label={
-                        currentTheme === "dark"
-                            ? t("titlebar.theme.switch_to_light")
-                            : t("titlebar.theme.switch_to_dark")
-                    }
-                >
-                    <Icon
-                        name={currentTheme === "dark" ? "common-sun" : "common-moon"}
-                        width={16}
-                        height={16}
-                    />
-                </Button>
-
-                <div className={styles.divider} data-tauri-drag-region />
-
-                <Button
-                    variant="ghost"
-                    onClick={() => appWindow.minimize()}
-                    aria-label={t("titlebar.minimize")}
-                    square
-                >
-                    <Icon name="window-minimize" width={15} height={15} />
-                </Button>
-
-                <Button
-                    variant="ghost"
-                    onClick={() => appWindow.toggleMaximize()}
-                    aria-label={t("titlebar.maximize")}
-                    square
-                >
-                    <Icon name="window-maximize" width={12} height={12} />
-                </Button>
-
-                <Button
-                    variant="ghost"
-                    onClick={() => appWindow.close()}
-                    colorScheme={{
-                        colorHover: "white",
-                        bgColorHover: "var(--danger)",
-                    }}
-                    aria-label={t("titlebar.close")}
-                    square
-                >
-                    <Icon name="action-close" width={16} height={16} />
-                </Button>
-            </Flex>
-        </header>
+            <TasksDrawer
+                open={isTasksOpen}
+                onOpenChange={(open) => {
+                    setIsTasksOpen(open);
+                }}
+            />
+        </>
     );
 };
