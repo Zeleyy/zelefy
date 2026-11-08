@@ -1,6 +1,9 @@
 import styles from "./TasksDrawer.module.scss";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Drawer } from "@zelefy/ui";
+import { Button, Drawer, Flex } from "@zelefy/ui";
+import { ActiveJobsTab } from "./ActiveJobsTab";
+import { AllJobsTab } from "./AllJobsTab";
 
 export interface TasksDrawerProps {
     open: boolean;
@@ -9,6 +12,7 @@ export interface TasksDrawerProps {
 
 export const TasksDrawer = ({ open, onOpenChange }: TasksDrawerProps) => {
     const { t } = useTranslation();
+    const [tab, setTab] = useState<"active" | "all">("active");
 
     return (
         <Drawer
@@ -17,7 +21,19 @@ export const TasksDrawer = ({ open, onOpenChange }: TasksDrawerProps) => {
             open={open}
             onOpenChange={onOpenChange}
         >
-            <div></div>
+            <Flex gap="2xs">
+                <Button
+                    variant={tab === "active" ? "primary" : "ghost"}
+                    onClick={() => setTab("active")}
+                >
+                    Активные
+                </Button>
+                <Button variant={tab === "all" ? "primary" : "ghost"} onClick={() => setTab("all")}>
+                    Все
+                </Button>
+            </Flex>
+
+            {tab === "active" ? <ActiveJobsTab /> : <AllJobsTab />}
         </Drawer>
     );
 };

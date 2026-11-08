@@ -5,6 +5,7 @@ use rusqlite::{
     types::{FromSql, FromSqlError, ToSqlOutput},
 };
 use serde::{Deserialize, Serialize};
+use zelefy_common::CursorPage;
 
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -63,6 +64,7 @@ impl FromSql for JobStatus {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum JobPayload {
+    #[serde(rename_all = "camelCase")]
     Waveform { track_id: i64 },
 }
 
@@ -86,6 +88,7 @@ impl ToSql for JobPayload {
         Ok(ToSqlOutput::from(s))
     }
 }
+
 impl FromSql for JobPayload {
     fn column_result(value: rusqlite::types::ValueRef<'_>) -> rusqlite::types::FromSqlResult<Self> {
         serde_json::from_str(value.as_str()?).map_err(|e| FromSqlError::Other(Box::new(e)))
@@ -171,3 +174,33 @@ pub struct UpdateJob {
     pub started_at: Option<Option<DateTime<Utc>>>,
     pub finished_at: Option<Option<DateTime<Utc>>>,
 }
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct JobEvent {
+    pub job_id: i64,
+    pub kind: JobKind,
+    pub payload: JobPayload,
+    pub status: JobStatus,
+    pub error: Option<String>,
+}
+
+impl From<&Job> for JobEvent {
+    fn from(j: &Job) -> Self {
+        Self {
+            job_id: j.job_id,
+            kind: j.job_kind,
+            payload: j.payload.clone(),
+            status: j.job_status,
+            error: j.error.clone(),
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone, Copy)]
+#[serde(rename_all = "camelCase")]
+pub struct JobCursor {
+    pub job_id: i64,
+}
+
+pub type JobsPage = CursorPage<JobEvent, JobCursor>;

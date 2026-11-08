@@ -13,16 +13,16 @@
 
     --success: var(--green-400);
 
+    --error: var(--red-400);
+    --error-border: var(--red-600);
+
     --text-primary: var(--neutral-900);
     --text-secondary: var(--neutral-500);
-    --text-muted: var(--neutral-400);
+    --text-muted: var(--neutral-300);
     --text-on-accent: #ffffff;
 
     --border-subtle: rgba(0, 0, 0, 0.08);
     --border-strong: var(--neutral-300);
-
-    --state-error: var(--error-500);
-    --state-error-bg: var(--error-100);
 
     --scrollbar-track: transparent;
     --scrollbar-thumb: rgba(0, 0, 0, 0.15);
@@ -31,7 +31,4 @@
     --danger: var(--red-400);
     --danger-hover: var(--red-500);
     --danger-active: var(--red-600);
-
-    --error-bg-subtle: var(--red-50);
-    --error-border: var(--red-200);
 }

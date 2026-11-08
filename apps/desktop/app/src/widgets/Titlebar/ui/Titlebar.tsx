@@ -27,7 +27,7 @@ export const Titlebar = () => {
             >
                 <Flex gap="xs" data-tauri-drag-region>
                     <div className={styles.brand} data-tauri-drag-region>
-                        <Icon name="zelefy" width={22} height={22} />
+                        <Icon name="zelefy-gradient" width={22} height={22} />
                         <span>Zelefy Desktop</span>
                     </div>
 

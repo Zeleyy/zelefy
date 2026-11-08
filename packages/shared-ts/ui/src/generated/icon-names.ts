@@ -39,4 +39,5 @@ export type IconName =
     | "player-volume-mute"
     | "window-maximize"
     | "window-minimize"
-    | "zelefy";
+    | "zelefy"
+    | "zelefy-gradient";

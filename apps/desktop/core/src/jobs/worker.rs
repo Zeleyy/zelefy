@@ -7,8 +7,8 @@ use std::{
 
 use crate::{
     db::{DbState, repository},
-    jobs::{JobError, JobEvent, handlers},
-    models::jobs::{Job, JobStatus},
+    jobs::{JobError, handlers},
+    models::jobs::{Job, JobEvent, JobStatus},
 };
 
 #[derive(Clone)]
@@ -53,12 +53,12 @@ fn run(db: DbState, rx: mpsc::Receiver<()>, emit: impl Fn(JobEvent)) {
 }
 
 fn process(db: &DbState, emit: &impl Fn(JobEvent), job: Job) {
-    let (job_id, kind) = (job.job_id, job.job_kind);
-    let track_id = job.payload.track_id();
+    let (job_id, kind, payload) = (job.job_id, job.job_kind, job.payload.clone());
+
     let ev = |status, error| JobEvent {
         job_id,
         kind,
-        track_id,
+        payload: payload.clone(),
         status,
         error,
     };
@@ -72,8 +72,15 @@ fn process(db: &DbState, emit: &impl Fn(JobEvent), job: Job) {
         let conn = db.lock();
         match outcome {
             Ok(()) => {
-                let _ = repository::jobs::complete(&conn, job_id);
-                (JobStatus::Done, None)
+                let applied = repository::jobs::complete(&conn, job_id).unwrap_or(false);
+                (
+                    if applied {
+                        JobStatus::Done
+                    } else {
+                        JobStatus::Cancelled
+                    },
+                    None,
+                )
             }
             Err(JobError::TrackGone) => {
                 let _ = repository::jobs::cancel(&conn, job_id);

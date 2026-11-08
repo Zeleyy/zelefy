@@ -20,6 +20,11 @@
     --success-subtle-bg: color-mix(in srgb, var(--success) 15%, transparent);
     --success-subtle-border: color-mix(in srgb, var(--success) 30%, transparent);
 
+    --error: var(--red-300);
+    --error-border: var(--red-500);
+    --error-subtle-bg: color-mix(in srgb, var(--error) 15%, transparent);
+    --error-subtle-border: color-mix(in srgb, var(--error) 30%, transparent);
+
     --text-primary: var(--neutral-50);
     --text-secondary: var(--neutral-300);
     --text-muted: var(--neutral-400);
@@ -29,9 +34,6 @@
     --border-subtle: rgba(255, 255, 255, 0.08);
     --border-strong: var(--neutral-500);
 
-    --state-error: var(--error-500);
-    --state-error-bg: var(--error-900);
-
     --scrollbar-track: transparent;
     --scrollbar-thumb: rgba(255, 255, 255, 0.15);
     --scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
@@ -39,7 +41,4 @@
     --danger: var(--red-300);
     --danger-hover: var(--red-200);
     --danger-active: var(--red-100);
-
-    --error-bg-subtle: var(--red-950);
-    --error-border: var(--red-600);
 }

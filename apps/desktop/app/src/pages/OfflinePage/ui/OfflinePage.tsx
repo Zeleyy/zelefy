@@ -19,10 +19,11 @@ export const OfflinePage = () => {
 
     const [search, setSearch] = useState("");
     const { data } = useLocalTracks();
-    const tracks = data ?? [];
 
     const { filteredTracks, playerTracks, allPlayerTracks } = useMemo(() => {
+        const tracks = data ?? [];
         const q = search.trim().toLowerCase();
+
         const filtered = q
             ? tracks.filter(
                   (t) =>
@@ -35,7 +36,7 @@ export const OfflinePage = () => {
             playerTracks: filtered.map(toPlayerTrack),
             allPlayerTracks: tracks.map(toPlayerTrack),
         };
-    }, [tracks, search]);
+    }, [data, search]);
 
     const navigate = useNavigate();
     const { mutate: importTracks, isPending, progress } = useImportTracks();

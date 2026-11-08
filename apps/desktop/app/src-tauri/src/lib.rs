@@ -48,7 +48,7 @@ pub fn run() {
             app.manage(db.clone());
             let handle = app.handle().clone();
             let jobs = jobs::spawn_worker(db, move |e| {
-                let _ = handle.emit("job-updated", e);
+                let _ = handle.emit("jobs://event", e);
             });
             app.manage(jobs);
             app.manage(AppState::default());
@@ -82,10 +82,11 @@ pub fn run() {
             cache::commands::set_cache_limit,
             cache::commands::get_default_cache_limit,
             cache::commands::reset_cache_limit,
-            commands::import_tracks,
-            commands::get_local_tracks,
-            commands::update_local_track,
-            commands::delete_local_track,
+            commands::tracks::import_tracks,
+            commands::tracks::get_local_tracks,
+            commands::tracks::get_local_track,
+            commands::tracks::update_local_track,
+            commands::tracks::delete_local_track,
             commands::audio::player_load_local,
             commands::audio::player_play,
             commands::audio::player_pause,
@@ -93,6 +94,8 @@ pub fn run() {
             commands::audio::player_set_volume,
             commands::audio::player_list_devices,
             commands::audio::player_unload,
+            commands::jobs::get_jobs_page,
+            commands::jobs::get_active_jobs,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

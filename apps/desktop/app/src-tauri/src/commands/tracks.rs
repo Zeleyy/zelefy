@@ -35,6 +35,15 @@ pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse
 }
 
 #[tauri::command]
+pub fn get_local_track(
+    db: State<'_, DbState>,
+    track_id: i64,
+) -> Result<LocalTrackResponse, String> {
+    let conn = db.lock();
+    services::tracks::load_track(&conn, track_id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn update_local_track(
     db: State<'_, DbState>,
     track_id: i64,
