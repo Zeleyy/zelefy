@@ -689,9 +689,9 @@ dependencies = [
 
 [[package]]
 name = "bin-rs"
-version = "0.0.10"
+version = "0.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23f756521115a60a84bc45722261eaf03aa6a59d886c9c3b41d08ac1c39e3e24"
+checksum = "b28062885c4e7689b7fbf601cc5ed5519efd9e07ae5c33266c41f9e87755e007"
 
 [[package]]
 name = "bit_field"
@@ -4585,9 +4585,9 @@ dependencies = [
 
 [[package]]
 name = "webp-rust"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50c858a3ae7a705e41370c569e3317b5e85b167700dc77b3c14e71a9ed077f71"
+checksum = "f4cec5854e9cf008deec3a7699dd009ba393aff42563f47df8c8d2b06976d5ba"
 dependencies = [
  "bin-rs",
 ]
