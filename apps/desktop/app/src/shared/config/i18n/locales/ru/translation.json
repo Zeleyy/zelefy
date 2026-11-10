@@ -56,7 +56,7 @@
         "storage": {
             "title": "Хранилище приложения",
             "settings": "Настройки хранилища",
-            "total_used": "Всего занято: <strong>{{used}}</strong>",
+            "total_used": "Всего занято:",
             "main_library": "Библиотека (Основная)",
             "tracks_count": " ({{count}} треков)"
         },

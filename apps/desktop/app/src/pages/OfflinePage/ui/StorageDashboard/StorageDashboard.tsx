@@ -23,11 +23,7 @@ export const StorageDashboard = () => {
             <Flex justify="space-between" align="center" className={styles.dashboardHeader}>
                 <span className={styles.storageTitle}>{t("offline.storage.title")}</span>
                 <div className={styles.totalInfo}>
-                    <Trans
-                        i18nKey="offline.storage.total_used"
-                        values={{ used: formatBytes(totalUsedBytes, 2) }}
-                        components={{ strong: <strong /> }}
-                    />
+                    {t("offline.storage.total_used")} {formatBytes(totalUsedBytes, 2)}
                 </div>
             </Flex>
 

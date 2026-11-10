@@ -1,0 +1,15 @@
+.toast {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-strong) !important;
+
+    &__success {
+        color: var(--success) !important;
+        border-color: var(--success) !important;
+    }
+
+    &__error {
+        color: var(--error) !important;
+        border-color: var(--error) !important;
+    }
+}

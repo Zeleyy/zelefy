@@ -4,6 +4,7 @@ import { Flex } from "@zelefy/ui";
 import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
 import { PlayerBar } from "@/widgets/PlayerBar";
+import { AppToaster } from "@/shared/ui";
 
 export const MainLayout = () => {
     return (
@@ -26,6 +27,8 @@ export const MainLayout = () => {
                 <div id="drawer-root" className={styles.drawerRoot} />
 
                 <div id="modal-root" className={styles.modalRoot} />
+
+                <AppToaster />
             </div>
         </>
     );

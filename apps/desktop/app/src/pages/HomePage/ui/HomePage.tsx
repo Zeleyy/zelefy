@@ -1,13 +1,9 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button, TrackHero } from "@zelefy/ui";
+import { TrackHero } from "@zelefy/ui";
 import { useWaveform } from "@/features/waveform";
 import { usePlayerStore } from "@/shared/lib/stores";
 
 export const HomePage = () => {
-    const { t } = useTranslation();
-    const resetPlayer = usePlayerStore((state) => state.resetPlayer);
-
     const isPlaying = usePlayerStore((state) => state.isPlaying);
     const togglePlay = usePlayerStore((state) => state.togglePlay);
 
@@ -24,8 +20,6 @@ export const HomePage = () => {
 
     return (
         <>
-            <h1>{t("home.title")}</h1>
-
             <TrackHero
                 track={displayTrack ?? undefined}
                 isPlaying={isPlaying}
@@ -40,10 +34,6 @@ export const HomePage = () => {
                     /* Логика сохранения */
                 }}
             />
-
-            <Button variant="primary" onClick={resetPlayer}>
-                Hide player
-            </Button>
         </>
     );
 };
