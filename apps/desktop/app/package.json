@@ -11,7 +11,7 @@
         "tauri": "tauri"
     },
     "dependencies": {
-        "@tanstack/react-query": "^5.106.1",
+        "@tanstack/react-query": "^5.107.1",
         "@tauri-apps/api": "2.12.4",
         "@tauri-apps/plugin-dialog": "~2.8.4",
         "@tauri-apps/plugin-opener": "2.7.2",
@@ -24,27 +24,27 @@
         "clsx": "^2.1.1",
         "i18next": "^26.7.2",
         "i18next-resources-to-backend": "^1.2.4",
-        "motion": "^14.10.0",
+        "motion": "^14.11.1",
         "react": "^19.3.1",
         "react-dom": "^19.3.1",
         "react-i18next": "^17.1.13",
         "react-router": "^8.5.1",
         "sonner": "^2.0.8",
-        "zustand": "^5.0.16"
+        "zustand": "^5.1.0"
     },
     "devDependencies": {
-        "@tanstack/react-query-devtools": "^5.106.1",
+        "@tanstack/react-query-devtools": "^5.107.1",
         "@tauri-apps/cli": "^2.12.4",
         "@types/node": "^26.6.6",
         "@types/react": "^19.3.0",
         "@types/react-dom": "^19.3.0",
-        "@vitejs/plugin-react": "^6.2.1",
-        "knip": "^6.44.1",
+        "@vitejs/plugin-react": "^6.3.0",
+        "knip": "^6.44.2",
         "oxc-transform-react": "^0.154.0",
-        "oxlint": "^1.92.0",
+        "oxlint": "^1.93.0",
         "sass-embedded": "1.108.1",
         "typescript": "~7.0.2",
-        "vite": "^8.3.6",
+        "vite": "^8.3.7",
         "vite-plugin-minify": "^3.0.0"
     }
 }

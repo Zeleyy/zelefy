@@ -1,4 +1,4 @@
-use audio_core::errors::AudioError;
+use crate::audio::errors::EngineError;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CoreError {
@@ -20,9 +20,12 @@ pub enum CoreError {
     #[error("not found: {0}")]
     NotFound(i64),
 
-    #[error("audio processing error: {0}")]
-    AudioProcessingError(AudioError),
+    #[error(transparent)]
+    Engine(#[from] EngineError),
 
-    #[error("audio device error: {0}")]
-    AudioDevice(rodio::CpalError),
+    #[error("audio engine is not running")]
+    EngineUnavailable,
+
+    #[error("audio engine did not respond in time")]
+    EngineTimeout,
 }

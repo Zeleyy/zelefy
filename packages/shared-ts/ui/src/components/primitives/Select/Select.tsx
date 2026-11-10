@@ -59,7 +59,9 @@ export const Select = ({
                         key={option.value}
                         onClick={() => {
                             if (option.disabled) return;
-                            onChange(option.value);
+                            if (option.value !== value) {
+                                onChange(option.value);
+                            }
                             setIsOpen(false);
                         }}
                         className={clsx(styles.option, {

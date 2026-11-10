@@ -92,8 +92,9 @@ pub fn run() {
             commands::audio::player_pause,
             commands::audio::player_seek,
             commands::audio::player_set_volume,
-            commands::audio::player_list_devices,
             commands::audio::player_unload,
+            commands::audio::audio_list_devices,
+            commands::audio::audio_switch_device,
             commands::jobs::get_jobs_page,
             commands::jobs::get_active_jobs,
         ])

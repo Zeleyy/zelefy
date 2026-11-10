@@ -4,7 +4,7 @@ use desktop_core::{
     services,
 };
 use std::path::PathBuf;
-use tauri::State;
+use tauri::{async_runtime::spawn_blocking, AppHandle, Manager, State};
 
 #[tauri::command]
 pub async fn player_load_local(
@@ -63,6 +63,21 @@ pub fn player_unload(audio: State<'_, AudioState>) {
 }
 
 #[tauri::command]
-pub async fn player_list_devices(s: State<'_, AudioState>) -> Result<Vec<AudioSink>, String> {
-    s.list_output_devices().map_err(|e| e.to_string())
+pub async fn audio_list_devices(app: AppHandle) -> Result<Vec<AudioSink>, String> {
+    spawn_blocking(move || {
+        let state = app.state::<AudioState>();
+        state.list_output_devices().map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+pub async fn audio_switch_device(app: AppHandle, device_id: Option<String>) -> Result<(), String> {
+    spawn_blocking(move || {
+        let state = app.state::<AudioState>();
+        state.switch_device(device_id).map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
