@@ -46,7 +46,7 @@ sqlx = { version = "0.9.0", features = [
     "tls-rustls",
 ] }
 redis = { version = "1.8.1", features = ["tokio-comp", "connection-manager"] }
-aws-sdk-s3 = { version = "1.158.0", features = ["behavior-version-latest"] }
+aws-sdk-s3 = { version = "1.159.0", features = ["behavior-version-latest"] }
 
 zelefy_common = { path = "packages/shared-rs/common", features = ["backend"] }
 zelefy_backend = { path = "packages/shared-rs/backend" }
