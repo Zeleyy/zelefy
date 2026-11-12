@@ -9,9 +9,9 @@
         "lint": "pnpm -r run lint"
     },
     "devDependencies": {
-        "knip": "^6.45.0",
+        "knip": "^6.45.1",
         "prettier": "^3.9.10",
         "prettier-plugin-sql": "^0.20.0",
-        "prettier-plugin-toml": "^3.0.2"
+        "prettier-plugin-toml": "^4.1.0"
     }
 }

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
-import { Button, Cover, Flex, formatBytes, formatTime, Icon, Input } from "@zelefy/ui";
+import { Button, Cover, EmptyState, Flex, formatBytes, formatTime, Icon, Input } from "@zelefy/ui";
 import { StorageDashboard } from "./StorageDashboard";
 import { selectAudio } from "@/shared/lib/utils/browse";
 import { useDeleteLocalTrack, useImportTracks, useLocalTracks } from "@/features/track";
@@ -98,123 +98,127 @@ export const OfflinePage = () => {
                     </div>
                 </Flex>
 
-                <div className={styles.trackList}>
-                    <div className={styles.header}>
-                        <span className={styles.center}>#</span>
-                        <span>{t("offline.list.header.track")}</span>
-                        <span className={styles.center}>{t("offline.list.header.type")}</span>
-                        <span className={styles.center}>{t("offline.list.header.weight")}</span>
-                        <span className={styles.center}>{t("offline.list.header.time")}</span>
-                    </div>
+                {filteredTracks.length > 0 ? (
+                    <div className={styles.trackList}>
+                        <div className={styles.header}>
+                            <span className={styles.center}>#</span>
+                            <span>{t("offline.list.header.track")}</span>
+                            <span className={styles.center}>{t("offline.list.header.type")}</span>
+                            <span className={styles.center}>{t("offline.list.header.weight")}</span>
+                            <span className={styles.center}>{t("offline.list.header.time")}</span>
+                        </div>
 
-                    {filteredTracks.map((track, i) => {
-                        const coverPath = trackFileSrc(track.cover);
-                        const isLinked = track.cover?.library === null;
-                        const isPlaying = track.trackId === currentTrack?.trackId;
+                        {filteredTracks.map((track, i) => {
+                            const coverPath = trackFileSrc(track.cover);
+                            const isLinked = track.cover?.library === null;
+                            const isPlaying = track.trackId === currentTrack?.trackId;
 
-                        return (
-                            <div
-                                key={track.trackId}
-                                className={clsx(styles.row, {
-                                    [styles["row--playing"]]: isPlaying,
-                                })}
-                                onClick={() => playTrack(playerTracks[i], allPlayerTracks)}
-                            >
-                                <span className={styles.index}>{i + 1}</span>
+                            return (
+                                <div
+                                    key={track.trackId}
+                                    className={clsx(styles.row, {
+                                        [styles["row--playing"]]: isPlaying,
+                                    })}
+                                    onClick={() => playTrack(playerTracks[i], allPlayerTracks)}
+                                >
+                                    <span className={styles.index}>{i + 1}</span>
 
-                                <div className={styles.track}>
-                                    <Cover
-                                        alt={track.title}
-                                        src={coverPath ?? undefined}
-                                        size="xs"
-                                    />
-                                    <div className={styles.info}>
-                                        <span className={styles.title}>{track.title}</span>
-                                        <span className={styles.artist}>
-                                            {track.metadataArtist}
+                                    <div className={styles.track}>
+                                        <Cover
+                                            alt={track.title}
+                                            src={coverPath ?? undefined}
+                                            size="xs"
+                                        />
+                                        <div className={styles.info}>
+                                            <span className={styles.title}>{track.title}</span>
+                                            <span className={styles.artist}>
+                                                {track.metadataArtist}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.type}>
+                                        <span
+                                            className={clsx(styles.badge, {
+                                                [styles.badgeLinked]: isLinked,
+                                                [styles.badgeCopied]: !isLinked,
+                                            })}
+                                        >
+                                            {isLinked ? "L" : "F"}
                                         </span>
                                     </div>
-                                </div>
 
-                                <div className={styles.type}>
-                                    <span
-                                        className={clsx(styles.badge, {
-                                            [styles.badgeLinked]: isLinked,
-                                            [styles.badgeCopied]: !isLinked,
-                                        })}
-                                    >
-                                        {isLinked ? "L" : "F"}
+                                    <span className={clsx(styles.center, styles.size)}>
+                                        {formatBytes(track.audio.sizeBytes)}
                                     </span>
+                                    <span className={clsx(styles.center, styles.duration)}>
+                                        {formatTime(track.durationMs ? track.durationMs / 1000 : 0)}
+                                    </span>
+
+                                    <Flex align="center" gap="2xs" className={styles.actions}>
+                                        <Button
+                                            variant="outline"
+                                            colorScheme={{
+                                                color: "var(--text-primary)",
+                                                colorHover: "var(--bg-primary)",
+                                            }}
+                                            square
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                addToQueue(playerTracks[i]);
+                                            }}
+                                        >
+                                            <Icon name="player-list-end" size={13} />
+                                        </Button>
+
+                                        <Button
+                                            variant="outline"
+                                            colorScheme={{
+                                                color: "var(--text-primary)",
+                                                colorHover: "var(--bg-primary)",
+                                            }}
+                                            square
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingTrack(track);
+                                            }}
+                                        >
+                                            <Icon name="action-edit" size={13} />
+                                        </Button>
+
+                                        <Button
+                                            variant="outline"
+                                            colorScheme={{
+                                                color: "var(--text-primary)",
+                                                colorHover: "var(--bg-primary)",
+                                            }}
+                                            square
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                            }}
+                                        >
+                                            <Icon name="action-save" size={13} />
+                                        </Button>
+
+                                        <Button
+                                            variant="outline"
+                                            colorScheme={{ color: "var(--danger)" }}
+                                            square
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteTrack(track.trackId);
+                                            }}
+                                        >
+                                            <Icon name="action-delete" size={13} />
+                                        </Button>
+                                    </Flex>
                                 </div>
-
-                                <span className={clsx(styles.center, styles.size)}>
-                                    {formatBytes(track.audio.sizeBytes)}
-                                </span>
-                                <span className={clsx(styles.center, styles.duration)}>
-                                    {formatTime(track.durationMs ? track.durationMs / 1000 : 0)}
-                                </span>
-
-                                <Flex align="center" gap="2xs" className={styles.actions}>
-                                    <Button
-                                        variant="outline"
-                                        colorScheme={{
-                                            color: "var(--text-primary)",
-                                            colorHover: "var(--bg-primary)",
-                                        }}
-                                        square
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            addToQueue(playerTracks[i]);
-                                        }}
-                                    >
-                                        <Icon name="player-list-end" size={13} />
-                                    </Button>
-
-                                    <Button
-                                        variant="outline"
-                                        colorScheme={{
-                                            color: "var(--text-primary)",
-                                            colorHover: "var(--bg-primary)",
-                                        }}
-                                        square
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingTrack(track);
-                                        }}
-                                    >
-                                        <Icon name="action-edit" size={13} />
-                                    </Button>
-
-                                    <Button
-                                        variant="outline"
-                                        colorScheme={{
-                                            color: "var(--text-primary)",
-                                            colorHover: "var(--bg-primary)",
-                                        }}
-                                        square
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                        }}
-                                    >
-                                        <Icon name="action-save" size={13} />
-                                    </Button>
-
-                                    <Button
-                                        variant="outline"
-                                        colorScheme={{ color: "var(--danger)" }}
-                                        square
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            deleteTrack(track.trackId);
-                                        }}
-                                    >
-                                        <Icon name="action-delete" size={13} />
-                                    </Button>
-                                </Flex>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <EmptyState title={"Ничего не нашлось"} />
+                )}
             </Flex>
 
             <EditTrackModal
