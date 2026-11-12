@@ -1,9 +1,11 @@
 import { useEffect, useRef, useMemo } from "react";
-import { Flex, Icon, SpinnerLoader } from "@zelefy/ui";
+import { useTranslation } from "react-i18next";
+import { EmptyState, Flex, Icon, SpinnerLoader } from "@zelefy/ui";
 import { useJobs } from "@/features/job";
 import { JobCard } from "../JobCard";
 
 export const AllJobsTab = () => {
+    const { t } = useTranslation();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
         useJobs();
 
@@ -28,8 +30,8 @@ export const AllJobsTab = () => {
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     if (isLoading) return <SpinnerLoader isLoading />;
-    if (isError) return <div>{String(error)}</div>;
-    if (jobs.length === 0) return <div>Задач нет</div>;
+    if (isError) return <EmptyState title={"tasks.tab.all.error"} description={String(error)} />;
+    if (jobs.length === 0) return <EmptyState title={t("tasks.tab.all.empty")} />;
 
     return (
         <Flex direction="column" gap="sm">

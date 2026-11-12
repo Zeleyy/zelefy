@@ -37,7 +37,18 @@
         "expand": "Expand"
     },
     "tasks": {
-        "title": "Tasks"
+        "title": "Tasks",
+        "tab": {
+            "active": {
+                "title": "Active",
+                "empty": "No active tasks"
+            },
+            "all": {
+                "title": "All",
+                "empty": "No tasks yet",
+                "error": "Failed to load tasks"
+            }
+        }
     },
     "queue": {
         "title": "Queue",

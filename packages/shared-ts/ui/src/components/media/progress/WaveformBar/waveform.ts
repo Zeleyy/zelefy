@@ -7,7 +7,7 @@ export interface PathParams {
     bottomMax: number;
 }
 
-export const toPx = (p: number, max: number) => (p === 0 ? 0 : Math.max(1, Math.round(p * max)));
+const toPx = (p: number, max: number) => (p === 0 ? 0 : Math.max(1, Math.round(p * max)));
 
 export const downsample = (data: Uint8Array, bars: number): number[] => {
     if (bars <= 0) return [];

@@ -8,14 +8,3 @@ declare module "*.module.sass" {
     const classes: CSSModuleClasses;
     export default classes;
 }
-
-declare module "*.svg?react" {
-    import type { FC, SVGProps } from "react";
-    const ReactComponent: FC<SVGProps<SVGSVGElement>>;
-    export default ReactComponent;
-}
-
-declare module "*.svg?no-inline" {
-    const content: string;
-    export default content;
-}

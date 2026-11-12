@@ -1,12 +1,14 @@
-import { Flex } from "@zelefy/ui";
+import { EmptyState, Flex } from "@zelefy/ui";
 import { useJobsStore } from "@/shared/lib/stores";
 import { JobCard } from "../JobCard";
+import { useTranslation } from "react-i18next";
 
 export const ActiveJobsTab = () => {
+    const { t } = useTranslation();
     const jobs = useJobsStore((s) => s.jobs);
 
     if (jobs.length === 0) {
-        return <div>Нет активных задач</div>;
+        return <EmptyState title={t("tasks.tab.active.empty")} />;
     }
 
     return (
