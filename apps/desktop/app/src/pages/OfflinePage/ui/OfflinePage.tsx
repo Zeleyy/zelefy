@@ -50,7 +50,6 @@ export const OfflinePage = () => {
         if (!selected?.length) return;
 
         try {
-            alert(`Выбранные файлы: ${selected}`);
             importTracks({ paths: selected });
         } catch (error) {
             console.error("Не удалось создать хранилища:", error);
@@ -73,7 +72,7 @@ export const OfflinePage = () => {
                             }}
                         >
                             {isPending && progress
-                                ? `Импорт ${progress.done}/${progress.total}`
+                                ? progress.done + "/" + progress.total
                                 : t("offline.actions.add.files")}
                         </Button>
                     </Flex>

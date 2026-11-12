@@ -3,27 +3,27 @@ import clsx from "clsx";
 
 type TabVariant = "primary" | "secondary";
 
-export interface TabItem {
+export interface TabItem<T extends string = string> {
     label: string;
-    value: string;
+    value: T;
     disabled?: boolean;
 }
 
-export interface TabsProps {
-    tabs?: TabItem[];
-    active?: string;
-    onTabClick?: (value: string) => void;
+export interface TabsProps<T extends string = string> {
+    tabs?: TabItem<T>[];
+    active?: T;
+    onTabClick?: (value: T) => void;
     variant?: TabVariant;
     className?: string;
 }
 
-export const Tabs = ({
+export const Tabs = <T extends string = string>({
     tabs = [],
     active,
     onTabClick,
     variant = "primary",
     className,
-}: TabsProps) => {
+}: TabsProps<T>) => {
     if (!tabs.length) return null;
 
     return (

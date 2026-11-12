@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import { Channel, invoke } from "@tauri-apps/api/core";
 import type { LocalTrack } from "../types";
 
 export type ImportOutcome =
@@ -19,19 +18,14 @@ export const useImportTracks = () => {
     const queryClient = useQueryClient();
     const [progress, setProgress] = useState<ImportProgress | null>(null);
 
-    useEffect(() => {
-        const unlisten = listen<[number, number]>("import-progress", (event) => {
-            const [done, total] = event.payload;
-            setProgress({ done, total });
-        });
-        return () => {
-            unlisten.then((fn) => fn());
-        };
-    }, []);
-
     const mutation = useMutation({
-        mutationFn: ({ paths, libraryId }: ImportVariables) =>
-            invoke<ImportOutcome[]>("import_tracks", { paths, libraryId }),
+        mutationFn: ({ paths, libraryId }: ImportVariables) => {
+            const onProgress = new Channel<[number, number]>();
+            onProgress.onmessage = ([done, total]) => {
+                setProgress({ done, total });
+            };
+            return invoke<ImportOutcome[]>("import_tracks", { paths, libraryId, onProgress });
+        },
         onSettled: () => {
             setProgress(null);
             queryClient.invalidateQueries({ queryKey: ["track"] });

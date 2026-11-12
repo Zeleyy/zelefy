@@ -8,7 +8,7 @@ type PlayerEvent =
     { type: "position"; seconds: number } | { type: "ended" } | { type: "error"; message: string };
 
 const load = (trackId: PlayerTrack["trackId"], autoplay: boolean) =>
-    invoke("player_load_local", { trackId: +trackId, autoplay });
+    invoke("player_load_local", { trackId: trackId, autoplay });
 
 export const usePlayerBridge = () => {
     useEffect(() => {

@@ -1,9 +1,11 @@
 import styles from "./TasksDrawer.module.scss";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Drawer, Tabs } from "@zelefy/ui";
+import { Drawer, Tabs, type TabItem } from "@zelefy/ui";
 import { ActiveJobsTab } from "./ActiveJobsTab";
 import { AllJobsTab } from "./AllJobsTab";
+
+type TasksTab = "active" | "all";
 
 export interface TasksDrawerProps {
     open: boolean;
@@ -12,18 +14,15 @@ export interface TasksDrawerProps {
 
 export const TasksDrawer = ({ open, onOpenChange }: TasksDrawerProps) => {
     const { t } = useTranslation();
-    const [tab, setTab] = useState("active");
+    const [tab, setTab] = useState<TasksTab>("active");
 
-    const tabs = [
-        {
-            label: t("tasks.tab.active.title"),
-            value: "active",
-        },
-        {
-            label: t("tasks.tab.all.title"),
-            value: "all",
-        },
-    ];
+    const tabs: TabItem<TasksTab>[] = useMemo(
+        () => [
+            { label: t("tasks.tab.active.title"), value: "active" },
+            { label: t("tasks.tab.all.title"), value: "all" },
+        ],
+        [t],
+    );
 
     return (
         <Drawer
@@ -32,11 +31,11 @@ export const TasksDrawer = ({ open, onOpenChange }: TasksDrawerProps) => {
             open={open}
             onOpenChange={onOpenChange}
         >
-            <Tabs
+            <Tabs<TasksTab>
                 active={tab}
                 tabs={tabs}
-                onTabClick={(tab) => {
-                    setTab(tab);
+                onTabClick={(value) => {
+                    setTab(value);
                 }}
             />
 

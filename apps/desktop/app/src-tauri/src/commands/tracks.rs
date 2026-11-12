@@ -3,7 +3,7 @@ use desktop_core::{
     models::tracks::{LocalTrackResponse, UpdateTrackRequest},
     services::{self, tracks::ImportOutcome},
 };
-use tauri::{AppHandle, Emitter, Manager, State};
+use tauri::{ipc::Channel, AppHandle, Manager, State};
 
 use crate::jobs::JobsHandle;
 
@@ -12,13 +12,14 @@ pub async fn import_tracks(
     app: AppHandle,
     paths: Vec<String>,
     library_id: Option<i64>,
+    on_progress: Channel<(usize, usize)>,
 ) -> Result<Vec<ImportOutcome>, String> {
     tauri::async_runtime::spawn_blocking(move || {
         let db = app.state::<DbState>();
         let jobs = app.state::<JobsHandle>();
         let res = services::tracks::import_tracks(&db, paths, library_id, |done, total| {
             jobs.wake();
-            let _ = app.emit("import-progress", (done, total));
+            let _ = on_progress.send((done, total));
         });
         jobs.wake();
         res

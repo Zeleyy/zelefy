@@ -2,13 +2,15 @@ import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { invoke } from "@tauri-apps/api/core";
 import type { PlayerTrack } from "@zelefy/types";
+import { queryClient } from "@/shared/api";
 import { tauriStorage } from "../storage";
 
-export type RepeatMode = "off" | "queue" | "track";
+type RepeatMode = "off" | "queue" | "track";
+type TrackId = string | number;
 
 interface QueueItem {
     qid: number;
-    track: PlayerTrack;
+    trackId: TrackId;
 }
 
 interface PlayerState {
@@ -30,15 +32,15 @@ interface PlayerState {
     seek: (time: number) => void;
     setCurrentTime: (time: number) => void;
 
-    playTrack: (track: PlayerTrack, queue?: PlayerTrack[]) => void;
+    playTrack: (track: PlayerTrack, queueTracks?: PlayerTrack[]) => void;
 
     previousTrack: () => void;
     nextTrack: () => void;
 
-    patchTrack: (trackId: number, patch: Partial<PlayerTrack>) => void;
-    deleteTrack: (trackId: number) => void;
+    patchTrack: (trackId: TrackId, patch: Partial<PlayerTrack>) => void;
+    deleteTrack: (trackId: TrackId) => void;
 
-    setQueue: (queue: PlayerTrack[]) => void;
+    setQueue: (tracksList: PlayerTrack[]) => void;
     addToQueue: (track: PlayerTrack) => void;
     playFromQueue: (qid: number) => void;
     removeFromQueue: (qid: number) => void;
@@ -54,7 +56,7 @@ interface PlayerState {
 
 type PersistedPlayer = Pick<
     PlayerState,
-    "currentTrack" | "queue" | "currentIndex" | "isShuffle" | "repeatMode"
+    "currentTrack" | "queue" | "currentIndex" | "isShuffle" | "repeatMode" | "_nextQid"
 >;
 
 export const usePlayerStore = create<PlayerState>()(
@@ -83,17 +85,17 @@ export const usePlayerStore = create<PlayerState>()(
                 },
                 setCurrentTime: (time) => set({ currentTime: time }),
 
-                playTrack: (track, newQueue) => {
+                playTrack: (track, queueTracks) => {
                     const state = get();
                     if (track.trackId === state.currentTrack?.trackId) return;
 
-                    if (newQueue) {
+                    if (queueTracks) {
                         let nextQid = state._nextQid;
-                        const items: QueueItem[] = newQueue.map((t) => ({
+                        const items: QueueItem[] = queueTracks.map((t) => ({
                             qid: nextQid++,
-                            track: t,
+                            trackId: t.trackId,
                         }));
-                        const index = items.findIndex((i) => i.track.trackId === track.trackId);
+                        const index = items.findIndex((i) => i.trackId === track.trackId);
 
                         set({
                             currentTrack: track,
@@ -106,7 +108,7 @@ export const usePlayerStore = create<PlayerState>()(
                         return;
                     }
 
-                    const item: QueueItem = { qid: state._nextQid, track };
+                    const item: QueueItem = { qid: state._nextQid, trackId: track.trackId };
                     set({
                         currentTrack: track,
                         queue: [item],
@@ -123,12 +125,20 @@ export const usePlayerStore = create<PlayerState>()(
 
                     if (currentIndex > 0) {
                         const prevIndex = currentIndex - 1;
-                        set({
-                            currentIndex: prevIndex,
-                            currentTrack: queue[prevIndex].track,
-                            currentTime: 0,
-                            isPlaying: true,
-                        });
+                        const prevItem = queue[prevIndex];
+                        const track = queryClient.getQueryData<PlayerTrack>([
+                            "track",
+                            prevItem.trackId,
+                        ]);
+
+                        if (track) {
+                            set({
+                                currentIndex: prevIndex,
+                                currentTrack: track,
+                                currentTime: 0,
+                                isPlaying: true,
+                            });
+                        }
                     }
                 },
 
@@ -152,46 +162,62 @@ export const usePlayerStore = create<PlayerState>()(
                     }
 
                     if (nextIndex < queue.length) {
-                        set({
-                            currentIndex: nextIndex,
-                            currentTrack: queue[nextIndex].track,
-                            currentTime: 0,
-                            isPlaying: true,
-                        });
+                        const nextItem = queue[nextIndex];
+                        const track = queryClient.getQueryData<PlayerTrack>([
+                            "track",
+                            nextItem.trackId,
+                        ]);
+
+                        if (track) {
+                            set({
+                                currentIndex: nextIndex,
+                                currentTrack: track,
+                                currentTime: 0,
+                                isPlaying: true,
+                            });
+                        }
                     } else if (repeatMode === "queue") {
-                        set({
-                            currentIndex: 0,
-                            currentTrack: queue[0].track,
-                            currentTime: 0,
-                            isPlaying: true,
-                        });
+                        const firstItem = queue[0];
+                        const track = queryClient.getQueryData<PlayerTrack>([
+                            "track",
+                            firstItem.trackId,
+                        ]);
+
+                        if (track) {
+                            set({
+                                currentIndex: 0,
+                                currentTrack: track,
+                                currentTime: 0,
+                                isPlaying: true,
+                            });
+                        }
                     } else {
                         set({ isPlaying: false });
                     }
                 },
 
                 patchTrack: (trackId, patch) =>
-                    set((state) => ({
-                        currentTrack:
-                            state.currentTrack?.trackId == trackId
-                                ? { ...state.currentTrack, ...patch }
-                                : state.currentTrack,
-                        queue: state.queue.map((item) =>
-                            item.track.trackId == trackId
-                                ? { ...item, track: { ...item.track, ...patch } }
-                                : item,
-                        ),
-                    })),
+                    set((state) => {
+                        queryClient.invalidateQueries({ queryKey: ["track", trackId] });
+
+                        return {
+                            currentTrack:
+                                state.currentTrack?.trackId === trackId
+                                    ? { ...state.currentTrack, ...patch }
+                                    : state.currentTrack,
+                        };
+                    }),
 
                 deleteTrack: (trackId) =>
                     set((state) => {
-                        const isRemoved = (t: QueueItem) =>
-                            String(t.track.trackId) === String(trackId);
+                        const isRemoved = (t: QueueItem) => t.trackId === trackId;
                         const isCurrent =
                             state.currentTrack != null &&
                             String(state.currentTrack.trackId) === String(trackId);
 
                         if (!isCurrent && !state.queue.some(isRemoved)) return state;
+
+                        queryClient.removeQueries({ queryKey: ["track", trackId] });
 
                         const queue = state.queue.filter((t) => !isRemoved(t));
                         const removedBefore = state.queue
@@ -214,27 +240,38 @@ export const usePlayerStore = create<PlayerState>()(
                         }
 
                         const nextIndex = Math.min(shiftedIndex, queue.length - 1);
+                        const track = queryClient.getQueryData<PlayerTrack>([
+                            "track",
+                            queue[nextIndex].trackId,
+                        ]);
                         return {
                             queue,
                             currentIndex: nextIndex,
-                            currentTrack: queue[nextIndex].track,
+                            currentTrack: track,
                             currentTime: 0,
                         };
                     }),
 
-                setQueue: (queue) =>
+                setQueue: (tracksList) =>
                     set((state) => {
                         let nextQid = state._nextQid;
-                        const items: QueueItem[] = queue.map((t) => ({ qid: nextQid++, track: t }));
-                        return { queue: items, currentIndex: 0, _nextQid: nextQid };
+                        const items: QueueItem[] = tracksList.map((t) => ({
+                            qid: nextQid++,
+                            trackId: t.trackId,
+                        }));
+                        return {
+                            queue: items,
+                            currentIndex: 0,
+                            _nextQid: nextQid,
+                        };
                     }),
 
                 addToQueue: (track) =>
                     set((state) => {
                         const last = state.queue[state.queue.length - 1];
-                        if (last && last.track.trackId === track.trackId) return state;
+                        if (last && last.trackId === track.trackId) return state;
 
-                        const item: QueueItem = { qid: state._nextQid, track };
+                        const item: QueueItem = { qid: state._nextQid, trackId: track.trackId };
                         const nextQid = state._nextQid + 1;
 
                         if (state.queue.length >= 100) {
@@ -246,7 +283,10 @@ export const usePlayerStore = create<PlayerState>()(
                             };
                         }
 
-                        return { queue: [...state.queue, item], _nextQid: nextQid };
+                        return {
+                            queue: [...state.queue, item],
+                            _nextQid: nextQid,
+                        };
                     }),
 
                 playFromQueue: (qid) =>
@@ -254,9 +294,14 @@ export const usePlayerStore = create<PlayerState>()(
                         const index = state.queue.findIndex((i) => i.qid === qid);
                         if (index === -1) return state;
 
+                        const trackId = state.queue[index].trackId;
+
+                        const track = queryClient.getQueryData<PlayerTrack>(["track", trackId]);
+                        if (!track) return state;
+
                         return {
                             currentIndex: index,
-                            currentTrack: state.queue[index].track,
+                            currentTrack: track,
                             currentTime: 0,
                             isPlaying: true,
                         };
@@ -286,7 +331,6 @@ export const usePlayerStore = create<PlayerState>()(
                             return {
                                 queue,
                                 currentIndex: nextIndex,
-                                currentTrack: queue[nextIndex].track,
                                 currentTime: 0,
                             };
                         }

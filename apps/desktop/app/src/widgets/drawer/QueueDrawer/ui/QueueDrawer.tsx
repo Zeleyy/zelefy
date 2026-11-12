@@ -1,8 +1,9 @@
 import styles from "./QueueDrawer.module.scss";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
-import { Button, Cover, Drawer, Flex, formatTime, Icon } from "@zelefy/ui";
+import { Button, Cover, Drawer, Flex, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
 import { usePlayerStore } from "@/shared/lib/stores";
+import { useQueue } from "@/features/queue";
 
 export interface QueueDrawerProps {
     open: boolean;
@@ -11,7 +12,7 @@ export interface QueueDrawerProps {
 
 export const QueueDrawer = ({ open, onOpenChange }: QueueDrawerProps) => {
     const { t } = useTranslation();
-    const queue = usePlayerStore((s) => s.queue);
+    const { queue } = useQueue();
     const currentQid = usePlayerStore((s) => s.queue[s.currentIndex]?.qid ?? null);
     const removeFromQueue = usePlayerStore((s) => s.removeFromQueue);
     const togglePlay = usePlayerStore((s) => s.togglePlay);
@@ -69,25 +70,35 @@ export const QueueDrawer = ({ open, onOpenChange }: QueueDrawerProps) => {
                         >
                             <span className={styles.queue__index}>{i + 1}</span>
 
-                            <div className={styles.queue__track}>
-                                <Cover
-                                    alt={item.track.title}
-                                    src={item.track.coverSrc ?? undefined}
-                                    size="xs"
-                                />
-                                <div className={styles.queue__info}>
-                                    <span className={styles.queue__title}>{item.track.title}</span>
-                                    <span className={styles.queue__artist}>
-                                        {item.track.metadataArtist}
-                                    </span>
-                                </div>
-                            </div>
+                            {item.track ? (
+                                <>
+                                    <div className={styles.queue__track}>
+                                        <Cover
+                                            alt={item.track.title}
+                                            src={item.track.coverSrc ?? undefined}
+                                            size="xs"
+                                        />
+                                        <div className={styles.queue__info}>
+                                            <span className={styles.queue__title}>
+                                                {item.track.title}
+                                            </span>
+                                            <span className={styles.queue__artist}>
+                                                {item.track.metadataArtist}
+                                            </span>
+                                        </div>
+                                    </div>
 
-                            <span className={styles.queue__duration}>
-                                {formatTime(
-                                    item.track.durationMs ? item.track.durationMs / 1000 : 0,
-                                )}
-                            </span>
+                                    <span className={styles.queue__duration}>
+                                        {formatTime(
+                                            item.track.durationMs
+                                                ? item.track.durationMs / 1000
+                                                : 0,
+                                        )}
+                                    </span>
+                                </>
+                            ) : (
+                                <SpinnerLoader />
+                            )}
 
                             <div className={styles.queue__actions}>
                                 <Button
