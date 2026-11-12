@@ -217,7 +217,7 @@ export const OfflinePage = () => {
                         })}
                     </div>
                 ) : (
-                    <EmptyState title={"Ничего не нашлось"} />
+                    <EmptyState title={t("offline.list.empty")} />
                 )}
             </Flex>
 

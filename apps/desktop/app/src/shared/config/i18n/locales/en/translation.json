@@ -82,7 +82,8 @@
                 "type": "type",
                 "weight": "weight",
                 "time": "time"
-            }
+            },
+            "empty": "Nothing matches your search"
         },
         "edit": {
             "title": "Edit track",
