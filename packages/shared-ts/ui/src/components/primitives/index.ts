@@ -9,3 +9,4 @@ export { Modal, type ModalProps } from "./Modal";
 export { Select, type SelectProps } from "./Select";
 export { Drawer, type DrawerProps } from "./Drawer";
 export { EmptyState, type EmptyStateProps } from "./EmptyState";
+export * from "./drag";

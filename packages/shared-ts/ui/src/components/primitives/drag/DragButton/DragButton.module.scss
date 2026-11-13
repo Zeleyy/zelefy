@@ -1,0 +1,11 @@
+.drag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    outline: none;
+
+    &:active {
+        cursor: grabbing;
+    }
+}

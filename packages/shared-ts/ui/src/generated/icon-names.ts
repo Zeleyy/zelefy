@@ -2,6 +2,7 @@ export type IconName =
     | "action-close"
     | "action-delete"
     | "action-edit"
+    | "action-grip-vertical"
     | "action-save"
     | "common-cloud"
     | "common-collapse"

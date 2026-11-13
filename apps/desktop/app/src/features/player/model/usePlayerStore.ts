@@ -41,6 +41,7 @@ interface PlayerState {
 
     setQueue: (tracksList: PlayerTrack[]) => void;
     addToQueue: (track: PlayerTrack) => void;
+    replaceTrack: (movingQid?: number, afterQid?: number, beforeQid?: number) => void;
     playFromQueue: (qid: number) => void;
     removeFromQueue: (qid: number) => void;
     clearQueue: () => void;
@@ -267,6 +268,51 @@ export const usePlayerStore = create<PlayerState>()(
                         };
                     });
                 },
+
+                replaceTrack: (movingQid, afterQid, beforeQid) =>
+                    set((state) => {
+                        const queue = [...state.queue];
+
+                        const movingIndex = queue.findIndex((item) => item.qid === movingQid);
+                        if (movingIndex === -1) return state;
+
+                        const anchorQid = afterQid ?? beforeQid;
+                        if (!anchorQid || anchorQid === movingQid) return state;
+
+                        const anchorIndex = queue.findIndex((item) => item.qid === anchorQid);
+                        if (anchorIndex === -1) return state;
+
+                        if (afterQid !== undefined && anchorIndex === movingIndex - 1) return state;
+                        if (beforeQid !== undefined && anchorIndex === movingIndex + 1)
+                            return state;
+
+                        const [movingItem] = queue.splice(movingIndex, 1);
+
+                        const adjustedAnchorIndex =
+                            anchorIndex > movingIndex ? anchorIndex - 1 : anchorIndex;
+                        const insertIndex =
+                            afterQid !== undefined ? adjustedAnchorIndex + 1 : adjustedAnchorIndex;
+
+                        queue.splice(insertIndex, 0, movingItem);
+
+                        let newCurrentIndex = state.currentIndex;
+                        if (state.currentIndex !== -1) {
+                            if (movingIndex === state.currentIndex) {
+                                newCurrentIndex = insertIndex;
+                            } else {
+                                const currAfterRemove =
+                                    movingIndex < state.currentIndex
+                                        ? state.currentIndex - 1
+                                        : state.currentIndex;
+                                newCurrentIndex =
+                                    insertIndex <= currAfterRemove
+                                        ? currAfterRemove + 1
+                                        : currAfterRemove;
+                            }
+                        }
+
+                        return { queue, currentIndex: newCurrentIndex };
+                    }),
 
                 playFromQueue: (qid) =>
                     set((state) => {

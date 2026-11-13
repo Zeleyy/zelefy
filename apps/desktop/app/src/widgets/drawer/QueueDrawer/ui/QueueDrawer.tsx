@@ -1,9 +1,9 @@
 import styles from "./QueueDrawer.module.scss";
 import { useTranslation } from "react-i18next";
-import clsx from "clsx";
-import { Button, Cover, Drawer, Flex, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
+import { Button, DraggableItem, DraggableList, Drawer, Flex, Icon } from "@zelefy/ui";
 import { usePlayerStore } from "@/features/player";
 import { useQueue } from "@/features/queue";
+import { QueueRow } from "./QueueRow";
 
 export interface QueueDrawerProps {
     open: boolean;
@@ -18,12 +18,25 @@ export const QueueDrawer = ({ open, onOpenChange }: QueueDrawerProps) => {
     const togglePlay = usePlayerStore((s) => s.togglePlay);
     const playFromQueue = usePlayerStore((s) => s.playFromQueue);
     const clearQueue = usePlayerStore((s) => s.clearQueue);
+    const replaceTrack = usePlayerStore((s) => s.replaceTrack);
+
+    const handleReorder = (activeId: number, overId: number) => {
+        const oldIndex = queue.findIndex((i) => i.qid === activeId);
+        const newIndex = queue.findIndex((i) => i.qid === overId);
+        if (oldIndex === -1 || newIndex === -1) return;
+
+        if (newIndex > oldIndex) {
+            replaceTrack(activeId, overId, undefined);
+        } else {
+            replaceTrack(activeId, undefined, overId);
+        }
+    };
 
     return (
         <Drawer
             title={
                 <Flex gap="xs" justify="space-between" align="center" className={styles.header}>
-                    <Flex as={"span"} gap="xs" align="center">
+                    <Flex gap="xs" align="center">
                         <span className={styles.header__title}>{t("queue.title")}</span>
                         <span className={styles.header__count}>{queue.length}</span>
                     </Flex>
@@ -42,93 +55,43 @@ export const QueueDrawer = ({ open, onOpenChange }: QueueDrawerProps) => {
             open={open}
             onOpenChange={onOpenChange}
         >
-            <Flex
-                direction="column"
-                gap="xs"
-                role="listbox"
-                onPointerDown={(e) => e.stopPropagation()}
-            >
-                {queue.map((item, i) => {
-                    const isActive = currentQid === item.qid;
+            <DraggableList<number> items={queue.map((item) => item.qid)} onReorder={handleReorder}>
+                <Flex
+                    direction="column"
+                    gap="xs"
+                    role="listbox"
+                    onPointerDown={(e) => e.stopPropagation()}
+                >
+                    {queue.map((item, i) => {
+                        const isActive = currentQid === item.qid;
 
-                    return (
-                        <div
-                            key={item.qid}
-                            className={clsx(styles.queue__row, {
-                                [styles["queue__row--active"]]: isActive,
-                            })}
-                            role="option"
-                            aria-selected={isActive}
-                            onClick={() => {
-                                if (isActive) {
-                                    togglePlay();
-                                    return;
-                                }
-
-                                playFromQueue(item.qid);
-                            }}
-                        >
-                            <span className={styles.queue__index}>{i + 1}</span>
-
-                            {item.track ? (
-                                <>
-                                    <div className={styles.queue__track}>
-                                        <Cover
-                                            alt={item.track.title}
-                                            src={item.track.coverSrc ?? undefined}
-                                            size="xs"
-                                        />
-                                        <div className={styles.queue__info}>
-                                            <span className={styles.queue__title}>
-                                                {item.track.title}
-                                            </span>
-                                            <span className={styles.queue__artist}>
-                                                {item.track.metadataArtist}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <span className={styles.queue__duration}>
-                                        {formatTime(
-                                            item.track.durationMs
-                                                ? item.track.durationMs / 1000
-                                                : 0,
-                                        )}
-                                    </span>
-                                </>
-                            ) : (
-                                <SpinnerLoader />
-                            )}
-
-                            <div className={styles.queue__actions}>
-                                <Button
-                                    variant="ghost"
-                                    colorScheme={{ bgColorHover: "transparent" }}
-                                    square
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <Icon name="player-heart" size={14} />
-                                </Button>
-
-                                {!isActive && (
-                                    <Button
-                                        variant="ghost"
-                                        square
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            removeFromQueue(item.qid);
+                        return (
+                            <DraggableItem key={item.qid} id={item.qid}>
+                                {({ setNodeRef, style, isDragging, listeners, attributes }) => (
+                                    <QueueRow
+                                        index={i}
+                                        track={item.track}
+                                        isActive={isActive}
+                                        onRowClick={() => {
+                                            if (isActive) {
+                                                togglePlay();
+                                                return;
+                                            }
+                                            playFromQueue(item.qid);
                                         }}
-                                    >
-                                        <Icon name="action-close" size={14} />
-                                    </Button>
+                                        onRemoveFromQueue={() => removeFromQueue(item.qid)}
+                                        setNodeRef={setNodeRef}
+                                        style={style}
+                                        listeners={listeners}
+                                        attributes={attributes}
+                                        isDragging={isDragging}
+                                    />
                                 )}
-                            </div>
-                        </div>
-                    );
-                })}
-            </Flex>
+                            </DraggableItem>
+                        );
+                    })}
+                </Flex>
+            </DraggableList>
         </Drawer>
     );
 };
