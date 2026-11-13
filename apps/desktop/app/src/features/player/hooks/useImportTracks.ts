@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Channel, invoke } from "@tauri-apps/api/core";
-import type { LocalTrack } from "../types";
+import { trackKeys, type LocalTrack } from "@/entities/track";
 
 export type ImportOutcome =
     | { status: "imported"; path: string; track: LocalTrack }
@@ -28,7 +28,7 @@ export const useImportTracks = () => {
         },
         onSettled: () => {
             setProgress(null);
-            queryClient.invalidateQueries({ queryKey: ["track"] });
+            queryClient.invalidateQueries({ queryKey: trackKeys.all });
         },
     });
 

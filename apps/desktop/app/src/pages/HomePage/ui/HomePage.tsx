@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { TrackHero } from "@zelefy/ui";
 import { useWaveform } from "@/features/waveform";
-import { usePlayerStore } from "@/shared/lib/stores";
+import { useCurrentTrack, usePlayerStore } from "@/features/player";
 
 export const HomePage = () => {
     const isPlaying = usePlayerStore((state) => state.isPlaying);
     const togglePlay = usePlayerStore((state) => state.togglePlay);
 
-    const track = usePlayerStore((state) => state.currentTrack);
+    const track = useCurrentTrack();
 
     const { data } = useWaveform(track?.waveformSrc);
 

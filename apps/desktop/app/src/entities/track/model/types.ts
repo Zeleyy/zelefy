@@ -1,6 +1,6 @@
 import type { NullablePatch, PlayerTrack } from "@zelefy/types";
-import type { Library } from "./libraries";
-import { trackFilePath, trackFileSrc } from "../lib/utils";
+import type { Library } from "@/shared/types";
+import { trackFilePath, trackFileSrc } from "../lib";
 
 export const TrackFileType = {
     audio: 0,
@@ -71,4 +71,9 @@ export interface UpdateTrack {
 
 export interface UpdateTrackRequest extends UpdateTrack {
     newCoverPath?: string | null;
+}
+
+export interface LocalTrack extends Track {
+    fileId: number | null;
+    fileSizeBytes: number;
 }

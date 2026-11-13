@@ -1,6 +1,7 @@
 import { RouterProvider } from "react-router";
 import { router } from "./providers";
-import { useJobsBridge, usePlayerBridge } from "@/shared/lib/hooks";
+import { useJobsBridge } from "@/shared/lib/hooks";
+import { usePlayerBridge } from "@/features/player";
 
 const App = () => {
     usePlayerBridge();

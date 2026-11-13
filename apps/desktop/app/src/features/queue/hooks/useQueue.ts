@@ -1,8 +1,7 @@
-import { usePlayerStore } from "@/shared/lib/stores";
-import { toPlayerTrack, type LocalTrackResponse } from "@/shared/types";
 import { useQueries } from "@tanstack/react-query";
-import { invoke } from "@tauri-apps/api/core";
 import type { PlayerTrack } from "@zelefy/types";
+import { trackQueryOptions } from "@/entities/track";
+import { usePlayerStore } from "@/features/player";
 
 export const useQueue = () => {
     const queue = usePlayerStore((s) => s.queue);
@@ -10,20 +9,7 @@ export const useQueue = () => {
     const uniqueTrackIds = Array.from(new Set(queue.map((item) => item.trackId)));
 
     const trackQueries = useQueries({
-        queries: uniqueTrackIds.map((trackId) => ({
-            queryKey: ["track", trackId],
-            queryFn: async () => {
-                if (typeof trackId === "number") {
-                    return toPlayerTrack(
-                        await invoke<LocalTrackResponse>("get_local_track", { trackId }),
-                    );
-                } else {
-                    // TODO: Получение с сервера
-                }
-            },
-            staleTime: 1000 * 60 * 10,
-            gcTime: 1000 * 60 * 30,
-        })),
+        queries: uniqueTrackIds.map((trackId) => trackQueryOptions(trackId)),
     });
 
     const trackMap = new Map<string | number, PlayerTrack>();

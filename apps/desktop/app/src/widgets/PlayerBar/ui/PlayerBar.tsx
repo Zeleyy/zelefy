@@ -11,7 +11,8 @@ import {
     useSeekProgress,
     VolumeControl,
 } from "@zelefy/ui";
-import { usePlayerStore, useSettingsStore } from "@/shared/lib/stores";
+import { useSettingsStore } from "@/shared/lib/stores";
+import { useCurrentTrack, usePlayerStore } from "@/features/player";
 import { QueueDrawer } from "@/widgets/drawer";
 
 export const PlayerBar = () => {
@@ -30,7 +31,7 @@ export const PlayerBar = () => {
     const repeatMode = usePlayerStore((state) => state.repeatMode);
     const toggleRepeat = usePlayerStore((state) => state.toggleRepeat);
 
-    const track = usePlayerStore((state) => state.currentTrack);
+    const track = useCurrentTrack();
 
     const [lastTrack, setLastTrack] = useState(track);
     if (track && track !== lastTrack) setLastTrack(track);

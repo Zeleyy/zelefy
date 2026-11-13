@@ -2,10 +2,10 @@ import styles from "./StorageSettings.module.scss";
 import { Trans, useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { Button, Flex, formatBytes, Input } from "@zelefy/ui";
+import { selectDirectory } from "@/shared/lib/utils";
+import { useCacheStore } from "@/shared/lib/stores";
 import { useCreateLibrary, useLibraries, useUpdateLibraryPath } from "@/features/storage";
 import { SettingsSection } from "@/widgets/sections";
-import { useCacheStore } from "@/shared/lib/stores";
-import { selectDirectory } from "@/shared/lib/utils";
 
 // @TODO: переработать после удаления кеша
 export const StorageSettings = () => {

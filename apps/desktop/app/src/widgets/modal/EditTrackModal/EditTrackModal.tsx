@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, EditableCover, Flex, InputLabel, Modal } from "@zelefy/ui";
-import type { LocalTrackResponse } from "@/shared/types";
-import { useUpdateLocalTrack } from "@/features/track";
-import { selectImage, toSrc, trackFileSrc } from "@/shared/lib/utils";
+import { selectImage } from "@/shared/lib/utils";
+import { toSrc, trackFileSrc, type LocalTrackResponse } from "@/entities/track";
+import { useUpdateLocalTrack } from "@/features/player";
 
 interface EditTrackModalProps {
     open: boolean;

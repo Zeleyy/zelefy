@@ -2,7 +2,7 @@ import styles from "./QueueDrawer.module.scss";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { Button, Cover, Drawer, Flex, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
-import { usePlayerStore } from "@/shared/lib/stores";
+import { usePlayerStore } from "@/features/player";
 import { useQueue } from "@/features/queue";
 
 export interface QueueDrawerProps {

@@ -1,6 +1,6 @@
-import { useUpdate } from "@/features/update";
-import { Button, Flex, SpinnerLoader } from "@zelefy/ui";
 import { useTranslation } from "react-i18next";
+import { Button, Flex, SpinnerLoader } from "@zelefy/ui";
+import { useUpdate } from "@/features/update";
 
 export const GeneralSettings = () => {
     const { t } = useTranslation();

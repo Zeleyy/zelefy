@@ -3,10 +3,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { queryClient } from "@/shared/api";
 import {
     toPlayerTrack,
+    trackKeys,
     type LocalTrackResponse,
     type UpdateTrackRequest,
-} from "@/shared/types/tracks";
-import { usePlayerStore } from "@/shared/lib/stores";
+} from "@/entities/track";
+import { usePlayerStore } from "../model";
 
 export const useUpdateLocalTrack = () => {
     return useMutation({
@@ -14,7 +15,7 @@ export const useUpdateLocalTrack = () => {
             invoke<LocalTrackResponse>("update_local_track", { trackId, update }),
         onSuccess: (track) => {
             usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
-            queryClient.invalidateQueries({ queryKey: ["track", "local"] });
+            queryClient.invalidateQueries({ queryKey: trackKeys.local() });
         },
     });
 };

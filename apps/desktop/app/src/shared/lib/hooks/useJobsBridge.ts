@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { queryClient } from "@/shared/api";
+import type { JobEvent } from "@/shared/types";
+import { trackKeys, type LocalTrackResponse } from "@/entities/track";
 import { useJobsStore } from "../stores";
-import type { JobEvent, LocalTrackResponse } from "@/shared/types";
 
 export const useJobsBridge = () => {
     useEffect(() => {
@@ -27,10 +28,8 @@ export const useJobsBridge = () => {
                         trackId: payload.payload.trackId,
                     });
 
-                    // usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
-
-                    queryClient.invalidateQueries({ queryKey: ["track", track.trackId] });
-                    queryClient.invalidateQueries({ queryKey: ["track", "local"] });
+                    queryClient.invalidateQueries({ queryKey: trackKeys.detail(track.trackId) });
+                    queryClient.invalidateQueries({ queryKey: trackKeys.local() });
                     queryClient.invalidateQueries({ queryKey: ["jobs"] });
                 })().catch(console.error);
             }

@@ -4,14 +4,17 @@ import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { Button, Cover, EmptyState, Flex, formatBytes, formatTime, Icon, Input } from "@zelefy/ui";
-import { StorageDashboard } from "./StorageDashboard";
 import { selectAudio } from "@/shared/lib/utils/browse";
-import { useDeleteLocalTrack, useImportTracks, useLocalTracks } from "@/features/track";
-import { type LocalTrackResponse } from "@/shared/types";
-import { usePlayerStore } from "@/shared/lib/stores";
+import { toPlayerTrack, trackFileSrc, type LocalTrackResponse } from "@/entities/track";
+import {
+    useCurrentTrack,
+    useDeleteLocalTrack,
+    useImportTracks,
+    useLocalTracks,
+    usePlayerStore,
+} from "@/features/player";
 import { EditTrackModal } from "@/widgets/modal";
-import { trackFileSrc } from "@/shared/lib/utils";
-import { toPlayerTrack } from "@/shared/types/tracks";
+import { StorageDashboard } from "./StorageDashboard";
 
 export const OfflinePage = () => {
     const { t } = useTranslation();
@@ -42,7 +45,7 @@ export const OfflinePage = () => {
     const { mutate: importTracks, isPending, progress } = useImportTracks();
     const playTrack = usePlayerStore((s) => s.playTrack);
     const addToQueue = usePlayerStore((s) => s.addToQueue);
-    const currentTrack = usePlayerStore((s) => s.currentTrack);
+    const currentTrack = useCurrentTrack();
     const { mutate: deleteTrack } = useDeleteLocalTrack();
 
     const handleBrowseFiles = async (currentPath?: string) => {

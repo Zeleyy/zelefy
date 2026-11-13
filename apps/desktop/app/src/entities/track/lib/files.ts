@@ -1,5 +1,5 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
-import type { TrackFileResponse } from "@/shared/types";
+import type { TrackFileResponse } from "../model";
 
 export const trackFilePath = (file?: TrackFileResponse | null): string | null =>
     file ? `${file.library.path}/${file.path}` : null;
