@@ -33,10 +33,11 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xs) var(--spacing-md);
-    width: max-content;
-    max-width: 100%;
+    width: 100%;
+    max-width: 750px;
     background-color: var(--bg-primary);
     pointer-events: all;
+    user-select: none;
 }
 
 .mainControls {
@@ -73,6 +74,14 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
 }
 
+.title {
+    cursor: pointer;
+
+    &:hover {
+        color: var(--text-secondary);
+    }
+}
+
 .tertiaryControl {
     @container (max-width: 700px) {
         display: none !important;
@@ -92,9 +101,6 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @container (max-width: 700px) {
-    .container {
-        padding: var(--spacing-xs);
-    }
     .meta {
         max-width: 110px;
     }

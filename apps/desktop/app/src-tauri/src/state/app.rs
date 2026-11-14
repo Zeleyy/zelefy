@@ -1,6 +1,6 @@
 use tauri::async_runtime::Mutex;
 
-pub const DEFAULT_GATEWAY_URL: &str = "https://api.zelefy.com";
+pub const DEFAULT_GATEWAY_URL: &str = "https://api.zelefy.zeleyy.com";
 
 pub struct AppState {
     pub gateway_url: Mutex<String>,

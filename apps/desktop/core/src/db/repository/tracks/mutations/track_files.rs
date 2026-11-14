@@ -73,3 +73,10 @@ pub fn update(conn: &Connection, file_id: i64, update: &UpdateTrackFile) -> rusq
 
     Ok(())
 }
+
+pub fn delete(conn: &Connection, file_id: i64) -> rusqlite::Result<bool> {
+    Ok(conn.execute(
+        "DELETE FROM track_files WHERE file_id = ?1",
+        params![file_id],
+    )? > 0)
+}

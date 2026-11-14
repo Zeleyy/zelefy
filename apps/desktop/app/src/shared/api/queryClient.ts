@@ -17,6 +17,18 @@ export const queryClient = new QueryClient({
         queries: {
             staleTime: 1000 * 60 * 5,
             gcTime: 1000 * 60 * 10,
+            networkMode: "always",
+            retry: false,
+            refetchOnWindowFocus: false,
+        },
+
+        mutations: {
+            networkMode: "always",
         },
     },
+});
+
+queryClient.setQueryDefaults(["track"], {
+    staleTime: Infinity,
+    gcTime: Infinity,
 });

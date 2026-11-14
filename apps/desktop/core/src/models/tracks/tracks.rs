@@ -49,6 +49,14 @@ pub struct LocalTrackResponse {
     pub track_files: TrackFilesResponse,
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalTrackIdResponse {
+    pub track_id: i64,
+    #[serde(flatten)]
+    pub track_files: TrackFilesResponse,
+}
+
 #[derive(Debug, Default)]
 pub struct NewTrack {
     pub title: String,
@@ -95,5 +103,6 @@ impl UpdateTrack {
 pub struct UpdateTrackRequest {
     #[serde(flatten)]
     pub update_track: UpdateTrack,
-    pub new_cover_path: Option<String>,
+    #[serde(default, with = "double_option")]
+    pub new_cover_path: Option<Option<String>>,
 }

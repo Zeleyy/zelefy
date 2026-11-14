@@ -15,6 +15,12 @@ use crate::{cache::AppCache, commands::refresh_asset_scope};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _, _| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -84,7 +90,9 @@ pub fn run() {
             cache::commands::reset_cache_limit,
             commands::tracks::import_tracks,
             commands::tracks::get_local_tracks,
+            commands::tracks::get_local_tracks_ids,
             commands::tracks::get_local_track,
+            commands::tracks::get_local_tracks_by_ids,
             commands::tracks::update_local_track,
             commands::tracks::delete_local_track,
             commands::audio::player_load_local,

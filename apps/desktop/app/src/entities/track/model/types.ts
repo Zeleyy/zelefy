@@ -60,6 +60,10 @@ export const toPlayerTrack = (track: LocalTrackResponse): PlayerTrack => ({
     genre: track.genre,
 });
 
+export interface LocalTrackIdResponse extends TrackFilesResponse {
+    trackId: number;
+}
+
 export interface UpdateTrack {
     title?: string;
     metadataArtist?: NullablePatch<string>;

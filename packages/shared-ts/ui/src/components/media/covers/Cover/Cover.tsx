@@ -1,11 +1,11 @@
 import styles from "./Cover.module.scss";
 import type { ReactNode } from "react";
 import clsx from "clsx";
-import { GradientImage } from "../../../primitives";
+import { GradientImage, type ImageProps } from "../../../primitives";
 
 export type CoverSize = "xs" | "sm" | "md" | "lg" | "xl";
 
-export interface CoverProps {
+export interface CoverProps extends ImageProps {
     src?: string;
     size?: CoverSize;
     alt?: string;
@@ -19,6 +19,7 @@ export const Cover = ({
     alt = "Track cover",
     className,
     children,
+    ...rest
 }: CoverProps) => (
     <GradientImage
         className={clsx(styles.cover, styles[`cover--${size}`], className)}
@@ -26,6 +27,7 @@ export const Cover = ({
         seed={alt}
         aspectRatio="1/1"
         alt={alt}
+        {...rest}
     >
         {children}
     </GradientImage>

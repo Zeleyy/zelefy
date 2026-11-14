@@ -20,3 +20,7 @@ pub fn push_opt_nullable<T>(
         }
     }
 }
+
+pub fn placeholders(n: usize) -> String {
+    std::iter::repeat("?").take(n).collect::<Vec<_>>().join(",")
+}

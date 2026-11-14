@@ -1,62 +1,50 @@
 import styles from "./OfflinePage.module.scss";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import clsx from "clsx";
-import { Button, Cover, EmptyState, Flex, formatBytes, formatTime, Icon, Input } from "@zelefy/ui";
+import { Button, EmptyState, Flex, Input } from "@zelefy/ui";
 import { selectAudio } from "@/shared/lib/utils/browse";
-import { toPlayerTrack, trackFileSrc, type LocalTrackResponse } from "@/entities/track";
+import type { TrackId } from "@/entities/track";
 import {
-    useCurrentTrack,
     useDeleteLocalTrack,
+    useEnsureTracks,
     useImportTracks,
     useLocalTracks,
     usePlayerStore,
 } from "@/features/player";
 import { EditTrackModal } from "@/widgets/modal";
 import { StorageDashboard } from "./StorageDashboard";
+import { TrackRow } from "./TrackRow";
 
 export const OfflinePage = () => {
     const { t } = useTranslation();
-    const [editingTrack, setEditingTrack] = useState<LocalTrackResponse | null>(null);
-
-    const [search, setSearch] = useState("");
-    const { data } = useLocalTracks();
-
-    const { filteredTracks, playerTracks, allPlayerTracks } = useMemo(() => {
-        const tracks = data ?? [];
-        const q = search.trim().toLowerCase();
-
-        const filtered = q
-            ? tracks.filter(
-                  (t) =>
-                      t.title.toLowerCase().includes(q) ||
-                      (t.metadataArtist ?? "").toLowerCase().includes(q),
-              )
-            : tracks;
-        return {
-            filteredTracks: filtered,
-            playerTracks: filtered.map(toPlayerTrack),
-            allPlayerTracks: tracks.map(toPlayerTrack),
-        };
-    }, [data, search]);
-
     const navigate = useNavigate();
+    const [editingTrackId, setEditingTrackId] = useState<TrackId | null>(null);
+
+    const { data } = useLocalTracks();
+    const localTracks = data ?? [];
+
+    const trackIds = useMemo(() => (data ?? []).map((t) => t.trackId), [data]);
+    useEnsureTracks(trackIds);
+
     const { mutate: importTracks, isPending, progress } = useImportTracks();
-    const playTrack = usePlayerStore((s) => s.playTrack);
-    const addToQueue = usePlayerStore((s) => s.addToQueue);
-    const currentTrack = useCurrentTrack();
     const { mutate: deleteTrack } = useDeleteLocalTrack();
+    const playTrack = usePlayerStore((s) => s.playTrack);
+
+    const handlePlay = useCallback(
+        (trackId: TrackId) => playTrack(trackId, trackIds),
+        [playTrack, trackIds],
+    );
+    const handleEdit = useCallback((trackId: TrackId) => setEditingTrackId(trackId), []);
+    const handleDelete = useCallback(
+        (trackId: TrackId) => deleteTrack(Number(trackId)),
+        [deleteTrack],
+    );
 
     const handleBrowseFiles = async (currentPath?: string) => {
         const selected = await selectAudio(currentPath);
         if (!selected?.length) return;
-
-        try {
-            importTracks({ paths: selected });
-        } catch (error) {
-            console.error("Не удалось создать хранилища:", error);
-        }
+        importTracks({ paths: selected });
     };
 
     return (
@@ -93,14 +81,14 @@ export const OfflinePage = () => {
                     <div className={styles.search}>
                         <Input
                             placeholder={t("offline.controls.search.placeholder")}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
+                            onChange={() => {
+                                // setSearch(e.target.value);
                             }}
                         />
                     </div>
                 </Flex>
 
-                {filteredTracks.length > 0 ? (
+                {localTracks.length > 0 ? (
                     <div className={styles.trackList}>
                         <div className={styles.header}>
                             <span className={styles.center}>#</span>
@@ -110,113 +98,16 @@ export const OfflinePage = () => {
                             <span className={styles.center}>{t("offline.list.header.time")}</span>
                         </div>
 
-                        {filteredTracks.map((track, i) => {
-                            const coverPath = trackFileSrc(track.cover);
-                            const isLinked = track.cover?.library === null;
-                            const isPlaying = track.trackId === currentTrack?.trackId;
-
-                            return (
-                                <div
-                                    key={track.trackId}
-                                    className={clsx(styles.row, {
-                                        [styles["row--playing"]]: isPlaying,
-                                    })}
-                                    onClick={() => playTrack(playerTracks[i], allPlayerTracks)}
-                                >
-                                    <span className={styles.index}>{i + 1}</span>
-
-                                    <div className={styles.track}>
-                                        <Cover
-                                            alt={track.title}
-                                            src={coverPath ?? undefined}
-                                            size="xs"
-                                        />
-                                        <div className={styles.info}>
-                                            <span className={styles.title}>{track.title}</span>
-                                            <span className={styles.artist}>
-                                                {track.metadataArtist}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className={styles.type}>
-                                        <span
-                                            className={clsx(styles.badge, {
-                                                [styles.badgeLinked]: isLinked,
-                                                [styles.badgeCopied]: !isLinked,
-                                            })}
-                                        >
-                                            {isLinked ? "L" : "F"}
-                                        </span>
-                                    </div>
-
-                                    <span className={clsx(styles.center, styles.size)}>
-                                        {formatBytes(track.audio.sizeBytes)}
-                                    </span>
-                                    <span className={clsx(styles.center, styles.duration)}>
-                                        {formatTime(track.durationMs ? track.durationMs / 1000 : 0)}
-                                    </span>
-
-                                    <Flex align="center" gap="2xs" className={styles.actions}>
-                                        <Button
-                                            variant="outline"
-                                            colorScheme={{
-                                                color: "var(--text-primary)",
-                                                colorHover: "var(--bg-primary)",
-                                            }}
-                                            square
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                addToQueue(playerTracks[i]);
-                                            }}
-                                        >
-                                            <Icon name="player-list-end" size={13} />
-                                        </Button>
-
-                                        <Button
-                                            variant="outline"
-                                            colorScheme={{
-                                                color: "var(--text-primary)",
-                                                colorHover: "var(--bg-primary)",
-                                            }}
-                                            square
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setEditingTrack(track);
-                                            }}
-                                        >
-                                            <Icon name="action-edit" size={13} />
-                                        </Button>
-
-                                        <Button
-                                            variant="outline"
-                                            colorScheme={{
-                                                color: "var(--text-primary)",
-                                                colorHover: "var(--bg-primary)",
-                                            }}
-                                            square
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                            }}
-                                        >
-                                            <Icon name="action-save" size={13} />
-                                        </Button>
-
-                                        <Button
-                                            variant="outline"
-                                            colorScheme={{ color: "var(--danger)" }}
-                                            square
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                deleteTrack(track.trackId);
-                                            }}
-                                        >
-                                            <Icon name="action-delete" size={13} />
-                                        </Button>
-                                    </Flex>
-                                </div>
-                            );
-                        })}
+                        {localTracks.map((localTrack, i) => (
+                            <TrackRow
+                                key={localTrack.trackId}
+                                index={i}
+                                localTrack={localTrack}
+                                onPlay={handlePlay}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                            />
+                        ))}
                     </div>
                 ) : (
                     <EmptyState title={t("offline.list.empty")} />
@@ -224,12 +115,12 @@ export const OfflinePage = () => {
             </Flex>
 
             <EditTrackModal
-                key={editingTrack?.trackId ?? "empty"}
-                open={!!editingTrack}
+                key={editingTrackId ?? "empty"}
+                open={editingTrackId !== null}
                 onOpenChange={(open) => {
-                    if (!open) setEditingTrack(null);
+                    if (!open) setEditingTrackId(null);
                 }}
-                track={editingTrack}
+                trackId={editingTrackId}
             />
         </>
     );

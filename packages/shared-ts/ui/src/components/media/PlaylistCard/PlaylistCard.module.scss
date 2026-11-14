@@ -1,0 +1,30 @@
+.card {
+    padding: var(--spacing-2xs);
+    width: 188px;
+
+    .meta {
+        overflow: hidden;
+
+        .title,
+        .artist {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .title {
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+
+            &:hover {
+                color: var(--text-secondary);
+            }
+        }
+
+        .artist {
+            color: var(--text-secondary);
+            font-size: var(--font-size-xs);
+        }
+    }
+}

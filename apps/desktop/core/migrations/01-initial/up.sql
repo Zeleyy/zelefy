@@ -234,3 +234,42 @@ CREATE TABLE track_likes (
 ) STRICT;
 
 CREATE INDEX idx_track_likes_profile ON track_likes (profile_id);
+
+CREATE TABLE playlists (
+    playlist_id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    created_at INTEGER NOT NULL
+) STRICT;
+
+CREATE TABLE remote_playlists (
+    playlist_id INTEGER PRIMARY KEY REFERENCES playlists (playlist_id) ON DELETE CASCADE,
+    server_id INTEGER NOT NULL REFERENCES servers (server_id) ON DELETE CASCADE,
+    remote_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    profile_id INTEGER REFERENCES profiles (profile_id) ON DELETE SET NULL,
+    -- 
+    permalink TEXT NOT NULL,
+    is_album INTEGER NOT NULL DEFAULT 0 CHECK (is_album IN (0, 1)),
+    is_private INTEGER NOT NULL DEFAULT 0 CHECK (is_private IN (0, 1)),
+    -- 
+    remote_created_at INTEGER NOT NULL,
+    remote_updated_at INTEGER,
+    synced_at INTEGER NOT NULL,
+    -- 
+    UNIQUE (server_id, remote_id)
+) STRICT;
+
+CREATE INDEX idx_remote_playlists_profile ON remote_playlists (profile_id);
+
+CREATE TABLE playlist_tracks (
+    playlist_id INTEGER NOT NULL REFERENCES playlists (playlist_id) ON DELETE CASCADE,
+    track_id INTEGER NOT NULL REFERENCES tracks (track_id) ON DELETE CASCADE,
+    position REAL NOT NULL,
+    added_at INTEGER NOT NULL,
+    PRIMARY KEY (playlist_id, track_id)
+) STRICT;
+
+CREATE INDEX idx_playlist_tracks_order ON playlist_tracks (playlist_id, position);
+
+CREATE INDEX idx_playlist_tracks_track ON playlist_tracks (track_id);

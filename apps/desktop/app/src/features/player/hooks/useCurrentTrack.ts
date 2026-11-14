@@ -1,15 +1,8 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { selectCurrentTrackId, usePlayerStore } from "../model";
-import { trackQueryOptions } from "@/entities/track";
+import { useTrack } from "./useTrack";
 
 export const useCurrentTrack = () => {
     const trackId = usePlayerStore(selectCurrentTrackId);
-
-    const { data } = useQuery({
-        ...trackQueryOptions(trackId ?? ""),
-        enabled: trackId !== undefined,
-        placeholderData: keepPreviousData,
-    });
-
+    const { data } = useTrack(trackId);
     return trackId === undefined ? null : (data ?? null);
 };

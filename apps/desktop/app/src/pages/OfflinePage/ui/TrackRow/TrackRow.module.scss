@@ -1,0 +1,133 @@
+.row {
+    display: grid;
+    grid-template-columns: var(--tracklist-columns);
+    align-items: center;
+    padding: var(--spacing-xs) var(--tracklist-padding-x);
+    column-gap: var(--spacing-sm);
+}
+
+.row {
+    border-radius: var(--radius-sm);
+    position: relative;
+    transition: background-color 0.15s ease;
+    overflow: hidden;
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--bg-surface);
+
+        .actions {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+    }
+
+    &--playing {
+        .title {
+            color: var(--primary);
+        }
+    }
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.index {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.track {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-width: 0;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.title,
+.artist {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.title {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+.artist {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.type {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    border: 1px solid transparent;
+
+    &.badgeCache {
+        background-color: var(--primary-subtle-bg);
+        color: var(--primary);
+        border-color: var(--primary-subtle-border);
+    }
+
+    &.badgeCopied {
+        background-color: var(--accent-subtle-bg);
+        color: var(--accent);
+        border-color: var(--accent-subtle-border);
+    }
+
+    &.badgeLinked {
+        background-color: var(--success-subtle-bg);
+        color: var(--success);
+        border-color: var(--success-subtle-border);
+    }
+}
+
+.size,
+.duration {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.actions {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--bg-primary) 5%, transparent),
+        var(--bg-primary) 40%
+    );
+    inset: 0 0 0 auto;
+    padding: 0 var(--spacing-md) 0 var(--spacing-xl);
+    transform: translateX(10%);
+
+    transition:
+        transform 0.1s,
+        opacity 0.1s;
+}

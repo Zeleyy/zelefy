@@ -1,6 +1,6 @@
 use desktop_core::{
-    db::DbState,
-    models::tracks::{LocalTrackResponse, UpdateTrackRequest},
+    db::{repository, DbState},
+    models::tracks::{LocalTrackIdResponse, LocalTrackResponse, UpdateTrackRequest},
     services::{self, tracks::ImportOutcome},
 };
 use tauri::{ipc::Channel, AppHandle, Manager, State};
@@ -36,12 +36,28 @@ pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse
 }
 
 #[tauri::command]
+pub fn get_local_tracks_ids(db: State<'_, DbState>) -> Result<Vec<LocalTrackIdResponse>, String> {
+    let mut conn = db.lock();
+    repository::tracks::tracks::get_local_ids_with_files(&mut conn).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn get_local_track(
     db: State<'_, DbState>,
     track_id: i64,
 ) -> Result<LocalTrackResponse, String> {
     let conn = db.lock();
     services::tracks::load_track(&conn, track_id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_local_tracks_by_ids(
+    db: State<'_, DbState>,
+    track_ids: Vec<i64>,
+) -> Result<Vec<LocalTrackResponse>, String> {
+    let conn = db.lock();
+    repository::tracks::tracks::get_local_by_ids_with_files(&conn, track_ids)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

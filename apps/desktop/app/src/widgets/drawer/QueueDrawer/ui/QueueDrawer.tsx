@@ -12,7 +12,7 @@ export interface QueueDrawerProps {
 
 export const QueueDrawer = ({ open, onOpenChange }: QueueDrawerProps) => {
     const { t } = useTranslation();
-    const { queue } = useQueue();
+    const { queue, isLoading } = useQueue();
     const currentQid = usePlayerStore((s) => s.queue[s.currentIndex]?.qid ?? null);
     const removeFromQueue = usePlayerStore((s) => s.removeFromQueue);
     const togglePlay = usePlayerStore((s) => s.togglePlay);
@@ -70,7 +70,8 @@ export const QueueDrawer = ({ open, onOpenChange }: QueueDrawerProps) => {
                                 {({ setNodeRef, style, isDragging, listeners, attributes }) => (
                                     <QueueRow
                                         index={i}
-                                        track={item.track}
+                                        trackId={item.trackId}
+                                        isLoading={isLoading}
                                         isActive={isActive}
                                         onRowClick={() => {
                                             if (isActive) {

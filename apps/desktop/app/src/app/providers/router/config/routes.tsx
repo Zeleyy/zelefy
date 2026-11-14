@@ -91,6 +91,21 @@ export const routes: RouteObject[] = [
             },
 
             {
+                path: "track/:trackId",
+                lazy: async () => {
+                    const { TrackPage } = await import("@/pages/TrackPage");
+                    return { Component: TrackPage };
+                },
+            },
+            {
+                path: "playlist/:playlistId",
+                lazy: async () => {
+                    const { PlaylistPage } = await import("@/pages/PlaylistPage");
+                    return { Component: PlaylistPage };
+                },
+            },
+
+            {
                 path: "*",
                 element: <div>Страница не найдена</div>,
             },

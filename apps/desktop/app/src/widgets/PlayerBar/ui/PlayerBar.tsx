@@ -14,8 +14,11 @@ import {
 import { useSettingsStore } from "@/shared/lib/stores";
 import { useCurrentTrack, usePlayerStore } from "@/features/player";
 import { QueueDrawer } from "@/widgets/drawer";
+import { useNavigate } from "react-router";
 
 export const PlayerBar = () => {
+    const navigate = useNavigate();
+
     const isMuted = useSettingsStore((state) => state.isMuted);
     const volume = useSettingsStore((state) => state.volume);
     const setVolume = useSettingsStore((state) => state.setVolume);
@@ -66,7 +69,14 @@ export const PlayerBar = () => {
                                             size="sm"
                                         />
                                         <div className={styles.meta}>
-                                            <span className={styles.title}>
+                                            <span
+                                                className={styles.title}
+                                                onClick={() => {
+                                                    if (displayTrack) {
+                                                        navigate("/track/" + displayTrack.trackId);
+                                                    }
+                                                }}
+                                            >
                                                 {displayTrack?.title ?? "No track selected"}
                                             </span>
                                             <span className={styles.author}>

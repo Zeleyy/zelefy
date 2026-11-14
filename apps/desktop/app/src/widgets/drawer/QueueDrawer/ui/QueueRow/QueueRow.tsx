@@ -2,13 +2,16 @@ import styles from "./QueueRow.module.scss";
 import type { CSSProperties } from "react";
 import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 import clsx from "clsx";
-import type { PlayerTrack } from "@zelefy/types";
 import { Button, Cover, DragButton, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
+import type { TrackId } from "@/entities/track";
+import { useTrack } from "@/features/player";
+import { useTranslation } from "react-i18next";
 
 interface QueueRowProps {
     index: number;
-    track?: PlayerTrack | null;
+    trackId?: TrackId;
     isActive?: boolean;
+    isLoading?: boolean;
     onRowClick?: () => void;
     onRemoveFromQueue?: () => void;
     setNodeRef?: (node: HTMLElement | null) => void;
@@ -20,8 +23,9 @@ interface QueueRowProps {
 
 export const QueueRow = ({
     index,
-    track,
+    trackId,
     isActive = false,
+    isLoading,
     onRowClick,
     onRemoveFromQueue,
     setNodeRef,
@@ -30,6 +34,9 @@ export const QueueRow = ({
     attributes,
     isDragging = false,
 }: QueueRowProps) => {
+    const { t } = useTranslation();
+    const { data: track } = useTrack(trackId);
+
     return (
         <div
             ref={setNodeRef}
@@ -65,8 +72,10 @@ export const QueueRow = ({
                         {formatTime(track.durationMs ? track.durationMs / 1000 : 0)}
                     </span>
                 </>
-            ) : (
+            ) : isLoading ? (
                 <SpinnerLoader isLoading />
+            ) : (
+                <span className={styles.queue__unavailable}>{t("queue.unavailable")}</span>
             )}
 
             <div className={styles.queue__actions}>

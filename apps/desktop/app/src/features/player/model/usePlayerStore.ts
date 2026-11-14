@@ -31,7 +31,7 @@ interface PlayerState {
     seek: (time: number) => void;
     setCurrentTime: (time: number) => void;
 
-    playTrack: (track: PlayerTrack, queueTracks?: PlayerTrack[]) => void;
+    playTrack: (trackId: TrackId, trackIds?: TrackId[]) => void;
 
     previousTrack: () => void;
     nextTrack: () => void;
@@ -39,8 +39,8 @@ interface PlayerState {
     patchTrack: (trackId: TrackId, patch: Partial<PlayerTrack>) => void;
     deleteTrack: (trackId: TrackId) => void;
 
-    setQueue: (tracksList: PlayerTrack[]) => void;
-    addToQueue: (track: PlayerTrack) => void;
+    setQueue: (tracksIds: TrackId[]) => void;
+    addToQueue: (trackId: TrackId) => void;
     replaceTrack: (movingQid?: number, afterQid?: number, beforeQid?: number) => void;
     playFromQueue: (qid: number) => void;
     removeFromQueue: (qid: number) => void;
@@ -64,15 +64,6 @@ const MAX_QUEUE = 100;
 export const selectCurrentTrackId = (
     s: Pick<PlayerState, "queue" | "currentIndex">,
 ): TrackId | undefined => s.queue[s.currentIndex]?.trackId;
-
-const seedTracks = (tracks: PlayerTrack[]) => {
-    for (const track of tracks) {
-        const key = trackKeys.detail(track.trackId);
-        if (queryClient.getQueryData<PlayerTrack>(key) === undefined) {
-            queryClient.setQueryData<PlayerTrack>(key, track);
-        }
-    }
-};
 
 export const usePlayerStore = create<PlayerState>()(
     subscribeWithSelector(
@@ -99,24 +90,19 @@ export const usePlayerStore = create<PlayerState>()(
                 },
                 setCurrentTime: (time) => set({ currentTime: time }),
 
-                playTrack: (track, queueTracks) => {
+                playTrack: (trackId, trackIds) => {
                     const state = get();
-                    if (track.trackId === selectCurrentTrackId(state)) return;
+                    if (trackId === selectCurrentTrackId(state)) return;
 
-                    let list = queueTracks ?? [track];
-                    let index = list.findIndex((t) => t.trackId === track.trackId);
+                    let list = trackIds ?? [trackId];
+                    let index = list.findIndex((t) => t === trackId);
                     if (index === -1) {
-                        list = [track, ...list];
+                        list = [trackId, ...list];
                         index = 0;
                     }
 
-                    seedTracks(list);
-
                     let nextQid = state._nextQid;
-                    const queue: QueueItem[] = list.map((t) => ({
-                        qid: nextQid++,
-                        trackId: t.trackId,
-                    }));
+                    const queue: QueueItem[] = list.map((id) => ({ qid: nextQid++, trackId: id }));
 
                     set({
                         queue,
@@ -212,14 +198,12 @@ export const usePlayerStore = create<PlayerState>()(
                     });
                 },
 
-                setQueue: (tracksList) => {
-                    seedTracks(tracksList);
-
+                setQueue: (trackIds) => {
                     set((state) => {
                         let nextQid = state._nextQid;
-                        const items: QueueItem[] = tracksList.map((t) => ({
+                        const items: QueueItem[] = trackIds.map((id) => ({
                             qid: nextQid++,
-                            trackId: t.trackId,
+                            trackId: id,
                         }));
 
                         if (items.length === 0) {
@@ -230,7 +214,6 @@ export const usePlayerStore = create<PlayerState>()(
                                 currentTime: 0,
                             };
                         }
-
                         return {
                             queue: items,
                             currentIndex: state.currentIndex < 0 ? -1 : 0,
@@ -240,14 +223,12 @@ export const usePlayerStore = create<PlayerState>()(
                     });
                 },
 
-                addToQueue: (track) => {
-                    seedTracks([track]);
-
+                addToQueue: (trackId) => {
                     set((state) => {
                         const last = state.queue[state.queue.length - 1];
-                        if (last && last.trackId === track.trackId) return state;
+                        if (last && last.trackId === trackId) return state;
 
-                        const item: QueueItem = { qid: state._nextQid, trackId: track.trackId };
+                        const item: QueueItem = { qid: state._nextQid, trackId };
                         const nextQid = state._nextQid + 1;
 
                         if (state.queue.length >= MAX_QUEUE) {

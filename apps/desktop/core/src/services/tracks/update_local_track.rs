@@ -29,22 +29,52 @@ pub fn update_local_track(
     track_id: i64,
     update: UpdateTrackRequest,
 ) -> Result<LocalTrackResponse, CoreError> {
-    if update.update_track.is_empty() && update.new_cover_path.is_none() {
+    let has_cover_op = update.new_cover_path.is_some();
+
+    if update.update_track.is_empty() && !has_cover_op {
         let conn = db.lock();
         return load_track(&conn, track_id);
     }
 
-    let staged = match update.new_cover_path {
-        Some(p) => {
+    let mut staged: Option<StagedCover> = None;
+    let mut cover_to_delete: Option<(i64, PathBuf)> = None;
+
+    match &update.new_cover_path {
+        None => {}
+        Some(Some(p)) => {
             let track = {
                 let conn = db.lock();
                 repository::tracks::tracks::get_local_by_id_with_files(&conn, track_id)?
                     .ok_or(CoreError::NotFound(track_id))?
             };
-            Some(stage_cover(&track, Path::new(&p))?)
+            staged = Some(stage_cover(&track, Path::new(p))?);
         }
-        None => None,
-    };
+        Some(None) => {
+            let track = {
+                let conn = db.lock();
+                repository::tracks::tracks::get_local_by_id_with_files(&conn, track_id)?
+                    .ok_or(CoreError::NotFound(track_id))?
+            };
+            if let Some(c) = track.track_files.cover.as_ref() {
+                let library_path =
+                    c.library
+                        .as_ref()
+                        .map(|l| PathBuf::from(&l.path))
+                        .or_else(|| {
+                            track
+                                .track_files
+                                .audio
+                                .as_ref()
+                                .and_then(|a| a.library.as_ref())
+                                .map(|l| PathBuf::from(&l.path))
+                        });
+                let abs = library_path
+                    .map(|p| p.join(&c.track_file.path))
+                    .unwrap_or_else(|| PathBuf::from(&c.track_file.path));
+                cover_to_delete = Some((c.track_file.file_id, abs));
+            }
+        }
+    }
 
     let mut written = Written::default();
     if let Some(s) = &staged {
@@ -92,6 +122,10 @@ pub fn update_local_track(
             }
         }
 
+        if let Some((file_id, _)) = &cover_to_delete {
+            repository::tracks::track_files::delete(&tx, *file_id)?;
+        }
+
         let response = load_track(&tx, track_id)?;
         tx.commit()?;
         response
@@ -105,6 +139,10 @@ pub fn update_local_track(
     }) = staged
     {
         let _ = fs::remove_file(old_abs);
+    }
+
+    if let Some((_, abs)) = cover_to_delete {
+        let _ = fs::remove_file(abs);
     }
 
     Ok(response)

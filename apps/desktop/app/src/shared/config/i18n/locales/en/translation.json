@@ -57,6 +57,10 @@
     "home": {
         "title": "Home"
     },
+    "library": {
+        "title": "Library",
+        "your": "Your playlists"
+    },
     "offline": {
         "title": "Offline library",
         "actions": {
@@ -88,7 +92,10 @@
         "edit": {
             "title": "Edit track",
             "cover": {
-                "action": "Update cover"
+                "action": "Update cover",
+                "clear": "Clear cover",
+                "restore": "Restore cover",
+                "delete": "Delete cover"
             },
             "field": {
                 "title": {

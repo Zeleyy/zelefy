@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, EditableCover, Flex, InputLabel, Modal } from "@zelefy/ui";
+import { Button, EditableCover, Flex, InputLabel, Modal, SpinnerLoader } from "@zelefy/ui";
 import { selectImage } from "@/shared/lib/utils";
-import { toSrc, trackFileSrc, type LocalTrackResponse } from "@/entities/track";
-import { useUpdateLocalTrack } from "@/features/player";
+import { toSrc, trackFileSrc, type TrackId } from "@/entities/track";
+import { useLocalTrackDetails, useUpdateLocalTrack } from "@/features/player";
 
 interface EditTrackModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    track: LocalTrackResponse | null;
+    trackId: TrackId | null;
 }
 
 type EditableField = "title" | "metadataArtist" | "genre" | "bpm" | "keySignature" | "description";
+type CoverAction = "clear" | "delete" | "restore";
 
 const fields: {
     name: EditableField;
@@ -26,19 +27,39 @@ const fields: {
     { name: "description", i18nKey: "description" },
 ];
 
-export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProps) => {
+export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalProps) => {
     const { t } = useTranslation();
-    const { mutate: updateLocalTrack } = useUpdateLocalTrack();
-    const [draftImagePath, setDraftImagePath] = useState<string | null>(null);
+    const numericId = typeof trackId === "number" ? trackId : null;
 
-    const [draft, setDraft] = useState(() => ({
-        title: track?.title ?? "",
-        metadataArtist: track?.metadataArtist ?? "",
-        genre: track?.genre ?? "",
-        bpm: track?.bpm != null ? String(track.bpm) : "",
-        keySignature: track?.keySignature ?? "",
-        description: track?.description ?? "",
-    }));
+    const { data: track, isLoading } = useLocalTrackDetails(numericId);
+
+    const { mutate: updateLocalTrack } = useUpdateLocalTrack();
+    const [draftImagePath, setDraftImagePath] = useState<string | null | undefined>(undefined);
+
+    const [draft, setDraft] = useState({
+        title: "",
+        metadataArtist: "",
+        genre: "",
+        bpm: "",
+        keySignature: "",
+        description: "",
+    });
+
+    const [prevTrack, setPrevTrack] = useState<typeof track>(undefined);
+
+    if (track !== prevTrack) {
+        setPrevTrack(track);
+        if (track) {
+            setDraft({
+                title: track.title ?? "",
+                metadataArtist: track.metadataArtist ?? "",
+                genre: track.genre ?? "",
+                bpm: track.bpm != null ? String(track.bpm) : "",
+                keySignature: track.keySignature ?? "",
+                description: track.description ?? "",
+            });
+        }
+    }
 
     const update = (name: EditableField) => (e: React.ChangeEvent<HTMLInputElement>) =>
         setDraft((d) => ({ ...d, [name]: e.target.value }));
@@ -61,7 +82,7 @@ export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProp
                     bpm: draft.bpm ? Number(draft.bpm) : null,
                     keySignature: draft.keySignature || null,
                     description: draft.description || null,
-                    newCoverPath: draftImagePath || undefined,
+                    newCoverPath: draftImagePath,
                 },
             },
             {
@@ -70,7 +91,20 @@ export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProp
         );
     };
 
-    const displayImage = toSrc(draftImagePath) ?? trackFileSrc(track?.cover);
+    const coverAction: CoverAction = (() => {
+        if (draftImagePath) return "clear";
+        if (Boolean(track?.cover)) {
+            return draftImagePath === null ? "restore" : "delete";
+        }
+        return "clear";
+    })();
+
+    const displayImage =
+        draftImagePath === null
+            ? null
+            : draftImagePath === undefined
+              ? trackFileSrc(track?.cover)
+              : toSrc(draftImagePath);
 
     return (
         <Modal
@@ -86,28 +120,45 @@ export const EditTrackModal = ({ open, onOpenChange, track }: EditTrackModalProp
                 </Flex>
             }
         >
-            <Flex as="form" gap="lg">
-                <EditableCover
-                    src={displayImage ?? undefined}
-                    alt={draft?.title}
-                    size="xl"
-                    action={t("offline.edit.cover.action")}
-                    onEditClick={() => handleBrowseImage()}
-                />
-
-                <Flex direction="column" gap="md" fullWidth>
-                    {fields.map((field) => (
-                        <InputLabel
-                            key={field.name}
-                            label={t(`offline.edit.field.${field.i18nKey}.label`)}
-                            placeholder={t(`offline.edit.field.${field.i18nKey}.placeholder`)}
-                            value={draft[field.name]}
-                            onChange={update(field.name)}
-                            required={field.required}
+            {isLoading || !track ? (
+                <SpinnerLoader isLoading />
+            ) : (
+                <Flex as="form" gap="lg">
+                    <Flex direction="column" gap="md">
+                        <EditableCover
+                            src={displayImage ?? undefined}
+                            alt={draft?.title}
+                            size="xl"
+                            action={t("offline.edit.cover.action")}
+                            onEditClick={() => handleBrowseImage()}
                         />
-                    ))}
+
+                        <Button
+                            variant="secondary"
+                            type="button"
+                            disabled={!track?.cover && !draftImagePath}
+                            onClick={() => {
+                                setDraftImagePath(coverAction === "delete" ? null : undefined);
+                            }}
+                        >
+                            {t("offline.edit.cover." + coverAction)}
+                        </Button>
+                    </Flex>
+
+                    <Flex direction="column" gap="md" fullWidth>
+                        {fields.map((field) => (
+                            <InputLabel
+                                key={field.name}
+                                label={t(`offline.edit.field.${field.i18nKey}.label`)}
+                                placeholder={t(`offline.edit.field.${field.i18nKey}.placeholder`)}
+                                value={draft[field.name]}
+                                onChange={update(field.name)}
+                                required={field.required}
+                            />
+                        ))}
+                    </Flex>
                 </Flex>
-            </Flex>
+            )}
         </Modal>
     );
 };
