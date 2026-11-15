@@ -68,7 +68,7 @@ CREATE TABLE jobs (
     error TEXT,
     -- 
     run_after INTEGER NOT NULL,
-    created_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
     started_at INTEGER,
     finished_at INTEGER
 ) STRICT;
@@ -86,10 +86,10 @@ CREATE INDEX idx_jobs_kind_status ON jobs (job_kind_id, job_status_id);
 
 -- 
 CREATE TABLE libraries (
-    library_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    library_id INTEGER PRIMARY KEY,
     path TEXT NOT NULL UNIQUE,
     is_primary INTEGER NOT NULL DEFAULT 0 CHECK (is_primary IN (0, 1)),
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER))
 ) STRICT;
 
 CREATE UNIQUE INDEX uq_libraries_primary ON libraries (is_primary)
@@ -98,19 +98,19 @@ WHERE
 
 -- 
 CREATE TABLE profiles (
-    profile_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER PRIMARY KEY,
     server_id INTEGER NOT NULL REFERENCES servers (server_id) ON DELETE CASCADE,
-    user_id TEXT NOT NULL,
+    user_id BLOB NOT NULL CHECK (length(user_id) = 16),
     display_name TEXT NOT NULL,
-    permalink TEXT NOT NULL UNIQUE,
+    permalink TEXT NOT NULL,
     -- 
     avatar_path TEXT,
     banner_path TEXT,
     bio TEXT,
     location TEXT,
     is_verified INTEGER NOT NULL DEFAULT 0 CHECK (is_verified IN (0, 1)),
-    created_at INTEGER NOT NULL,
-    last_accessed_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
+    last_accessed_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
     -- 
     followers_count INTEGER NOT NULL DEFAULT 0,
     following_count INTEGER NOT NULL DEFAULT 0,
@@ -126,20 +126,17 @@ CREATE INDEX idx_profiles_user_id ON profiles (user_id);
 
 -- 
 CREATE TABLE profile_social_links (
-    profile_social_link_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    profile_id INTEGER NOT NULL,
+    profile_social_link_id INTEGER PRIMARY KEY,
+    profile_id INTEGER NOT NULL REFERENCES profiles (profile_id) ON DELETE CASCADE,
     platform TEXT NOT NULL,
     url TEXT NOT NULL,
-    FOREIGN KEY (profile_id) REFERENCES profiles (profile_id) ON DELETE CASCADE,
-    CONSTRAINT uq_profile_platform UNIQUE (profile_id, platform)
+    UNIQUE (profile_id, platform)
 ) STRICT;
-
-CREATE INDEX idx_profile_social_links_profile ON profile_social_links (profile_id);
 
 --
 CREATE TABLE tracks (
     track_id INTEGER PRIMARY KEY,
-    local_uuid BLOB NOT NULL UNIQUE,
+    local_uuid BLOB NOT NULL UNIQUE CHECK (length(local_uuid) = 16),
     title TEXT NOT NULL,
     metadata_artist TEXT,
     -- 
@@ -149,7 +146,7 @@ CREATE TABLE tracks (
     key_signature TEXT,
     description TEXT,
     -- 
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER))
 ) STRICT;
 
 CREATE INDEX idx_tracks_created ON tracks (created_at DESC);
@@ -157,8 +154,8 @@ CREATE INDEX idx_tracks_created ON tracks (created_at DESC);
 CREATE TABLE remote_tracks (
     track_id INTEGER PRIMARY KEY REFERENCES tracks (track_id) ON DELETE CASCADE,
     server_id INTEGER NOT NULL REFERENCES servers (server_id) ON DELETE CASCADE,
-    remote_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
+    remote_id BLOB NOT NULL CHECK (length(remote_id) = 16),
+    user_id BLOB NOT NULL CHECK (length(user_id) = 16),
     profile_id INTEGER REFERENCES profiles (profile_id) ON DELETE SET NULL,
     --
     permalink TEXT NOT NULL,
@@ -177,7 +174,7 @@ CREATE TABLE remote_tracks (
     -- 
     remote_created_at INTEGER NOT NULL,
     remote_updated_at INTEGER,
-    synced_at INTEGER NOT NULL,
+    synced_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
     -- 
     UNIQUE (server_id, remote_id)
 ) STRICT;
@@ -195,8 +192,8 @@ CREATE TABLE track_files (
     size_bytes INTEGER NOT NULL,
     hash TEXT,
     -- 
-    last_accessed_at INTEGER NOT NULL,
-    created_at INTEGER NOT NULL,
+    last_accessed_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
     -- 
     UNIQUE (track_id, track_file_type_id),
     UNIQUE (library_id, path),
@@ -207,46 +204,40 @@ CREATE UNIQUE INDEX uq_track_files_link_path ON track_files (path)
 WHERE
     library_id IS NULL;
 
-CREATE INDEX idx_track_files_library ON track_files (library_id);
-
 CREATE INDEX idx_track_files_hash ON track_files (hash)
 WHERE
     hash IS NOT NULL;
 
 -- 
 CREATE TABLE track_artists (
-    track_id INTEGER NOT NULL,
-    profile_id INTEGER NOT NULL,
-    PRIMARY KEY (track_id, profile_id),
-    FOREIGN KEY (track_id) REFERENCES tracks (track_id) ON DELETE CASCADE,
-    FOREIGN KEY (profile_id) REFERENCES profiles (profile_id) ON DELETE CASCADE
-) STRICT;
+    track_id INTEGER NOT NULL REFERENCES tracks (track_id) ON DELETE CASCADE,
+    profile_id INTEGER NOT NULL REFERENCES profiles (profile_id) ON DELETE CASCADE,
+    PRIMARY KEY (track_id, profile_id)
+) STRICT,
+WITHOUT ROWID;
 
 CREATE INDEX idx_track_artists_profile ON track_artists (profile_id);
 
 CREATE TABLE track_likes (
-    profile_id INTEGER NOT NULL,
-    track_id INTEGER NOT NULL,
+    profile_id INTEGER NOT NULL REFERENCES profiles (profile_id) ON DELETE CASCADE,
+    track_id INTEGER NOT NULL REFERENCES tracks (track_id) ON DELETE CASCADE,
     created_at INTEGER NOT NULL,
-    PRIMARY KEY (profile_id, track_id),
-    FOREIGN KEY (profile_id) REFERENCES profiles (profile_id) ON DELETE CASCADE,
-    FOREIGN KEY (track_id) REFERENCES tracks (track_id) ON DELETE CASCADE
-) STRICT;
-
-CREATE INDEX idx_track_likes_profile ON track_likes (profile_id);
+    PRIMARY KEY (profile_id, track_id)
+) STRICT,
+WITHOUT ROWID;
 
 CREATE TABLE playlists (
     playlist_id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER))
 ) STRICT;
 
 CREATE TABLE remote_playlists (
     playlist_id INTEGER PRIMARY KEY REFERENCES playlists (playlist_id) ON DELETE CASCADE,
     server_id INTEGER NOT NULL REFERENCES servers (server_id) ON DELETE CASCADE,
-    remote_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
+    remote_id BLOB NOT NULL CHECK (length(remote_id) = 16),
+    user_id BLOB NOT NULL CHECK (length(user_id) = 16),
     profile_id INTEGER REFERENCES profiles (profile_id) ON DELETE SET NULL,
     -- 
     permalink TEXT NOT NULL,
@@ -255,7 +246,7 @@ CREATE TABLE remote_playlists (
     -- 
     remote_created_at INTEGER NOT NULL,
     remote_updated_at INTEGER,
-    synced_at INTEGER NOT NULL,
+    synced_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
     -- 
     UNIQUE (server_id, remote_id)
 ) STRICT;
@@ -266,9 +257,10 @@ CREATE TABLE playlist_tracks (
     playlist_id INTEGER NOT NULL REFERENCES playlists (playlist_id) ON DELETE CASCADE,
     track_id INTEGER NOT NULL REFERENCES tracks (track_id) ON DELETE CASCADE,
     position REAL NOT NULL,
-    added_at INTEGER NOT NULL,
+    added_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
     PRIMARY KEY (playlist_id, track_id)
-) STRICT;
+) STRICT,
+WITHOUT ROWID;
 
 CREATE INDEX idx_playlist_tracks_order ON playlist_tracks (playlist_id, position);
 

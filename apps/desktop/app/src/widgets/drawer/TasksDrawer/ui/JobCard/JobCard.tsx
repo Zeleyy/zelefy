@@ -1,5 +1,5 @@
-import type { JobEvent } from "@/shared/types";
 import styles from "./JobCard.module.scss";
+import type { JobEvent } from "@/entities/job";
 
 interface JobCardProps {
     job: JobEvent;

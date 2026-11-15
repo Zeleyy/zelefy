@@ -1,6 +1,7 @@
-use chrono::{DateTime, Utc};
 use rusqlite::Row;
 use serde::{Deserialize, Serialize};
+
+use crate::models::utils::TimestampMs;
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -8,11 +9,11 @@ pub struct Library {
     pub library_id: i64,
     pub path: String,
     pub is_primary: bool,
-    pub created_at: DateTime<Utc>,
+    pub created_at: TimestampMs,
 }
 
 impl Library {
-    pub fn row_to_library(row: &Row<'_>, prefix: Option<&str>) -> rusqlite::Result<Self> {
+    pub fn from_row(row: &Row<'_>, prefix: Option<&str>) -> rusqlite::Result<Self> {
         let p = prefix.unwrap_or("");
 
         let library_id_col = format!("{}library_id", p);

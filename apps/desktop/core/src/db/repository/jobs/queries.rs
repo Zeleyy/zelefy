@@ -23,7 +23,7 @@ pub fn get_by_id(conn: &Connection, job_id: i64) -> rusqlite::Result<Option<Job>
             WHERE job_id = ?1
         "#,
         params![job_id],
-        Job::row_to_job,
+        Job::from_row,
     )
     .optional()
 }
@@ -58,7 +58,7 @@ pub fn get_page(
 
     let job_id = after.map(|a| a.job_id);
 
-    stmt.query_map(params![job_id, limit], Job::row_to_job)?
+    stmt.query_map(params![job_id, limit], Job::from_row)?
         .collect()
 }
 
@@ -87,7 +87,7 @@ pub fn get_active(conn: &Connection) -> rusqlite::Result<Vec<Job>> {
 
     stmt.query_map(
         params![JobStatus::Pending, JobStatus::Running],
-        Job::row_to_job,
+        Job::from_row,
     )?
     .collect::<rusqlite::Result<_>>()
 }

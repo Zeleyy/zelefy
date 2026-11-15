@@ -11,7 +11,7 @@ pub fn get_by_track_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Vec
         "#,
     )?;
 
-    let rows = stmt.query_map(params![track_id], TrackFile::row_to_track_file)?;
+    let rows = stmt.query_map(params![track_id], TrackFile::from_row)?;
 
     rows.collect()
 }
@@ -34,10 +34,7 @@ pub fn get_by_track_id_with_library(
         "#,
     )?;
 
-    let rows = stmt.query_map(
-        params![track_id],
-        TrackFileResponse::row_to_track_file_response,
-    )?;
+    let rows = stmt.query_map(params![track_id], TrackFileResponse::from_row)?;
 
     rows.collect()
 }

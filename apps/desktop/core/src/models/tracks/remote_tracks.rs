@@ -1,6 +1,7 @@
-use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use zelefy_common::TrackStatus;
+
+use crate::models::utils::TimestampMs;
 
 pub struct RemoteTrack {
     pub track_id: i64,
@@ -23,7 +24,7 @@ pub struct RemoteTrack {
     pub reposts_count: i32,
     pub comments_count: i32,
 
-    pub remote_created_at: DateTime<Utc>,
-    pub remote_updated_at: Option<DateTime<Utc>>,
-    pub synced_at: DateTime<Utc>,
+    pub remote_created_at: TimestampMs,
+    pub remote_updated_at: Option<TimestampMs>,
+    pub synced_at: TimestampMs,
 }

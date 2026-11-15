@@ -8,9 +8,9 @@ chrono = { workspace = true }
 uuid = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
 
 include_dir = "0.7.4"
-reqwest = { version = "0.13.5", features = ["json"] }
 rusqlite = { version = "0.41.1", features = [
     "bundled",
     "chrono",
@@ -18,11 +18,9 @@ rusqlite = { version = "0.41.1", features = [
     "uuid",
 ] }
 rusqlite_migration = { version = "2.7.0", features = ["from-directory"] }
+thiserror = "2.0.21"
+dunce = "1.0.5"
+rodio = "0.23.0"
 
 zelefy_common = { workspace = true }
-thiserror = "2.0.21"
-strum = { workspace = true, features = ["derive"] }
-dunce = "1.0.5"
-
 audio-core = { workspace = true }
-rodio = "0.23.0"

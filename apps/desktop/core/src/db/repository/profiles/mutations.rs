@@ -1,21 +1,21 @@
 use rusqlite::{Connection, params};
 use zelefy_common::profiles::ProfileDetails;
 
-pub fn upsert(conn: &Connection, profile: &ProfileDetails) -> rusqlite::Result<()> {
-    let last_accessed_at = chrono::Utc::now().timestamp();
+use crate::models::utils::TimestampMs;
 
+pub fn upsert(conn: &Connection, profile: &ProfileDetails) -> rusqlite::Result<()> {
     let profile_id: i64 = conn.query_row(
         r#"
             INSERT INTO profiles (
                 user_id, display_name, permalink,
                 avatar_path, banner_path, bio, location, is_verified, 
-                created_at, last_accessed_at,
+                created_at, 
                 followers_count, following_count, tracks_count
             ) VALUES (
                 ?1, ?2, ?3,
                 ?4, ?5, ?6, ?7, ?8,
-                ?9, ?10,
-                ?11, ?12, ?13
+                ?9,
+                ?10, ?11, ?12, 
             ) ON CONFLICT (user_id) DO UPDATE SET
                 display_name = excluded.display_name
                 , permalink = excluded.permalink
@@ -39,8 +39,7 @@ pub fn upsert(conn: &Connection, profile: &ProfileDetails) -> rusqlite::Result<(
             profile.bio,
             profile.location,
             profile.is_verified,
-            profile.created_at.timestamp(),
-            last_accessed_at,
+            TimestampMs::from(profile.created_at),
             profile.followers_count,
             profile.following_count,
             profile.tracks_count

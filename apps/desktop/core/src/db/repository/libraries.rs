@@ -1,4 +1,3 @@
-use chrono::Utc;
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter, types::Value};
 
 use crate::models::libraries::{Library, NewLibrary, UpdateLibrary};
@@ -15,7 +14,7 @@ pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library
             WHERE library_id = ?1
         "#,
         params![library_id],
-        |row| Library::row_to_library(row, None),
+        |row| Library::from_row(row, None),
     )
 }
 
@@ -34,7 +33,7 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Library>> {
         "#,
     )?;
 
-    let rows = stmt.query_map([], |row| Library::row_to_library(row, None))?;
+    let rows = stmt.query_map([], |row| Library::from_row(row, None))?;
 
     rows.collect()
 }
@@ -75,9 +74,7 @@ pub fn get_by(
 
     let mut stmt = conn.prepare(&sql)?;
 
-    let rows = stmt.query_map(params_from_iter(values), |row| {
-        Library::row_to_library(row, None)
-    })?;
+    let rows = stmt.query_map(params_from_iter(values), |row| Library::from_row(row, None))?;
 
     rows.collect()
 }
@@ -85,11 +82,11 @@ pub fn get_by(
 pub fn create(conn: &Connection, new: &NewLibrary) -> rusqlite::Result<i64> {
     conn.query_row(
         r#"
-            INSERT INTO libraries (path, is_primary, created_at)
-            VALUES (?1, ?2, ?3)
+            INSERT INTO libraries (path, is_primary)
+            VALUES (?1, ?2)
             RETURNING library_id
         "#,
-        params![new.path, new.is_primary, Utc::now().timestamp(),],
+        params![new.path, new.is_primary],
         |row| row.get(0),
     )
 }
@@ -142,7 +139,7 @@ pub fn get_primary(conn: &Connection) -> rusqlite::Result<Option<Library>> {
         "SELECT library_id, path, is_primary, created_at
          FROM libraries WHERE is_primary = 1 LIMIT 1",
         [],
-        |row| Library::row_to_library(row, None),
+        |row| Library::from_row(row, None),
     )
     .optional()
 }

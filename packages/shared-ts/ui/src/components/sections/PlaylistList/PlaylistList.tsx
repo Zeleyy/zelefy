@@ -1,6 +1,6 @@
-import { Flex } from "../../primitives";
 import styles from "./PlaylistList.module.scss";
 import clsx from "clsx";
+import { Flex } from "../../primitives";
 
 interface PlaylistListProps {
     title?: string;

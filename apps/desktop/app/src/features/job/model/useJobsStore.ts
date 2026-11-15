@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { JobEvent } from "@/shared/types";
+import type { JobEvent } from "@/entities/job";
 
 interface JobsState {
     jobs: JobEvent[];

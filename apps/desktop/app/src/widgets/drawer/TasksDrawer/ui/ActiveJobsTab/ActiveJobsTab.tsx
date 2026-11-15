@@ -1,7 +1,7 @@
-import { EmptyState, Flex } from "@zelefy/ui";
-import { useJobsStore } from "@/shared/lib/stores";
-import { JobCard } from "../JobCard";
 import { useTranslation } from "react-i18next";
+import { EmptyState, Flex } from "@zelefy/ui";
+import { useJobsStore } from "@/features/job";
+import { JobCard } from "../JobCard";
 
 export const ActiveJobsTab = () => {
     const { t } = useTranslation();

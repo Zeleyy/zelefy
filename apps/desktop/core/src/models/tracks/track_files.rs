@@ -1,11 +1,10 @@
-use chrono::{DateTime, Utc};
 use rusqlite::{
     Row, ToSql,
     types::{FromSql, FromSqlError, ToSqlOutput},
 };
 use serde::{Deserialize, Serialize};
 
-use crate::models::libraries::Library;
+use crate::models::{libraries::Library, utils::TimestampMs};
 
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -47,12 +46,12 @@ pub struct TrackFile {
     pub size_bytes: i64,
     pub hash: Option<String>,
 
-    pub last_accessed_at: DateTime<Utc>,
-    pub created_at: DateTime<Utc>,
+    pub last_accessed_at: TimestampMs,
+    pub created_at: TimestampMs,
 }
 
 impl TrackFile {
-    pub fn row_to_track_file(row: &Row<'_>) -> rusqlite::Result<Self> {
+    pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
         Ok(Self {
             file_id: row.get("file_id")?,
             track_id: row.get("track_id")?,
@@ -77,13 +76,13 @@ pub struct TrackFileResponse {
 }
 
 impl TrackFileResponse {
-    pub fn row_to_track_file_response(row: &Row<'_>) -> rusqlite::Result<Self> {
-        let track_file = TrackFile::row_to_track_file(row)?;
+    pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
+        let track_file = TrackFile::from_row(row)?;
 
         let library_id: Option<i64> = row.get("lib_library_id")?;
 
         let library = if library_id.is_some() {
-            Some(Library::row_to_library(row, Some("lib_"))?)
+            Some(Library::from_row(row, Some("lib_"))?)
         } else {
             None
         };

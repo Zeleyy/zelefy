@@ -2,6 +2,8 @@ import type { NullablePatch, PlayerTrack } from "@zelefy/types";
 import type { Library } from "@/shared/types";
 import { trackFilePath, trackFileSrc } from "../lib";
 
+export type TrackId = string | number;
+
 export const TrackFileType = {
     audio: 0,
     cover: 1,

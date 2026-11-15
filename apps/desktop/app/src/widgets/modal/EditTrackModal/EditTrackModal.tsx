@@ -93,7 +93,7 @@ export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalPr
 
     const coverAction: CoverAction = (() => {
         if (draftImagePath) return "clear";
-        if (Boolean(track?.cover)) {
+        if (track?.cover) {
             return draftImagePath === null ? "restore" : "delete";
         }
         return "clear";

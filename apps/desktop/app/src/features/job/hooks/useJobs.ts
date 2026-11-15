@@ -1,6 +1,6 @@
-import type { JobCursor, JobsPage } from "@/shared/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
+import type { JobCursor, JobsPage } from "@/entities/job";
 
 export const useJobs = () => {
     return useInfiniteQuery({

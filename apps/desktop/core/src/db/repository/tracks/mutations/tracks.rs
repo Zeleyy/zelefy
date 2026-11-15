@@ -1,4 +1,3 @@
-use chrono::Utc;
 use rusqlite::{Connection, params, params_from_iter, types::Value};
 
 use crate::{
@@ -19,9 +18,8 @@ pub fn create(conn: &Connection, track: &NewTrack) -> rusqlite::Result<i64> {
                     , bpm
                     , key_signature
                     , description
-                    , created_at
                 )
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
             RETURNING track_id
         "#,
         params![
@@ -32,8 +30,7 @@ pub fn create(conn: &Connection, track: &NewTrack) -> rusqlite::Result<i64> {
             track.genre,
             track.bpm,
             track.key_signature,
-            track.description,
-            Utc::now().timestamp()
+            track.description
         ],
         |row| row.get(0),
     )

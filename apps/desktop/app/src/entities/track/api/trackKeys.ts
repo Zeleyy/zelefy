@@ -1,4 +1,4 @@
-import type { TrackId } from "./trackQuery";
+import type { TrackId } from "../model";
 
 export const trackKeys = {
     all: ["track"] as const,

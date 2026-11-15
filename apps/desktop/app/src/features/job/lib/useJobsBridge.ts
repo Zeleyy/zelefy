@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { toast } from "sonner";
 import { queryClient } from "@/shared/api";
-import type { JobEvent } from "@/shared/types";
-import { trackKeys, type LocalTrackResponse } from "@/entities/track";
-import { useJobsStore } from "../stores";
+import type { JobEvent } from "@/entities/job";
+import { toPlayerTrack, trackKeys, type LocalTrackResponse } from "@/entities/track";
+import { usePlayerStore } from "@/features/player";
+import { useJobsStore } from "../model";
 
 export const useJobsBridge = () => {
     useEffect(() => {
@@ -12,7 +14,6 @@ export const useJobsBridge = () => {
 
         const unlistenPromise = listen<JobEvent>("jobs://event", ({ payload }) => {
             upsert(payload);
-            console.log(payload);
 
             if (payload.status === "done" || payload.status === "cancelled") {
                 setTimeout(() => remove(payload.jobId), 3000);
@@ -28,15 +29,15 @@ export const useJobsBridge = () => {
                         trackId: payload.payload.trackId,
                     });
 
-                    queryClient.invalidateQueries({ queryKey: trackKeys.detail(track.trackId) });
+                    usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
                     queryClient.invalidateQueries({ queryKey: trackKeys.local() });
                     queryClient.invalidateQueries({ queryKey: ["jobs"] });
-                })().catch(console.error);
+                })().catch(toast.error);
             }
         });
 
         unlistenPromise.then(() =>
-            invoke<JobEvent[]>("get_active_jobs").then(merge).catch(console.error),
+            invoke<JobEvent[]>("get_active_jobs").then(merge).catch(toast.error),
         );
 
         return () => {

@@ -185,6 +185,10 @@
                 "options": "Options",
                 "add_library_folder": "Add library folder"
             },
+            "message": {
+                "success_updated": "The library has been updated successfully",
+                "success_added": "The library has been added successfully"
+            },
             "errors": {
                 "browse_failed": "Failed to pick a folder"
             }

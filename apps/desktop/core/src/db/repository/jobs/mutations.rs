@@ -1,14 +1,16 @@
-use chrono::Utc;
+use chrono::TimeDelta;
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter, types::Value};
 
 use crate::{
     db::utils::push_opt_nullable,
-    models::jobs::{Job, JobStatus, NewJob, UpdateJob},
+    models::{
+        jobs::{Job, JobStatus, NewJob, UpdateJob},
+        utils::TimestampMs,
+    },
 };
 
 pub fn create(conn: &Connection, job: &NewJob) -> rusqlite::Result<i64> {
-    let now = Utc::now().timestamp();
-    let run_after = job.run_after.unwrap_or_else(Utc::now).timestamp();
+    let run_after = job.run_after.unwrap_or_else(TimestampMs::now);
 
     conn.query_row(
         r#"
@@ -20,9 +22,8 @@ pub fn create(conn: &Connection, job: &NewJob) -> rusqlite::Result<i64> {
                 priority,
                 attempts,
                 max_attempts,
-                run_after,
-                created_at
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+                run_after
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
             RETURNING job_id
         "#,
         params![
@@ -33,8 +34,7 @@ pub fn create(conn: &Connection, job: &NewJob) -> rusqlite::Result<i64> {
             job.priority,
             job.attempts,
             job.max_attempts,
-            run_after,
-            now,
+            run_after
         ],
         |row| row.get(0),
     )
@@ -91,15 +91,15 @@ pub fn complete(conn: &Connection, job_id: i64) -> rusqlite::Result<bool> {
         job_id,
         &UpdateJob {
             job_status: Some(JobStatus::Done),
-            finished_at: Some(Some(Utc::now())),
+            finished_at: Some(Some(TimestampMs::now())),
             ..Default::default()
         },
     )
 }
 
 pub fn fail(conn: &Connection, job_id: i64, error: String) -> rusqlite::Result<bool> {
-    let now = Utc::now().timestamp();
-    let backoff = 5 * 60;
+    let now = TimestampMs::now();
+    let backoff = TimeDelta::minutes(5);
 
     let updated = conn.execute(
         r#"
@@ -142,7 +142,7 @@ pub fn cancel(conn: &Connection, job_id: i64) -> rusqlite::Result<bool> {
         job_id,
         &UpdateJob {
             job_status: Some(JobStatus::Cancelled),
-            finished_at: Some(Some(Utc::now())),
+            finished_at: Some(Some(TimestampMs::now())),
             ..Default::default()
         },
     )
@@ -165,8 +165,8 @@ pub fn claim_next(conn: &Connection) -> rusqlite::Result<Option<Job>> {
                 , attempts, max_attempts, error
                 , run_after, created_at, started_at, finished_at
         "#,
-        params![JobStatus::Running, Utc::now().timestamp()],
-        Job::row_to_job,
+        params![JobStatus::Running, TimestampMs::now()],
+        Job::from_row,
     )
     .optional()
 }
@@ -184,7 +184,7 @@ pub fn recover_running(conn: &Connection) -> rusqlite::Result<usize> {
         params![
             JobStatus::Pending,
             JobStatus::Failed,
-            Utc::now().timestamp(),
+            TimestampMs::now(),
             JobStatus::Running
         ],
     )

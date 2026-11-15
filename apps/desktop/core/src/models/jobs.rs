@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use rusqlite::{
     Error::ToSqlConversionFailure,
     Row, ToSql,
@@ -6,6 +5,8 @@ use rusqlite::{
 };
 use serde::{Deserialize, Serialize};
 use zelefy_common::CursorPage;
+
+use crate::models::utils::TimestampMs;
 
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -109,14 +110,14 @@ pub struct Job {
     pub max_attempts: i64,
     pub error: Option<String>,
 
-    pub run_after: DateTime<Utc>,
-    pub created_at: DateTime<Utc>,
-    pub started_at: Option<DateTime<Utc>>,
-    pub finished_at: Option<DateTime<Utc>>,
+    pub run_after: TimestampMs,
+    pub created_at: TimestampMs,
+    pub started_at: Option<TimestampMs>,
+    pub finished_at: Option<TimestampMs>,
 }
 
 impl Job {
-    pub fn row_to_job(row: &Row<'_>) -> rusqlite::Result<Self> {
+    pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
         Ok(Self {
             job_id: row.get("job_id")?,
             job_kind: row.get("job_kind_id")?,
@@ -147,7 +148,7 @@ pub struct NewJob {
     pub attempts: i64,
     pub max_attempts: i64,
 
-    pub run_after: Option<DateTime<Utc>>,
+    pub run_after: Option<TimestampMs>,
 }
 
 impl NewJob {
@@ -170,9 +171,9 @@ pub struct UpdateJob {
     pub job_status: Option<JobStatus>,
     pub attempts: Option<i64>,
     pub error: Option<Option<String>>,
-    pub run_after: Option<DateTime<Utc>>,
-    pub started_at: Option<Option<DateTime<Utc>>>,
-    pub finished_at: Option<Option<DateTime<Utc>>>,
+    pub run_after: Option<TimestampMs>,
+    pub started_at: Option<Option<TimestampMs>>,
+    pub finished_at: Option<Option<TimestampMs>>,
 }
 
 #[derive(Debug, Clone, Serialize)]

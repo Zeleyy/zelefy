@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { invoke } from "@tauri-apps/api/core";
 import { tauriStorage } from "@/shared/lib/storage";
 import i18n from "@/shared/config/i18n";
-import { invoke } from "@tauri-apps/api/core";
 import { invokeTry } from "./helpers";
 
 export type Theme = "dark" | "light";

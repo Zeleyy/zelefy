@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter};
+use std::collections::HashMap;
 
 use crate::{
     db::utils::placeholders,
@@ -30,7 +29,7 @@ pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Option<Tr
             WHERE t.track_id = ?1
         "#,
         params![track_id],
-        Track::row_to_track,
+        Track::from_row,
     )
     .optional()
 }
@@ -52,7 +51,7 @@ fn load_files_map(
     let mut stmt = conn.prepare(&sql)?;
     let files_iter = stmt.query_map(
         params_from_iter(track_ids.iter()),
-        TrackFileResponse::row_to_track_file_response,
+        TrackFileResponse::from_row,
     )?;
 
     let mut map: HashMap<i64, Vec<TrackFileResponse>> = HashMap::new();
@@ -105,7 +104,7 @@ pub fn get_all_local(conn: &Connection) -> rusqlite::Result<Vec<Track>> {
         "#,
     )?;
 
-    let rows = stmt.query_map(params![TrackFileType::Audio], Track::row_to_track)?;
+    let rows = stmt.query_map(params![TrackFileType::Audio], Track::from_row)?;
 
     rows.collect()
 }
@@ -126,7 +125,7 @@ pub fn get_by_ids(conn: &Connection, track_ids: Vec<i64>) -> rusqlite::Result<Ve
         placeholders(track_ids.len())
     );
     let mut stmt = conn.prepare(&sql)?;
-    stmt.query_map(params_from_iter(track_ids.iter()), Track::row_to_track)?
+    stmt.query_map(params_from_iter(track_ids.iter()), Track::from_row)?
         .collect()
 }
 

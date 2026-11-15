@@ -1,10 +1,9 @@
-use chrono::{DateTime, Utc};
 use rusqlite::Row;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zelefy_common::double_option;
 
-use crate::models::tracks::TrackFilesResponse;
+use crate::models::{tracks::TrackFilesResponse, utils::TimestampMs};
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -20,11 +19,11 @@ pub struct Track {
     pub key_signature: Option<String>,
     pub description: Option<String>,
 
-    pub created_at: DateTime<Utc>,
+    pub created_at: TimestampMs,
 }
 
 impl Track {
-    pub fn row_to_track(row: &Row<'_>) -> rusqlite::Result<Self> {
+    pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
         Ok(Self {
             track_id: row.get("track_id")?,
             local_uuid: row.get("local_uuid")?,
