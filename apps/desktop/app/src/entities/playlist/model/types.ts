@@ -1,4 +1,4 @@
-import type { CursorPage } from "@zelefy/types";
+import type { CursorPage, NullablePatch } from "@zelefy/types";
 
 export type PlaylistId = string | number;
 
@@ -20,6 +20,11 @@ export interface NewPlaylist {
 
 export interface NewPlaylistRequest extends NewPlaylist {
     trackId: number;
+}
+
+export interface UpdatePlaylist {
+    title?: string;
+    description?: NullablePatch<string>;
 }
 
 export interface PlaylistTrack {

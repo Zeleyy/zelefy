@@ -1,9 +1,11 @@
-import type { TrackId } from "@/entities/track";
 import { create } from "zustand";
+import type { PlaylistId } from "@/entities/playlist";
+import type { TrackId } from "@/entities/track";
 
 export interface ModalPropsMap {
     addToPlaylist: { trackId: TrackId };
     editTrack: { trackId: TrackId };
+    editPlaylist: { playlistId: PlaylistId };
 }
 
 export type ModalName = keyof ModalPropsMap;

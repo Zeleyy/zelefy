@@ -15,6 +15,7 @@ export type IconName =
     | "common-library"
     | "common-list-clock"
     | "common-moon"
+    | "common-plus"
     | "common-search"
     | "common-settings"
     | "common-sparkles"

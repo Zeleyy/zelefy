@@ -1,9 +1,26 @@
-use rusqlite::{Connection, params, params_from_iter, types::Value};
+use rusqlite::{Connection, OptionalExtension, params, params_from_iter, types::Value};
 
 use crate::{
     db::utils::push_opt_nullable,
     models::playlists::{NewPlaylist, Playlist, PlaylistWithFirstTrackId, UpdatePlaylist},
 };
+
+pub fn get_by_id(conn: &Connection, playlist_id: i64) -> rusqlite::Result<Option<Playlist>> {
+    conn.query_one(
+        r#"
+            SELECT
+                playlist_id
+                , title
+                , description
+                , created_at
+            FROM playlists
+            WHERE playlist_id = ?1
+        "#,
+        params![playlist_id],
+        Playlist::from_row,
+    )
+    .optional()
+}
 
 pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Playlist>> {
     let mut stmt = conn.prepare_cached(
@@ -98,4 +115,14 @@ pub fn update(
     stmt.execute(params_from_iter(values))?;
 
     Ok(())
+}
+
+pub fn delete(conn: &Connection, playlist_id: i64) -> rusqlite::Result<bool> {
+    Ok(conn.execute(
+        r#"
+            DELETE FROM playlists
+            WHERE playlist_id = ?1
+        "#,
+        params![playlist_id],
+    )? > 0)
 }

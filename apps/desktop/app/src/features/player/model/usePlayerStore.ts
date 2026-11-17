@@ -8,6 +8,12 @@ import { trackKeys, type TrackId } from "@/entities/track";
 import type { PlaylistId } from "@/entities/playlist";
 
 type RepeatMode = "off" | "queue" | "track";
+type AddResult = "added" | "replaced" | "noop";
+type BatchAddResult = {
+    added: number;
+    dropped: number;
+    skipped: number;
+};
 
 interface QueueItem {
     qid: number;
@@ -42,7 +48,8 @@ interface PlayerState {
     deleteTrack: (trackId: TrackId) => void;
 
     setQueue: (tracksIds: TrackId[], playlistId?: PlaylistId) => void;
-    addToQueue: (trackId: TrackId) => void;
+    addToQueue: (trackId: TrackId, playlistId?: PlaylistId) => AddResult;
+    addManyToQueue: (trackIds: TrackId[], playlistId?: PlaylistId) => BatchAddResult;
     replaceTrack: (movingQid?: number, afterQid?: number, beforeQid?: number) => void;
     playFromQueue: (qid: number) => void;
     removeFromQueue: (qid: number) => void;
@@ -61,7 +68,7 @@ type PersistedPlayer = Pick<
     "queue" | "currentIndex" | "isShuffle" | "repeatMode" | "_nextQid"
 >;
 
-const MAX_QUEUE = 100;
+const MAX_QUEUE = 300;
 
 export const selectCurrentTrackId = (
     s: Pick<PlayerState, "queue" | "currentIndex">,
@@ -239,14 +246,14 @@ export const usePlayerStore = create<PlayerState>()(
                 },
 
                 addToQueue: (trackId) => {
-                    set((state) => {
-                        const last = state.queue[state.queue.length - 1];
-                        if (last && last.trackId === trackId) return state;
+                    let result: AddResult = "noop";
 
+                    set((state) => {
                         const item: QueueItem = { qid: state._nextQid, trackId };
                         const nextQid = state._nextQid + 1;
 
                         if (state.queue.length >= MAX_QUEUE) {
+                            result = "replaced";
                             const dropIndex = state.currentIndex === 0 ? 1 : 0;
                             return {
                                 queue: [...state.queue.filter((_, i) => i !== dropIndex), item],
@@ -258,11 +265,64 @@ export const usePlayerStore = create<PlayerState>()(
                             };
                         }
 
+                        result = "added";
                         return {
                             queue: [...state.queue, item],
                             _nextQid: nextQid,
                         };
                     });
+
+                    return result;
+                },
+
+                addManyToQueue: (trackIds, playlistId) => {
+                    const result: BatchAddResult = { added: 0, dropped: 0, skipped: 0 };
+                    if (trackIds.length === 0) return result;
+
+                    set((state) => {
+                        let queue = state.queue.slice();
+                        let currentIndex = state.currentIndex;
+                        let nextQid = state._nextQid;
+                        let dropped = 0;
+
+                        for (const trackId of trackIds) {
+                            const item: QueueItem = { qid: nextQid++, trackId, playlistId };
+
+                            if (queue.length < MAX_QUEUE) {
+                                queue.push(item);
+                                result.added++;
+                                continue;
+                            }
+
+                            let dropIndex: number;
+                            if (currentIndex <= 0) {
+                                dropIndex = currentIndex === 0 ? 1 : 0;
+                            } else {
+                                dropIndex = 0;
+                            }
+
+                            if (dropIndex === currentIndex) {
+                                dropIndex = currentIndex === 0 ? 1 : 0;
+                            }
+
+                            queue.splice(dropIndex, 1);
+                            if (currentIndex > dropIndex) currentIndex--;
+
+                            queue.push(item);
+                            dropped++;
+                            result.added++;
+                        }
+
+                        result.dropped = dropped;
+
+                        return {
+                            queue,
+                            currentIndex,
+                            _nextQid: nextQid,
+                        };
+                    });
+
+                    return result;
                 },
 
                 replaceTrack: (movingQid, afterQid, beforeQid) =>

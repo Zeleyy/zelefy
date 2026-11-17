@@ -12,4 +12,8 @@ export const modalRegistry: Registry = {
         const { EditTrackModal } = await import("@/features/player");
         return { default: EditTrackModal };
     }),
+    editPlaylist: lazy(async () => {
+        const { EdtiPlaylistModal } = await import("@/features/playlist");
+        return { default: EdtiPlaylistModal };
+    }),
 };

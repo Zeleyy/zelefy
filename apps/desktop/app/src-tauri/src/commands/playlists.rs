@@ -9,6 +9,15 @@ use desktop_core::{
 use tauri::State;
 
 #[tauri::command]
+pub fn get_local_playlist(
+    db: State<'_, DbState>,
+    playlist_id: i64,
+) -> Result<Option<Playlist>, String> {
+    let conn = db.lock();
+    repository::playlists::get_by_id(&conn, playlist_id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn get_local_playlists(db: State<'_, DbState>) -> Result<Vec<Playlist>, String> {
     let conn = db.lock();
     repository::playlists::get_all(&conn).map_err(|e| e.to_string())
@@ -79,9 +88,24 @@ pub fn update_local_playlist(
     db: State<'_, DbState>,
     playlist_id: i64,
     update: UpdatePlaylist,
-) -> Result<(), String> {
+) -> Result<i64, String> {
     let conn = db.lock();
-    repository::playlists::update(&conn, playlist_id, &update).map_err(|e| e.to_string())
+    repository::playlists::update(&conn, playlist_id, &update).map_err(|e| e.to_string())?;
+    Ok(playlist_id)
+}
+
+#[tauri::command]
+pub fn delete_local_playlist(
+    db: State<'_, DbState>,
+    playlist_id: i64,
+) -> Result<Option<i64>, String> {
+    let conn = db.lock();
+    let deleted = repository::playlists::delete(&conn, playlist_id).map_err(|e| e.to_string())?;
+    if deleted {
+        Ok(Some(playlist_id))
+    } else {
+        Ok(None)
+    }
 }
 
 #[tauri::command]

@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { useWaveform } from "@/features/waveform";
 import { PlayerTrackHero, useCurrentTrack, usePlayerStore } from "@/features/player";
+import { useModalStore } from "@/shared/lib/stores";
+import { useAddToQueue } from "@/features/queue";
 
 export const HomePage = () => {
-    const isPlaying = usePlayerStore((state) => state.isPlaying);
-    const togglePlay = usePlayerStore((state) => state.togglePlay);
+    const isPlaying = usePlayerStore((s) => s.isPlaying);
+    const togglePlay = usePlayerStore((s) => s.togglePlay);
+    const addToQueue = useAddToQueue();
+    const openModal = useModalStore((s) => s.openModal);
 
     const track = useCurrentTrack();
 
@@ -26,6 +30,16 @@ export const HomePage = () => {
                 }}
                 onSaveClick={() => {
                     /* Логика сохранения */
+                }}
+                onAddToPlaylistClick={() => {
+                    if (displayTrack?.trackId) {
+                        openModal("addToPlaylist", { trackId: displayTrack.trackId });
+                    }
+                }}
+                onAddToQueueClick={() => {
+                    if (displayTrack) {
+                        addToQueue(displayTrack);
+                    }
                 }}
             />
         </>

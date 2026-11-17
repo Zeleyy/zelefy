@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { EmptyState, Flex, SpinnerLoader } from "@zelefy/ui";
+import { Button, EmptyState, Flex, Icon, SpinnerLoader } from "@zelefy/ui";
 import { queryClient } from "@/shared/api";
+import { useModalStore } from "@/shared/lib/stores";
 import { localPlaylistAllTrackIdsOptions } from "@/entities/playlist";
-import { useLocalPlaylistTrackIds } from "@/features/playlist";
+import type { TrackId } from "@/entities/track";
+import {
+    useDeleteLocalPlaylist,
+    useLocalPlaylist,
+    useLocalPlaylistTrackIds,
+} from "@/features/playlist";
 import { useWaveform } from "@/features/waveform";
 import {
     PlayerTrackHero,
@@ -14,14 +20,18 @@ import {
     useTrack,
 } from "@/features/player";
 import { PlaylistTrackRow } from "./PlaylistTrackRow";
-import { openModal } from "@/shared/lib/stores/useModalStore";
-import type { TrackId } from "@/entities/track";
+import { useAddManyToQueue } from "@/features/queue";
 
 export const PlaylistPage = () => {
     const { t } = useTranslation();
     const { playlistId: rawPlaylistId } = useParams();
     const playlistId = Number(rawPlaylistId);
+    const { data: playlist } = useLocalPlaylist(playlistId);
     const navigate = useNavigate();
+
+    const openModal = useModalStore((s) => s.openModal);
+    const addManyToQueue = useAddManyToQueue();
+    const { mutate: deleteLocalPlaylist } = useDeleteLocalPlaylist();
 
     const playTrack = usePlayerStore((s) => s.playTrack);
     const isPlaying = usePlayerStore((s) => s.isPlaying);
@@ -72,8 +82,22 @@ export const PlaylistPage = () => {
 
     const handleAddToPlaylist = useCallback(
         (trackId: TrackId) => openModal("addToPlaylist", { trackId }),
-        [],
+        [openModal],
     );
+
+    const handleAddManyToQueue = useCallback(async () => {
+        if (!playlist) return;
+        const trackIds = await queryClient.query(localPlaylistAllTrackIdsOptions(playlistId));
+        if (!trackIds?.length) return;
+        addManyToQueue(trackIds, playlist);
+    }, [queryClient, playlist]);
+
+    const handleDeletePlaylist = useCallback(() => {
+        if (!playlist) return;
+        // openModal("") // TODO: добавить окно подтверждения
+        navigate("/", { replace: true });
+        deleteLocalPlaylist(playlist.playlistId);
+    }, [navigate, deleteLocalPlaylist, playlist]);
 
     const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -104,7 +128,6 @@ export const PlaylistPage = () => {
                 isCurrentTrack={isCurrentPlaylist}
                 waveformData={waveform}
                 onTogglePlay={() => {
-                    console.log(isCurrentPlaylist);
                     if (isCurrentPlaylist) {
                         togglePlay();
                         return;
@@ -112,6 +135,27 @@ export const PlaylistPage = () => {
                     handlePlay();
                 }}
             />
+
+            <Flex gap="xs">
+                <Button
+                    variant="secondary"
+                    onClick={() => {
+                        if (playlist) {
+                            openModal("editPlaylist", { playlistId: playlist.playlistId });
+                        }
+                    }}
+                >
+                    <Icon name="action-edit" size={20} />
+                </Button>
+
+                <Button variant="secondary" onClick={handleAddManyToQueue}>
+                    <Icon name="player-list-end" size={20} />
+                </Button>
+
+                <Button variant="secondary" onClick={handleDeletePlaylist}>
+                    <Icon name="action-delete" size={20} />
+                </Button>
+            </Flex>
 
             <Flex direction="column" gap="xs">
                 {tracks.map((item, i) => {
@@ -133,6 +177,12 @@ export const PlaylistPage = () => {
             </Flex>
 
             <div ref={sentinelRef} />
+
+            <Flex align="center" justify="center">
+                <SpinnerLoader isLoading={isFetchingNextPage} />
+
+                {!hasNextPage && <Icon name="zelefy" color="var(--text-muted)" size={18} />}
+            </Flex>
         </>
     );
 };

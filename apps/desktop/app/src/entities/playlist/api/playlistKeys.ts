@@ -8,4 +8,6 @@ export const playlistKeys = {
     localWithFirstTrackId: () => [...playlistKeys.locals(), "id"],
     feeds: () => [...playlistKeys.all, "feed"] as const,
     feed: (playlistId: PlaylistId) => [...playlistKeys.feeds(), playlistId] as const,
+    details: () => [...playlistKeys.all, "detail"] as const,
+    detail: (playlistId: PlaylistId) => [...playlistKeys.details(), playlistId] as const,
 };

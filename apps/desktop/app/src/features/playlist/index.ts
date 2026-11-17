@@ -1,2 +1,2 @@
 export * from "./hooks";
-export { AddToPlaylistModal } from "./ui";
+export * from "./ui";

@@ -93,6 +93,19 @@
                     "placeholder": "Describe your track"
                 }
             }
+        },
+        "edit_playlist": {
+            "title": "Edit playlist",
+            "field": {
+                "title": {
+                    "label": "Playlist title",
+                    "placeholder": "Playlist title"
+                },
+                "description": {
+                    "label": "Description",
+                    "placeholder": "Describe your playlist"
+                }
+            }
         }
     },
     "tasks": {
@@ -111,7 +124,11 @@
     },
     "queue": {
         "title": "Queue",
-        "clear": "Clear Queue"
+        "clear": "Clear Queue",
+        "added": "Added to queue",
+        "replaced": "Queue is full - track replaced",
+        "added_many": "{{count}} tracks from “{{playlist}}” added to queue",
+        "added_many_one": "{{count}} track from “{{playlist}}” added to queue"
     },
     "home": {
         "title": "Home"

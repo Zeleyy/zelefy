@@ -1,9 +1,9 @@
 import styles from "./TrackHero.module.scss";
+import type { CSSProperties } from "react";
 import type { PlayerTrack } from "@zelefy/types";
 import { Cover, WaveformBar } from "../../media";
 import { Button, Flex, Icon } from "../../primitives";
 import { useSeekProgress } from "../../../utils";
-import type { CSSProperties } from "react";
 
 export interface TrackHeroProps {
     track?: PlayerTrack | null;
@@ -16,6 +16,8 @@ export interface TrackHeroProps {
     onSeekCommit?: (time: number) => void;
     onLikeClick?: () => void;
     onSaveClick?: () => void;
+    onAddToPlaylistClick?: () => void;
+    onAddToQueueClick?: () => void;
     className?: string;
 }
 
@@ -28,6 +30,8 @@ export const TrackHero = ({
     onSeek,
     onLikeClick,
     onSaveClick,
+    onAddToPlaylistClick,
+    onAddToQueueClick,
     className,
 }: TrackHeroProps) => {
     const { displayTime, safeDuration, handleTimeChange, handleSeekCommit } = useSeekProgress(
@@ -93,12 +97,20 @@ export const TrackHero = ({
                         className={styles.track__likeButton}
                         onClick={onLikeClick}
                     >
-                        <Icon name="player-heart" width={20} height={20} />
+                        <Icon name="player-heart" size={20} />
                         <span>{track?.likesCount ?? 0}</span>
                     </Button>
 
                     <Button variant="outline" radius="full" square onClick={onSaveClick}>
                         <Icon name="action-save" size={20} />
+                    </Button>
+
+                    <Button variant="outline" radius="full" square onClick={onAddToPlaylistClick}>
+                        <Icon name="player-list-plus" size={20} />
+                    </Button>
+
+                    <Button variant="outline" radius="full" square onClick={onAddToQueueClick}>
+                        <Icon name="player-list-end" size={20} />
                     </Button>
                 </Flex>
             </Flex>
