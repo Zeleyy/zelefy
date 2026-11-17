@@ -1,2 +1,4 @@
 pub mod playlist_tracks;
-pub mod playlists;
+mod playlists;
+
+pub use self::playlists::*;

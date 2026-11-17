@@ -1,53 +1,22 @@
 import styles from "./PlayerBar.module.scss";
 import { useState } from "react";
 import clsx from "clsx";
-import {
-    Button,
-    Cover,
-    Flex,
-    formatTime,
-    Icon,
-    ProgressBar,
-    useSeekProgress,
-    VolumeControl,
-} from "@zelefy/ui";
-import { useSettingsStore } from "@/shared/lib/stores";
-import { useCurrentTrack, usePlayerStore } from "@/features/player";
+import { Button, Cover, Flex, Icon } from "@zelefy/ui";
+import { useCurrentTrack } from "@/features/player";
 import { QueueDrawer } from "@/widgets/drawer";
 import { useNavigate } from "react-router";
+import { PlayerBarProgress } from "./PlayerBarProgress";
+import { PlayerBarVolumeControl } from "./PlayerBarVolumeControl";
+import { PlayerBarControls } from "./PlayerBarControls";
 
 export const PlayerBar = () => {
     const navigate = useNavigate();
-
-    const isMuted = useSettingsStore((state) => state.isMuted);
-    const volume = useSettingsStore((state) => state.volume);
-    const setVolume = useSettingsStore((state) => state.setVolume);
-    const setIsMuted = useSettingsStore((state) => state.setIsMuted);
-
-    const isPlaying = usePlayerStore((state) => state.isPlaying);
-    const togglePlay = usePlayerStore((state) => state.togglePlay);
-    const nextTrack = usePlayerStore((state) => state.nextTrack);
-    const previousTrack = usePlayerStore((state) => state.previousTrack);
-
-    const isShuffle = usePlayerStore((state) => state.isShuffle);
-    const toggleShuffle = usePlayerStore((state) => state.toggleShuffle);
-    const repeatMode = usePlayerStore((state) => state.repeatMode);
-    const toggleRepeat = usePlayerStore((state) => state.toggleRepeat);
 
     const track = useCurrentTrack();
 
     const [lastTrack, setLastTrack] = useState(track);
     if (track && track !== lastTrack) setLastTrack(track);
     const displayTrack = track ?? lastTrack;
-
-    const currentTime = usePlayerStore((state) => state.currentTime);
-    const seek = usePlayerStore((state) => state.seek);
-
-    const { displayTime, safeDuration, handleTimeChange, handleSeekCommit } = useSeekProgress(
-        currentTime,
-        track?.durationMs,
-        seek,
-    );
 
     const [isQueueOpen, setIsQueueOpen] = useState(false);
 
@@ -90,82 +59,7 @@ export const PlayerBar = () => {
 
                                     <div className={styles.divider} />
 
-                                    <Flex align="center" gap="3xs" className={styles.shrinkPrevent}>
-                                        <Button
-                                            variant="ghost"
-                                            radius="full"
-                                            square
-                                            className={styles.optionalControl}
-                                            onClick={toggleShuffle}
-                                            colorScheme={
-                                                isShuffle
-                                                    ? {
-                                                          color: "var(--primary)",
-                                                          colorHover: "var(--primary)",
-                                                      }
-                                                    : undefined
-                                            }
-                                        >
-                                            <Icon name="player-shuffle" width={16} height={16} />
-                                        </Button>
-
-                                        <Button
-                                            variant="ghost"
-                                            radius="full"
-                                            square
-                                            onClick={previousTrack}
-                                        >
-                                            <Icon name="player-skip-prev" width={20} height={20} />
-                                        </Button>
-
-                                        <Button
-                                            radius="full"
-                                            size="large"
-                                            square
-                                            onClick={togglePlay}
-                                        >
-                                            <Icon
-                                                name={isPlaying ? "player-pause" : "player-play"}
-                                                width={20}
-                                                height={20}
-                                            />
-                                        </Button>
-
-                                        <Button
-                                            variant="ghost"
-                                            radius="full"
-                                            square
-                                            onClick={nextTrack}
-                                        >
-                                            <Icon name="player-skip-next" width={20} height={20} />
-                                        </Button>
-
-                                        <Button
-                                            variant="ghost"
-                                            radius="full"
-                                            square
-                                            className={styles.optionalControl}
-                                            onClick={toggleRepeat}
-                                            colorScheme={
-                                                repeatMode !== "off"
-                                                    ? {
-                                                          color: "var(--primary)",
-                                                          colorHover: "var(--primary)",
-                                                      }
-                                                    : undefined
-                                            }
-                                        >
-                                            <Icon
-                                                name={
-                                                    repeatMode === "track"
-                                                        ? "player-repeat-one"
-                                                        : "player-repeat"
-                                                }
-                                                width={16}
-                                                height={16}
-                                            />
-                                        </Button>
-                                    </Flex>
+                                    <PlayerBarControls />
 
                                     <div className={styles.divider}></div>
 
@@ -203,33 +97,11 @@ export const PlayerBar = () => {
                                             <Icon name="player-queue" width={16} height={16} />
                                         </Button>
 
-                                        <VolumeControl
-                                            volume={volume}
-                                            isMuted={isMuted}
-                                            onChange={(newVolume) => {
-                                                setVolume(newVolume);
-                                                if (isMuted && newVolume > 0) {
-                                                    setIsMuted(false);
-                                                }
-                                            }}
-                                            onToggleMute={() => setIsMuted(!isMuted)}
-                                        />
+                                        <PlayerBarVolumeControl />
                                     </Flex>
                                 </div>
 
-                                <div className={styles.progressSection}>
-                                    <Flex justify="space-between">
-                                        <p>{formatTime(displayTime)}</p>
-                                        <span>{formatTime(safeDuration / 1000)}</span>
-                                    </Flex>
-
-                                    <ProgressBar
-                                        time={displayTime}
-                                        duration={safeDuration / 1000}
-                                        onChange={handleTimeChange}
-                                        onChangeEnd={handleSeekCommit}
-                                    />
-                                </div>
+                                <PlayerBarProgress track={displayTrack} />
                             </Flex>
                         </div>
                     </Flex>

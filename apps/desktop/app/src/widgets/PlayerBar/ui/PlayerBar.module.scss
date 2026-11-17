@@ -117,11 +117,3 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
         display: none;
     }
 }
-
-// Progress Bar
-.progressSection {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    user-select: none;
-}

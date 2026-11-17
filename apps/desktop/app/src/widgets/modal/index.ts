@@ -1,1 +1,1 @@
-export { EditTrackModal } from "./EditTrackModal";
+export { ModalHost } from "./ModalHost";

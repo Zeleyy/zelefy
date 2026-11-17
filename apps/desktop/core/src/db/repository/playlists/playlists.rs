@@ -2,7 +2,7 @@ use rusqlite::{Connection, params, params_from_iter, types::Value};
 
 use crate::{
     db::utils::push_opt_nullable,
-    models::playlists::{NewPlaylist, Playlist, UpdatePlaylist},
+    models::playlists::{NewPlaylist, Playlist, PlaylistWithFirstTrackId, UpdatePlaylist},
 };
 
 pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Playlist>> {
@@ -24,15 +24,42 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Playlist>> {
     rows.collect()
 }
 
-pub fn create(conn: &Connection, new: &NewPlaylist) -> rusqlite::Result<i64> {
+pub fn get_all_with_first_track_id(
+    conn: &Connection,
+) -> rusqlite::Result<Vec<PlaylistWithFirstTrackId>> {
+    let mut stmt = conn.prepare_cached(
+        r#"
+            SELECT
+                p.playlist_id
+                , p.title
+                , p.description
+                , p.created_at
+                , (
+                    SELECT pt.track_id
+                    FROM playlist_tracks pt
+                    WHERE pt.playlist_id = p.playlist_id  
+                    ORDER BY pt.position ASC
+                    LIMIT 1
+                ) AS track_id
+            FROM playlists p
+            ORDER BY p.created_at ASC
+        "#,
+    )?;
+
+    let rows = stmt.query_map([], |row| PlaylistWithFirstTrackId::from_row(row))?;
+
+    rows.collect()
+}
+
+pub fn create(conn: &Connection, new: &NewPlaylist) -> rusqlite::Result<Playlist> {
     conn.query_one(
         r#"
             INSERT INTO playlists (title, description)
             VALUES (?1, ?2)
-            RETURNING playlist_id
+            RETURNING playlist_id, title, description, created_at
         "#,
         params![new.title, new.description],
-        |row| row.get("playlist_id"),
+        Playlist::from_row,
     )
 }
 

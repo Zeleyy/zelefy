@@ -241,6 +241,7 @@ CREATE TABLE remote_playlists (
     profile_id INTEGER REFERENCES profiles (profile_id) ON DELETE SET NULL,
     -- 
     permalink TEXT NOT NULL,
+    cover_url TEXT,
     is_album INTEGER NOT NULL DEFAULT 0 CHECK (is_album IN (0, 1)),
     is_private INTEGER NOT NULL DEFAULT 0 CHECK (is_private IN (0, 1)),
     -- 

@@ -10,6 +10,7 @@ pub struct RemotePlaylist {
     pub profile_id: i64,
 
     pub permalink: String,
+    pub cover_url: Option<String>,
     pub is_album: bool,
     pub is_private: bool,
 

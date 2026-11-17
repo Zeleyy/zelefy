@@ -1,10 +1,11 @@
 import styles from "./MainLayout.module.scss";
 import { Outlet } from "react-router";
 import { Flex } from "@zelefy/ui";
+import { AppToaster } from "@/shared/ui";
 import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
 import { PlayerBar } from "@/widgets/PlayerBar";
-import { AppToaster } from "@/shared/ui";
+import { ModalHost } from "@/widgets/modal";
 
 export const MainLayout = () => {
     return (
@@ -26,7 +27,9 @@ export const MainLayout = () => {
 
                 <div id="drawer-root" className={styles.drawerRoot} />
 
-                <div id="modal-root" className={styles.modalRoot} />
+                <div id="modal-root" className={styles.modalRoot}>
+                    <ModalHost />
+                </div>
 
                 <AppToaster />
             </div>

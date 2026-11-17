@@ -1,15 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, EditableCover, Flex, InputLabel, Modal, SpinnerLoader } from "@zelefy/ui";
+import type { ModalComponentProps } from "@/shared/lib/stores";
 import { selectImage } from "@/shared/lib/utils";
-import { toSrc, trackFileSrc, type TrackId } from "@/entities/track";
-import { useLocalTrackDetails, useUpdateLocalTrack } from "@/features/player";
-
-interface EditTrackModalProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    trackId: TrackId | null;
-}
+import { toSrc, trackFileSrc } from "@/entities/track";
+import { useLocalTrackDetails, useUpdateLocalTrack } from "../../hooks";
 
 type EditableField = "title" | "metadataArtist" | "genre" | "bpm" | "keySignature" | "description";
 type CoverAction = "clear" | "delete" | "restore";
@@ -27,7 +22,7 @@ const fields: {
     { name: "description", i18nKey: "description" },
 ];
 
-export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalProps) => {
+export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTrack">) => {
     const { t } = useTranslation();
     const numericId = typeof trackId === "number" ? trackId : null;
 
@@ -86,7 +81,7 @@ export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalPr
                 },
             },
             {
-                onSuccess: () => onOpenChange(false),
+                onSuccess: () => onClose(),
             },
         );
     };
@@ -108,12 +103,12 @@ export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalPr
 
     return (
         <Modal
-            open={open}
-            onOpenChange={onOpenChange}
-            title={t("offline.edit.title")}
+            open
+            onOpenChange={(open) => !open && onClose()}
+            title={t("modal.edit_track.title")}
             actions={
                 <Flex justify="flex-end" gap="sm">
-                    <Button variant="secondary" onClick={() => onOpenChange(false)}>
+                    <Button variant="secondary" onClick={() => onClose()}>
                         {t("common.cancel")}
                     </Button>
                     <Button onClick={handleSave}>{t("common.save")}</Button>
@@ -129,7 +124,7 @@ export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalPr
                             src={displayImage ?? undefined}
                             alt={draft?.title}
                             size="xl"
-                            action={t("offline.edit.cover.action")}
+                            action={t("modal.edit_track.cover.action")}
                             onEditClick={() => handleBrowseImage()}
                         />
 
@@ -141,7 +136,7 @@ export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalPr
                                 setDraftImagePath(coverAction === "delete" ? null : undefined);
                             }}
                         >
-                            {t("offline.edit.cover." + coverAction)}
+                            {t("modal.edit_track.cover." + coverAction)}
                         </Button>
                     </Flex>
 
@@ -149,8 +144,10 @@ export const EditTrackModal = ({ open, onOpenChange, trackId }: EditTrackModalPr
                         {fields.map((field) => (
                             <InputLabel
                                 key={field.name}
-                                label={t(`offline.edit.field.${field.i18nKey}.label`)}
-                                placeholder={t(`offline.edit.field.${field.i18nKey}.placeholder`)}
+                                label={t(`modal.edit_track.field.${field.i18nKey}.label`)}
+                                placeholder={t(
+                                    `modal.edit_track.field.${field.i18nKey}.placeholder`,
+                                )}
                                 value={draft[field.name]}
                                 onChange={update(field.name)}
                                 required={field.required}

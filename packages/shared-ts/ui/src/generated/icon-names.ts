@@ -27,6 +27,7 @@ export type IconName =
     | "player-heart"
     | "player-heart-filled"
     | "player-list-end"
+    | "player-list-plus"
     | "player-pause"
     | "player-play"
     | "player-queue"

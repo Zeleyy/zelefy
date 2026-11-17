@@ -1,6 +1,50 @@
 use rusqlite::{Connection, params};
 
-use crate::models::playlists::NewPlaylistTrack;
+use crate::models::playlists::{NewPlaylistTrack, PlaylistTrack, PlaylistTrackCursor};
+
+pub fn get_page(
+    conn: &Connection,
+    playlist_id: i64,
+    after: Option<PlaylistTrackCursor>,
+    limit: u32,
+) -> rusqlite::Result<Vec<PlaylistTrack>> {
+    let mut stmt = conn.prepare_cached(
+        r#"
+            SELECT
+                playlist_id
+                , track_id
+                , position
+                , added_at
+            FROM playlist_tracks
+            WHERE playlist_id = ?1
+                AND (?2 IS NULL OR position < ?2)
+            ORDER BY position ASC
+            LIMIT ?3
+        "#,
+    )?;
+
+    let position = after.map(|a| a.position);
+
+    stmt.query_map(
+        params![playlist_id, position, limit],
+        PlaylistTrack::from_row,
+    )?
+    .collect()
+}
+
+pub fn get_all_track_ids(conn: &Connection, playlist_id: i64) -> rusqlite::Result<Vec<i64>> {
+    let mut stmt = conn.prepare_cached(
+        r#"
+            SELECT track_id
+            FROM playlist_tracks
+            WHERE playlist_id = ?1
+            ORDER BY position ASC
+        "#,
+    )?;
+
+    stmt.query_map(params![playlist_id], |row| row.get(0))?
+        .collect()
+}
 
 pub fn add(conn: &Connection, new: &NewPlaylistTrack) -> rusqlite::Result<()> {
     conn.execute(

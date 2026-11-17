@@ -1,31 +1,30 @@
 import styles from "./OfflinePage.module.scss";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Button, EmptyState, Flex, Input } from "@zelefy/ui";
+import { useModalStore } from "@/shared/lib/stores";
 import { selectAudio } from "@/shared/lib/utils/browse";
 import type { TrackId } from "@/entities/track";
 import {
     useDeleteLocalTrack,
-    useEnsureTracks,
     useImportTracks,
     useLocalTracks,
     usePlayerStore,
 } from "@/features/player";
-import { EditTrackModal } from "@/widgets/modal";
 import { StorageDashboard } from "./StorageDashboard";
 import { TrackRow } from "./TrackRow";
 
 export const OfflinePage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [editingTrackId, setEditingTrackId] = useState<TrackId | null>(null);
+
+    const openModal = useModalStore((s) => s.openModal);
 
     const { data } = useLocalTracks();
     const localTracks = data ?? [];
 
     const trackIds = useMemo(() => (data ?? []).map((t) => t.trackId), [data]);
-    useEnsureTracks(trackIds);
 
     const { mutate: importTracks, isPending, progress } = useImportTracks();
     const { mutate: deleteTrack } = useDeleteLocalTrack();
@@ -35,7 +34,14 @@ export const OfflinePage = () => {
         (trackId: TrackId) => playTrack(trackId, trackIds),
         [playTrack, trackIds],
     );
-    const handleEdit = useCallback((trackId: TrackId) => setEditingTrackId(trackId), []);
+    const handleAddToPlaylist = useCallback(
+        (trackId: TrackId) => openModal("addToPlaylist", { trackId }),
+        [openModal],
+    );
+    const handleEdit = useCallback(
+        (trackId: TrackId) => openModal("editTrack", { trackId }),
+        [openModal],
+    );
     const handleDelete = useCallback(
         (trackId: TrackId) => deleteTrack(Number(trackId)),
         [deleteTrack],
@@ -106,6 +112,7 @@ export const OfflinePage = () => {
                                 onPlay={handlePlay}
                                 onEdit={handleEdit}
                                 onDelete={handleDelete}
+                                onAddToPlaylist={handleAddToPlaylist}
                             />
                         ))}
                     </div>
@@ -114,14 +121,14 @@ export const OfflinePage = () => {
                 )}
             </Flex>
 
-            <EditTrackModal
+            {/* <EditTrackModal
                 key={editingTrackId ?? "empty"}
                 open={editingTrackId !== null}
                 onOpenChange={(open) => {
                     if (!open) setEditingTrackId(null);
                 }}
                 trackId={editingTrackId}
-            />
+            /> */}
         </>
     );
 };

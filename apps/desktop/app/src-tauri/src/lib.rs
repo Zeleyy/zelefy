@@ -105,6 +105,13 @@ pub fn run() {
             commands::audio::audio_switch_device,
             commands::jobs::get_jobs_page,
             commands::jobs::get_active_jobs,
+            commands::playlists::get_local_playlists,
+            commands::playlists::get_local_playlist_tracks_paged,
+            commands::playlists::get_local_playlist_track_ids,
+            commands::playlists::get_local_playlists_with_first_track,
+            commands::playlists::create_local_playlist,
+            commands::playlists::update_local_playlist,
+            commands::playlists::add_track_to_playlist_end,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

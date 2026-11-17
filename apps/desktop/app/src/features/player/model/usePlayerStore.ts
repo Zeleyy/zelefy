@@ -5,12 +5,14 @@ import type { PlayerTrack } from "@zelefy/types";
 import { queryClient } from "@/shared/api";
 import { tauriStorage } from "@/shared/lib/storage";
 import { trackKeys, type TrackId } from "@/entities/track";
+import type { PlaylistId } from "@/entities/playlist";
 
 type RepeatMode = "off" | "queue" | "track";
 
 interface QueueItem {
     qid: number;
     trackId: TrackId;
+    playlistId?: PlaylistId;
 }
 
 interface PlayerState {
@@ -31,7 +33,7 @@ interface PlayerState {
     seek: (time: number) => void;
     setCurrentTime: (time: number) => void;
 
-    playTrack: (trackId: TrackId, trackIds?: TrackId[]) => void;
+    playTrack: (trackId: TrackId, trackIds?: TrackId[], playlistId?: PlaylistId) => void;
 
     previousTrack: () => void;
     nextTrack: () => void;
@@ -39,7 +41,7 @@ interface PlayerState {
     patchTrack: (trackId: TrackId, patch: Partial<PlayerTrack>) => void;
     deleteTrack: (trackId: TrackId) => void;
 
-    setQueue: (tracksIds: TrackId[]) => void;
+    setQueue: (tracksIds: TrackId[], playlistId?: PlaylistId) => void;
     addToQueue: (trackId: TrackId) => void;
     replaceTrack: (movingQid?: number, afterQid?: number, beforeQid?: number) => void;
     playFromQueue: (qid: number) => void;
@@ -64,6 +66,10 @@ const MAX_QUEUE = 100;
 export const selectCurrentTrackId = (
     s: Pick<PlayerState, "queue" | "currentIndex">,
 ): TrackId | undefined => s.queue[s.currentIndex]?.trackId;
+
+export const selectCurrentPlaylistId = (
+    s: Pick<PlayerState, "queue" | "currentIndex">,
+): PlaylistId | undefined => s.queue[s.currentIndex]?.playlistId;
 
 export const usePlayerStore = create<PlayerState>()(
     subscribeWithSelector(
@@ -90,9 +96,13 @@ export const usePlayerStore = create<PlayerState>()(
                 },
                 setCurrentTime: (time) => set({ currentTime: time }),
 
-                playTrack: (trackId, trackIds) => {
+                playTrack: (trackId, trackIds, playlistId) => {
                     const state = get();
-                    if (trackId === selectCurrentTrackId(state)) return;
+                    if (
+                        trackId === selectCurrentTrackId(state) &&
+                        playlistId === selectCurrentPlaylistId(state)
+                    )
+                        return;
 
                     let list = trackIds ?? [trackId];
                     let index = list.findIndex((t) => t === trackId);
@@ -102,7 +112,11 @@ export const usePlayerStore = create<PlayerState>()(
                     }
 
                     let nextQid = state._nextQid;
-                    const queue: QueueItem[] = list.map((id) => ({ qid: nextQid++, trackId: id }));
+                    const queue: QueueItem[] = list.map((id) => ({
+                        qid: nextQid++,
+                        trackId: id,
+                        playlistId,
+                    }));
 
                     set({
                         queue,
@@ -198,12 +212,13 @@ export const usePlayerStore = create<PlayerState>()(
                     });
                 },
 
-                setQueue: (trackIds) => {
+                setQueue: (trackIds, playlistId) => {
                     set((state) => {
                         let nextQid = state._nextQid;
                         const items: QueueItem[] = trackIds.map((id) => ({
                             qid: nextQid++,
                             trackId: id,
+                            playlistId,
                         }));
 
                         if (items.length === 0) {

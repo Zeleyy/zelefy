@@ -1,11 +1,11 @@
 import styles from "./QueueRow.module.scss";
 import type { CSSProperties } from "react";
+import { useTranslation } from "react-i18next";
 import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 import clsx from "clsx";
 import { Button, Cover, DragButton, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
 import type { TrackId } from "@/entities/track";
 import { useTrack } from "@/features/player";
-import { useTranslation } from "react-i18next";
 
 interface QueueRowProps {
     index: number;

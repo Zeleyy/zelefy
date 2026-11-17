@@ -1,8 +1,11 @@
 use rusqlite::Row;
+use serde::{Deserialize, Serialize};
+use zelefy_common::double_option;
 
 use crate::models::utils::TimestampMs;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Playlist {
     pub playlist_id: i64,
     pub title: String,
@@ -21,12 +24,40 @@ impl Playlist {
     }
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlaylistWithFirstTrackId {
+    #[serde(flatten)]
+    pub playlist: Playlist,
+    pub track_id: Option<i64>,
+}
+
+impl PlaylistWithFirstTrackId {
+    pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
+        Ok(Self {
+            playlist: Playlist::from_row(row)?,
+            track_id: row.get("track_id")?,
+        })
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct NewPlaylist {
     pub title: String,
     pub description: Option<String>,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewPlaylistRequest {
+    #[serde(flatten)]
+    pub playlist: NewPlaylist,
+    pub track_id: i64,
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct UpdatePlaylist {
     pub title: Option<String>,
+    #[serde(default, with = "double_option")]
     pub description: Option<Option<String>>,
 }
