@@ -4,7 +4,7 @@ import { playlistKeys, type Playlist } from "@/entities/playlist";
 
 export const useLocalPlaylists = () => {
     return useQuery({
-        queryKey: playlistKeys.locals(),
+        queryKey: playlistKeys.lists(),
         queryFn: () => invoke<Playlist[]>("get_local_playlists"),
     });
 };

@@ -1,6 +1,7 @@
 .card {
     padding: var(--spacing-2xs);
     width: 188px;
+    user-select: none;
 
     .meta {
         overflow: hidden;

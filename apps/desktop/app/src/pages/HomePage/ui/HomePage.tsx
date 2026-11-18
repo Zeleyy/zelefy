@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { useModalStore } from "@/shared/lib/stores";
 import { useWaveform } from "@/features/waveform";
 import { PlayerTrackHero, useCurrentTrack, usePlayerStore } from "@/features/player";
-import { useModalStore } from "@/shared/lib/stores";
 import { useAddToQueue } from "@/features/queue";
 
 export const HomePage = () => {

@@ -113,7 +113,9 @@ pub fn run() {
             commands::playlists::create_local_playlist,
             commands::playlists::update_local_playlist,
             commands::playlists::delete_local_playlist,
-            commands::playlists::add_track_to_playlist_end,
+            commands::playlists::add_local_playlist_track_end,
+            commands::playlists::remove_local_playlist_track,
+            commands::playlists::replace_local_playlist_track,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

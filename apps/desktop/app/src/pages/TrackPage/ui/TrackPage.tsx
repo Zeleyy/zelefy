@@ -1,10 +1,15 @@
-import { useParams } from "react-router";
+import { useLoaderData } from "react-router";
+import type { TrackId } from "@/entities/track";
 import { PlayerTrackHero, useCurrentTrack, usePlayerStore, useTrack } from "@/features/player";
 import { useWaveform } from "@/features/waveform";
+import { useModalStore } from "@/shared/lib/stores";
+import { useAddToQueue } from "@/features/queue";
 
 export const TrackPage = () => {
-    const params = useParams();
-    const trackId = Number(params.trackId);
+    const { trackId } = useLoaderData() as { trackId: TrackId };
+
+    const openModal = useModalStore((s) => s.openModal);
+    const addToQueue = useAddToQueue();
 
     const { data: track } = useTrack(trackId);
     const { data: waveform } = useWaveform(track?.waveformSrc);
@@ -21,13 +26,7 @@ export const TrackPage = () => {
             track={track}
             isCurrentTrack={isCurrentTrack}
             waveformData={waveform}
-            onTogglePlay={() => {
-                if (isCurrentTrack) {
-                    togglePlay();
-                } else {
-                    playTrack(trackId);
-                }
-            }}
+            onTogglePlay={() => (isCurrentTrack ? togglePlay() : playTrack(trackId))}
             onSeek={(time) => {
                 if (isCurrentTrack) {
                     seek(time);
@@ -35,6 +34,14 @@ export const TrackPage = () => {
                     playTrack(trackId);
                     seek(time);
                 }
+            }}
+            onAddToPlaylistClick={() => {
+                if (!track?.trackId) return;
+                openModal("addToPlaylist", { trackId: track.trackId });
+            }}
+            onAddToQueueClick={() => {
+                if (!track) return;
+                addToQueue(track);
             }}
         />
     );

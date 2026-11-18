@@ -8,3 +8,5 @@ export { useUpdateLocalPlaylist } from "./useUpdateLocalPlaylist";
 export { useDeleteLocalPlaylist } from "./useDeleteLocalPlaylist";
 
 export { useAddLocalPlaylistEnd } from "./useAddLocalPlaylistEnd";
+export { useRemoveLocalPlaylistTrack } from "./useRemoveLocalPlaylistTrack";
+export { useReplaceLocalPlaylistTrack } from "./useReplaceLocalPlaylistTrack";

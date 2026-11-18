@@ -37,3 +37,11 @@ pub struct NewPlaylistTrack {
     pub track_id: i64,
     pub position: f64,
 }
+
+#[derive(Clone, Copy, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MoveTrackRequest {
+    pub track_id: i64,
+    pub after_track_id: Option<i64>,
+    pub before_track_id: Option<i64>,
+}

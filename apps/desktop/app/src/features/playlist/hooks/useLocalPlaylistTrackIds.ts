@@ -7,9 +7,9 @@ import {
 } from "@/entities/playlist";
 import { useEnsureTracks } from "@/features/player";
 
-export const useLocalPlaylistTrackIds = (playlistId: number) => {
+export const useLocalPlaylistTrackIds = (playlistId: number | null) => {
     const query = useInfiniteQuery({
-        queryKey: playlistKeys.feed(playlistId),
+        queryKey: playlistKeys.feed(playlistId!),
         queryFn: async ({ pageParam }: { pageParam: PlaylistTrackCursor | null }) => {
             return invoke<PlaylistTrackPage>("get_local_playlist_tracks_paged", {
                 playlistId,
@@ -24,6 +24,7 @@ export const useLocalPlaylistTrackIds = (playlistId: number) => {
             const seen = allPages.slice(0, -1).some((p) => p.nextCursor?.position == next.position);
             return seen ? undefined : next;
         },
+        enabled: playlistId !== null,
     });
 
     const trackIds = query.data?.pages

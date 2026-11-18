@@ -1,8 +1,9 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { EmptyState, Flex, Icon, SpinnerLoader } from "@zelefy/ui";
 import { useJobs } from "@/features/job";
 import { JobCard } from "../JobCard";
+import { useInfiniteSentinel } from "@/shared/lib/hooks";
 
 export const AllJobsTab = () => {
     const { t } = useTranslation();
@@ -11,23 +12,7 @@ export const AllJobsTab = () => {
 
     const jobs = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
-    const sentinelRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const el = sentinelRef.current;
-        if (!el) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                }
-            },
-            { rootMargin: "200px" },
-        );
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    const sentinelRef = useInfiniteSentinel({ hasNextPage, isFetchingNextPage, fetchNextPage });
 
     if (isLoading) return <SpinnerLoader isLoading />;
     if (isError) return <EmptyState title={"tasks.tab.all.error"} description={String(error)} />;

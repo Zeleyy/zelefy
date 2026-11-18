@@ -1,6 +1,7 @@
 import styles from "./PlaylistTrackRow.module.scss";
 import { memo, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 import clsx from "clsx";
 import { Button, Cover, DragButton, Flex, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
@@ -13,8 +14,8 @@ interface PlaylistTrackRowProps {
     isActive?: boolean;
     isLoading?: boolean;
     onRowClick: (index: number) => void;
-    onTitleClick: (trackId: TrackId) => void;
     onAddToPlaylist: (trackId: TrackId) => void;
+    onRemoveFromPlaylist: (trackId: TrackId) => void;
     setNodeRef?: (node: HTMLElement | null) => void;
     style?: CSSProperties;
     listeners?: DraggableSyntheticListeners;
@@ -29,8 +30,8 @@ export const PlaylistTrackRow = memo(
         isLoading,
         isActive = false,
         onRowClick,
-        onTitleClick,
         onAddToPlaylist,
+        onRemoveFromPlaylist,
         setNodeRef,
         style,
         listeners,
@@ -66,15 +67,13 @@ export const PlaylistTrackRow = memo(
                     <>
                         <div className={styles.row__track}>
                             <Cover alt={track.title} src={track.coverSrc ?? undefined} size="xs" />
-                            <span
+                            <Link
+                                to={`/track/${trackId}`}
                                 className={styles.row__title}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onTitleClick(track.trackId);
-                                }}
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 {track.title}
-                            </span>
+                            </Link>
                             <span className={styles.row__artist}>{track.metadataArtist}</span>
                         </div>
 
@@ -125,7 +124,7 @@ export const PlaylistTrackRow = memo(
                         square
                         onClick={(e) => {
                             e.stopPropagation();
-                            // onDelete(trackId);
+                            onRemoveFromPlaylist(trackId);
                         }}
                     >
                         <Icon name="action-delete" size={13} />

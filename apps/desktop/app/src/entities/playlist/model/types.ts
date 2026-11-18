@@ -27,6 +27,12 @@ export interface UpdatePlaylist {
     description?: NullablePatch<string>;
 }
 
+export interface MoveTrackRequest {
+    trackId: number;
+    afterTrackId?: number | null;
+    beforeTrackId?: number | null;
+}
+
 export interface PlaylistTrack {
     playlistId: number;
     trackId: number;

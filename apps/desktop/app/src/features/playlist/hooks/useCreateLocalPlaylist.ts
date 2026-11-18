@@ -12,7 +12,7 @@ export const useCreateLocalPlaylist = () => {
         mutationFn: (newPlaylist: NewPlaylistRequest) =>
             invoke<PlaylistWithFirstTrackId>("create_local_playlist", { new: newPlaylist }),
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: playlistKeys.locals() });
+            queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
         },
     });
 };

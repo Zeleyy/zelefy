@@ -4,8 +4,8 @@ import type { TrackId } from "@/entities/track";
 
 export interface ModalPropsMap {
     addToPlaylist: { trackId: TrackId };
-    editTrack: { trackId: TrackId };
     editPlaylist: { playlistId: PlaylistId };
+    editTrack: { trackId: TrackId };
 }
 
 export type ModalName = keyof ModalPropsMap;
@@ -25,8 +25,8 @@ type OpenArgs<K extends ModalName> = ModalPropsMap[K] extends undefined
 interface ModalStore {
     stack: ModalEntry[];
     openModal: <K extends ModalName>(name: K, ...args: OpenArgs<K>) => string;
-    closeCurrentModal: () => void;
-    closeModal: (id?: string) => void;
+    closeModal: (id: string) => void;
+    closeTop: () => void;
     closeAll: () => void;
 }
 
@@ -41,18 +41,18 @@ export const useModalStore = create<ModalStore>()((set) => ({
         return id;
     },
 
-    closeCurrentModal: () =>
+    closeModal: (id) =>
+        set((s) => ({
+            stack: s.stack.filter((m) => m.id !== id),
+        })),
+
+    closeTop: () =>
         set((s) => ({
             stack: s.stack.slice(0, -1),
         })),
-
-    closeModal: (id) =>
-        set((s) => ({
-            stack: id ? s.stack.filter((m) => m.id !== id) : s.stack.slice(0, -1),
-        })),
-
     closeAll: () => set({ stack: [] }),
 }));
 
-export const openModal = useModalStore.getState().openModal;
+export const openModal = <K extends ModalName>(name: K, ...args: OpenArgs<K>) =>
+    useModalStore.getState().openModal(name, ...args);
 export const closeModal = useModalStore.getState().closeModal;

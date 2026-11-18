@@ -5,6 +5,9 @@ pub enum CoreError {
     #[error("validation error: {0}")]
     Validation(String),
 
+    #[error("conflict: {0}")]
+    Conflict(String),
+
     #[error("database error: {0}")]
     Db(#[from] rusqlite::Error),
 

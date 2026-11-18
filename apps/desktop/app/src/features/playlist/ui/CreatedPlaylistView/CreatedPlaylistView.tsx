@@ -1,14 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Button, Cover, Flex } from "@zelefy/ui";
+import { useModalStore } from "@/shared/lib/stores";
 import type { PlaylistWithFirstTrackId } from "@/entities/playlist";
 import { useTrack } from "@/features/player";
-import { useModalStore } from "@/shared/lib/stores";
 
 export const CreatedPlaylistView = ({ playlist }: { playlist: PlaylistWithFirstTrackId }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const closeCurrentModal = useModalStore((s) => s.closeCurrentModal);
+    const closeTop = useModalStore((s) => s.closeTop);
     const { data: track } = useTrack(playlist.trackId ?? undefined);
 
     return (
@@ -17,7 +17,7 @@ export const CreatedPlaylistView = ({ playlist }: { playlist: PlaylistWithFirstT
             <h4 style={{ flex: 1 }}>{playlist.title}</h4>
             <Button
                 onClick={() => {
-                    closeCurrentModal();
+                    closeTop();
                     navigate("/playlist/" + playlist.playlistId);
                 }}
             >

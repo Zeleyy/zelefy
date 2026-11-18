@@ -1,7 +1,7 @@
 use desktop_core::{
     db::{repository, DbState},
     models::playlists::{
-        NewPlaylistRequest, Playlist, PlaylistTrackCursor, PlaylistTrackPage,
+        MoveTrackRequest, NewPlaylistRequest, Playlist, PlaylistTrackCursor, PlaylistTrackPage,
         PlaylistWithFirstTrackId, UpdatePlaylist,
     },
     services,
@@ -80,7 +80,7 @@ pub fn create_local_playlist(
     new: NewPlaylistRequest,
 ) -> Result<PlaylistWithFirstTrackId, String> {
     let mut conn = db.lock();
-    services::playlists::create_playlist(&mut conn, new).map_err(|e| e.to_string())
+    services::playlists::create_local_playlist(&mut conn, new).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -109,7 +109,7 @@ pub fn delete_local_playlist(
 }
 
 #[tauri::command]
-pub fn add_track_to_playlist_end(
+pub fn add_local_playlist_track_end(
     db: State<'_, DbState>,
     playlist_id: i64,
     track_id: i64,
@@ -118,4 +118,31 @@ pub fn add_track_to_playlist_end(
     repository::playlists::playlist_tracks::add_to_end(&conn, playlist_id, track_id)
         .map_err(|e| e.to_string())?;
     Ok(playlist_id)
+}
+
+#[tauri::command]
+pub fn remove_local_playlist_track(
+    db: State<'_, DbState>,
+    playlist_id: i64,
+    track_id: i64,
+) -> Result<Option<i64>, String> {
+    let conn = db.lock();
+    let deleted = repository::playlists::playlist_tracks::remove(&conn, playlist_id, track_id)
+        .map_err(|e| e.to_string())?;
+    if deleted {
+        Ok(Some(playlist_id))
+    } else {
+        Ok(None)
+    }
+}
+
+#[tauri::command]
+pub fn replace_local_playlist_track(
+    db: State<'_, DbState>,
+    playlist_id: i64,
+    request: MoveTrackRequest,
+) -> Result<(), String> {
+    let mut conn = db.lock();
+    services::playlists::replace_local_track(&mut conn, playlist_id, request)
+        .map_err(|e| e.to_string())
 }

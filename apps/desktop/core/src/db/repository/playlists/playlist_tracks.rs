@@ -1,4 +1,4 @@
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, OptionalExtension, params};
 
 use crate::models::playlists::{NewPlaylistTrack, PlaylistTrack, PlaylistTrackCursor};
 
@@ -88,12 +88,17 @@ pub fn remove(conn: &Connection, playlist_id: i64, track_id: i64) -> rusqlite::R
     )? > 0)
 }
 
-pub fn get_position(conn: &Connection, playlist_id: i64, track_id: i64) -> rusqlite::Result<f64> {
+pub fn get_position(
+    conn: &Connection,
+    playlist_id: i64,
+    track_id: i64,
+) -> rusqlite::Result<Option<f64>> {
     conn.query_one(
         "SELECT position FROM playlist_tracks WHERE playlist_id = ?1 AND track_id = ?2",
         params![playlist_id, track_id],
         |row| row.get(0),
     )
+    .optional()
 }
 
 pub fn update_position(
@@ -108,7 +113,7 @@ pub fn update_position(
             SET "position" = ?3
             WHERE playlist_id = ?1 AND track_id = ?2
         "#,
-        params![playlist_id, track_id, position,],
+        params![playlist_id, track_id, position],
     )? > 0)
 }
 

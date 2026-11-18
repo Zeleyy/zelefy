@@ -1,6 +1,6 @@
 import styles from "./OfflinePage.module.scss";
 import { useCallback, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Button, EmptyState, Flex, Input } from "@zelefy/ui";
 import { useModalStore } from "@/shared/lib/stores";
@@ -17,7 +17,6 @@ import { TrackRow } from "./TrackRow";
 
 export const OfflinePage = () => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
 
     const openModal = useModalStore((s) => s.openModal);
 
@@ -59,7 +58,7 @@ export const OfflinePage = () => {
                 <Flex as="header" justify="space-between" align="flex-end" wrap="wrap" gap="md">
                     <h1>{t("offline.title")}</h1>
                     <Flex gap="md">
-                        <Button variant="secondary" onClick={() => navigate("/settings/storage")}>
+                        <Button as={Link} to={"/settings/storage"} variant="secondary">
                             {t("offline.storage.settings")}
                         </Button>
                         <Button
@@ -120,15 +119,6 @@ export const OfflinePage = () => {
                     <EmptyState title={t("offline.list.empty")} />
                 )}
             </Flex>
-
-            {/* <EditTrackModal
-                key={editingTrackId ?? "empty"}
-                open={editingTrackId !== null}
-                onOpenChange={(open) => {
-                    if (!open) setEditingTrackId(null);
-                }}
-                trackId={editingTrackId}
-            /> */}
         </>
     );
 };

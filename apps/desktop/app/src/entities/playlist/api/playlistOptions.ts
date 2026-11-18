@@ -4,6 +4,6 @@ import { playlistKeys } from "./playlistKeys";
 
 export const localPlaylistAllTrackIdsOptions = (playlistId: number) =>
     queryOptions({
-        queryKey: playlistKeys.local(playlistId),
+        queryKey: playlistKeys.trackIdsOf(playlistId),
         queryFn: () => invoke<number[]>("get_local_playlist_track_ids", { playlistId }),
     });

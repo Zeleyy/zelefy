@@ -25,8 +25,9 @@ export const AddToPlaylistTab = ({ track }: AddToPlaylistTabProps) => {
                         <PlaylistRow
                             key={playlist.playlistId}
                             playlist={playlist}
-                            onAddClick={(playlistId) =>
-                                addToLocalPlaylist({ playlistId, trackId: track.trackId })
+                            trackId={track.trackId}
+                            onAddClick={(playlistId, trackId) =>
+                                addToLocalPlaylist({ playlistId, trackId })
                             }
                         />
                     ))

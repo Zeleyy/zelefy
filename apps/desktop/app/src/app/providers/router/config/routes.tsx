@@ -1,6 +1,9 @@
 import { Navigate, type RouteObject } from "react-router";
-import { MainLayout } from "@/app/layouts";
+import type { PlaylistId } from "@/entities/playlist";
+import type { TrackId } from "@/entities/track";
 import { HomePage } from "@/pages/HomePage";
+import { NotFoundPage } from "@/pages/NotFoundPage";
+import { MainLayout } from "@/app/layouts";
 import { HydrateFallback } from "../ui";
 
 export const routes: RouteObject[] = [
@@ -92,6 +95,16 @@ export const routes: RouteObject[] = [
 
             {
                 path: "track/:trackId",
+                loader: ({ params }) => {
+                    const raw = params.trackId;
+                    if (!raw) throw new Response("Missing track id", { status: 400 });
+
+                    const asNumber = Number(raw);
+                    const trackId: TrackId =
+                        Number.isFinite(asNumber) && String(asNumber) === raw ? asNumber : raw;
+
+                    return { trackId };
+                },
                 lazy: async () => {
                     const { TrackPage } = await import("@/pages/TrackPage");
                     return { Component: TrackPage };
@@ -99,6 +112,16 @@ export const routes: RouteObject[] = [
             },
             {
                 path: "playlist/:playlistId",
+                loader: ({ params }) => {
+                    const raw = params.playlistId;
+                    if (!raw) throw new Response("Missing playlist id", { status: 400 });
+
+                    const asNumber = Number(raw);
+                    const playlistId: PlaylistId =
+                        Number.isFinite(asNumber) && String(asNumber) === raw ? asNumber : raw;
+
+                    return { playlistId };
+                },
                 lazy: async () => {
                     const { PlaylistPage } = await import("@/pages/PlaylistPage");
                     return { Component: PlaylistPage };
@@ -107,7 +130,7 @@ export const routes: RouteObject[] = [
 
             {
                 path: "*",
-                element: <div>Страница не найдена</div>,
+                element: <NotFoundPage />,
             },
         ],
     },

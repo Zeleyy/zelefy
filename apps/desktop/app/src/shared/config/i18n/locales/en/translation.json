@@ -241,5 +241,10 @@
             "error": "Failed to load tracks",
             "empty": "Tracks not found"
         }
+    },
+    "track": {},
+    "not_found": {
+        "title": "Page not found",
+        "to_home": "Go home"
     }
 }

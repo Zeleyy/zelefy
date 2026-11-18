@@ -5,12 +5,11 @@ import { playlistKeys } from "@/entities/playlist";
 
 export const useDeleteLocalPlaylist = () => {
     return useMutation({
-        mutationFn: (playlistId: number) => invoke<number>("delete_local_playlist", { playlistId }),
-        onSettled: (deletedId) => {
-            if (!deletedId) return;
-
-            queryClient.removeQueries({ queryKey: playlistKeys.detail(deletedId) });
-            queryClient.invalidateQueries({ queryKey: playlistKeys.locals() });
+        mutationFn: (playlistId: number) =>
+            invoke<number | null>("delete_local_playlist", { playlistId }),
+        onSuccess: (_data, playlistId) => {
+            queryClient.removeQueries({ queryKey: playlistKeys.detail(playlistId) });
+            queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
         },
     });
 };

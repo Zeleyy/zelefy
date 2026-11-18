@@ -1,17 +1,15 @@
 import styles from "./PlayerBar.module.scss";
 import { useState } from "react";
+import { Link } from "react-router";
 import clsx from "clsx";
 import { Button, Cover, Flex, Icon } from "@zelefy/ui";
 import { useCurrentTrack } from "@/features/player";
 import { QueueDrawer } from "@/widgets/drawer";
-import { useNavigate } from "react-router";
 import { PlayerBarProgress } from "./PlayerBarProgress";
 import { PlayerBarVolumeControl } from "./PlayerBarVolumeControl";
 import { PlayerBarControls } from "./PlayerBarControls";
 
 export const PlayerBar = () => {
-    const navigate = useNavigate();
-
     const track = useCurrentTrack();
 
     const [lastTrack, setLastTrack] = useState(track);
@@ -38,16 +36,13 @@ export const PlayerBar = () => {
                                             size="sm"
                                         />
                                         <div className={styles.meta}>
-                                            <span
+                                            <Link
+                                                to={"/track/" + (displayTrack?.trackId ?? "")}
+
                                                 className={styles.title}
-                                                onClick={() => {
-                                                    if (displayTrack) {
-                                                        navigate("/track/" + displayTrack.trackId);
-                                                    }
-                                                }}
                                             >
                                                 {displayTrack?.title ?? "No track selected"}
-                                            </span>
+                                            </Link>
                                             <span className={styles.author}>
                                                 {displayTrack?.metadataArtist}
                                             </span>

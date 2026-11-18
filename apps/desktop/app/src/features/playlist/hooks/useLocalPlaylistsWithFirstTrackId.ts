@@ -5,7 +5,7 @@ import { useEnsureTracks } from "@/features/player";
 
 export const useLocalPlaylistsWithFirstTrackId = () => {
     const query = useQuery({
-        queryKey: playlistKeys.localWithFirstTrackId(),
+        queryKey: playlistKeys.listsWithFirstTrackId(),
         queryFn: () => invoke<PlaylistWithFirstTrackId[]>("get_local_playlists_with_first_track"),
     });
 
