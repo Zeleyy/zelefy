@@ -3,7 +3,7 @@ import { queryClient } from "@/shared/api";
 import { fetchLocalTracks, fetchServerTracks, trackKeys, type TrackId } from "@/entities/track";
 
 export const useEnsureTracks = (ids: TrackId[]) => {
-    const sortedIds = [...new Set(ids)].sort();
+    const sortedIds = [...new Set(ids)].sort((a, b) => String(a).localeCompare(String(b)));
 
     return useQuery({
         queryKey: trackKeys.batch(sortedIds),

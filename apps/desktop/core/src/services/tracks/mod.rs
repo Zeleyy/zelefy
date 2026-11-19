@@ -1,12 +1,12 @@
 use rusqlite::Connection;
 
 pub mod delete_local_track;
-pub mod get_local_tracks;
+pub mod get_local_tracks_paged;
 pub mod import_tracks;
 pub mod update_local_track;
 
 pub use delete_local_track::*;
-pub use get_local_tracks::*;
+pub use get_local_tracks_paged::*;
 pub use import_tracks::*;
 pub use update_local_track::*;
 

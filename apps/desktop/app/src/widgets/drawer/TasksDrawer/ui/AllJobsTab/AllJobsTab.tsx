@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { EmptyState, Flex, Icon, SpinnerLoader } from "@zelefy/ui";
+import { EmptyState, Flex, SpinnerLoader } from "@zelefy/ui";
+import { InfiniteScrollFooter } from "@/shared/ui";
 import { useJobs } from "@/features/job";
 import { JobCard } from "../JobCard";
-import { useInfiniteSentinel } from "@/shared/lib/hooks";
 
 export const AllJobsTab = () => {
     const { t } = useTranslation();
@@ -11,8 +11,6 @@ export const AllJobsTab = () => {
         useJobs();
 
     const jobs = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
-
-    const sentinelRef = useInfiniteSentinel({ hasNextPage, isFetchingNextPage, fetchNextPage });
 
     if (isLoading) return <SpinnerLoader isLoading />;
     if (isError) return <EmptyState title={"tasks.tab.all.error"} description={String(error)} />;
@@ -24,13 +22,11 @@ export const AllJobsTab = () => {
                 <JobCard key={item.jobId} job={item} />
             ))}
 
-            <div ref={sentinelRef} style={{ height: 1 }} />
-
-            <Flex align="center" justify="center">
-                <SpinnerLoader isLoading={isFetchingNextPage} />
-
-                {!hasNextPage && <Icon name="zelefy" color="var(--text-muted)" size={18} />}
-            </Flex>
+            <InfiniteScrollFooter
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+            />
         </Flex>
     );
 };

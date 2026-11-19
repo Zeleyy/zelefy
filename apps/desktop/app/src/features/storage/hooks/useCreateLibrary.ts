@@ -11,8 +11,8 @@ export const useCreateLibrary = () => {
         mutationFn: async (path: string) => {
             return await invoke<number>("add_user_library", { path });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["library"] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["library"] });
             toast.success(t("settings.storage.message.success_added"));
         },
     });

@@ -1,7 +1,7 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { locale } from "@tauri-apps/plugin-os";
-import i18n, { initI18n } from "@/shared/config/i18n";
-import { useCacheStore, useSettingsStore, type Theme } from "@/shared/lib/stores";
+import i18n, { initI18n, isLanguage, Language } from "@/shared/config/i18n";
+import { Theme, useCacheStore, useSettingsStore } from "@/shared/lib/stores";
 
 const waitForHydration = () =>
     new Promise<void>((resolve) => {
@@ -20,18 +20,19 @@ const waitForHydration = () =>
 const resolveTheme = async (): Promise<Theme> => {
     try {
         const sysTheme = await getCurrentWindow().theme();
-        return sysTheme === "dark" ? "dark" : "light";
+        return sysTheme === Theme.dark ? Theme.dark : Theme.light;
     } catch {
-        return "dark";
+        return Theme.dark;
     }
 };
 
-const resolveLanguage = async (): Promise<string> => {
+const resolveLanguage = async (): Promise<Language> => {
     try {
         const systemLocale = await locale();
-        return systemLocale ? systemLocale.split("-")[0] : "en";
+        const code = systemLocale?.split("-")[0];
+        return code && isLanguage(code) ? code : Language.en;
     } catch {
-        return "en";
+        return Language.en;
     }
 };
 

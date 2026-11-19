@@ -1,7 +1,7 @@
 import type { StateStorage } from "zustand/middleware";
 import { storage } from "./storage";
 
-const debounce = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
+const debounce = <T extends (...args: unknown[]) => void>(fn: T, delay: number) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     return (...args: Parameters<T>) => {
         if (timeoutId) clearTimeout(timeoutId);
@@ -23,7 +23,7 @@ export const tauriStorage: StateStorage = {
         return JSON.stringify(value);
     },
     setItem: async (name: string, value: string) => {
-        const parsedValue = JSON.parse(value);
+        const parsedValue = JSON.parse(value) as unknown;
         await storage.set(name, parsedValue);
 
         debouncedSave();

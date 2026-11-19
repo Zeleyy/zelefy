@@ -3,10 +3,10 @@ use rusqlite::{
     ToSql,
     types::{FromSql, FromSqlError},
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::ops::{Add, Deref};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Deserialize, Serialize)]
 pub struct TimestampMs(pub DateTime<Utc>);
 
 impl TimestampMs {

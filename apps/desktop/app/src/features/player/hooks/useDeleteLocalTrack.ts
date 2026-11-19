@@ -13,10 +13,10 @@ export const useDeleteLocalTrack = () => {
             }
             return invoke<number>("delete_local_track", { trackId });
         },
-        onSuccess: (trackId) => {
+        onSuccess: async (trackId) => {
             usePlayerStore.getState().deleteTrack(trackId);
             queryClient.removeQueries({ queryKey: trackKeys.detail(trackId) });
-            queryClient.invalidateQueries({ queryKey: trackKeys.local() });
+            await queryClient.invalidateQueries({ queryKey: trackKeys.locals() });
         },
     });
 };

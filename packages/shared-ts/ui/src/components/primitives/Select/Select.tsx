@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import clsx from "clsx";
 import { useClickOutside } from "../../../utils";
 
-interface Option {
+export interface Option {
     value: string | number;
     label: string;
     disabled?: boolean;
@@ -12,7 +12,7 @@ interface Option {
 export interface SelectProps {
     options: Option[];
     value?: Option["value"] | Option["value"][];
-    onChange: (value: any) => void;
+    onChange?: (value: any) => void;
     placeholder?: string;
     isMulti?: boolean;
     disabled?: boolean;
@@ -60,7 +60,7 @@ export const Select = ({
                         onClick={() => {
                             if (option.disabled) return;
                             if (option.value !== value) {
-                                onChange(option.value);
+                                onChange?.(option.value);
                             }
                             setIsOpen(false);
                         }}

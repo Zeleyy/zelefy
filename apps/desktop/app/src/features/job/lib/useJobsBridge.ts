@@ -30,18 +30,18 @@ export const useJobsBridge = () => {
                     });
 
                     usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
-                    queryClient.invalidateQueries({ queryKey: trackKeys.local() });
-                    queryClient.invalidateQueries({ queryKey: ["jobs"] });
+                    await queryClient.invalidateQueries({ queryKey: trackKeys.locals() });
+                    await queryClient.invalidateQueries({ queryKey: ["jobs"] });
                 })().catch(toast.error);
             }
         });
 
-        unlistenPromise.then(() =>
+        void unlistenPromise.then(() =>
             invoke<JobEvent[]>("get_active_jobs").then(merge).catch(toast.error),
         );
 
         return () => {
-            unlistenPromise.then((f) => f());
+            void unlistenPromise.then((f) => f());
         };
     }, []);
 };

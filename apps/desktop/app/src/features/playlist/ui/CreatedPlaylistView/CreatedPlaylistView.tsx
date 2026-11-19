@@ -18,7 +18,7 @@ export const CreatedPlaylistView = ({ playlist }: { playlist: PlaylistWithFirstT
             <Button
                 onClick={() => {
                     closeTop();
-                    navigate("/playlist/" + playlist.playlistId);
+                    void navigate("/playlist/" + playlist.playlistId);
                 }}
             >
                 {t("modal.add_to_playlist.tab.create.go_to")}

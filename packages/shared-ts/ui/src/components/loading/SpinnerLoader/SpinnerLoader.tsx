@@ -2,7 +2,7 @@ import styles from "./SpinnerLoader.module.scss";
 import type { HTMLAttributes } from "react";
 import clsx from "clsx";
 
-type SpinnerLoaderSize = "small" | "medium" | "large";
+type SpinnerLoaderSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 export interface SpinnerLoaderProps extends HTMLAttributes<HTMLDivElement> {
     isLoading?: boolean;
@@ -12,7 +12,7 @@ export interface SpinnerLoaderProps extends HTMLAttributes<HTMLDivElement> {
 
 export const SpinnerLoader = ({
     isLoading = false,
-    size = "medium",
+    size = "md",
     className,
     ...rest
 }: SpinnerLoaderProps) => {

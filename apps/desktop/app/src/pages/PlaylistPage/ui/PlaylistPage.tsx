@@ -10,8 +10,8 @@ import {
     Icon,
     SpinnerLoader,
 } from "@zelefy/ui";
-import { useModalStore } from "@/shared/lib/stores";
-import { useInfiniteSentinel, useOptimisticOrder } from "@/shared/lib/hooks";
+import { confirm, useModalStore } from "@/shared/lib/stores";
+import { useOptimisticOrder } from "@/shared/lib/hooks";
 import { type PlaylistId } from "@/entities/playlist";
 import type { TrackId } from "@/entities/track";
 import {
@@ -29,10 +29,11 @@ import {
 } from "@/features/player";
 import { useAddToQueue } from "@/features/queue";
 import { PlaylistTrackRow } from "./PlaylistTrackRow";
+import { InfiniteScrollFooter } from "@/shared/ui";
 
 export const PlaylistPage = () => {
     const { t } = useTranslation();
-    const { playlistId } = useLoaderData() as { playlistId: PlaylistId };
+    const { playlistId } = useLoaderData<{ playlistId: PlaylistId }>();
     const localId = typeof playlistId === "number" ? playlistId : undefined;
 
     const openModal = useModalStore((s) => s.openModal);
@@ -61,6 +62,19 @@ export const PlaylistPage = () => {
         [reorder, settle, move],
     );
 
+    const handleDeletePlaylist = useCallback(async () => {
+        if (!playlist) return;
+        const ok = await confirm({
+            title: t("playlist.delete.title"),
+            description: t("playlist.delete.description", { title: playlist.title }),
+            confirmLabel: t("common.delete"),
+            cancelLabel: t("common.cancel"),
+            variant: "danger",
+        });
+        if (!ok) return;
+        deletePlaylist();
+    }, [t, playlist, deletePlaylist]);
+
     const isPlaying = usePlayerStore((s) => s.isPlaying);
     const togglePlay = usePlayerStore((s) => s.togglePlay);
     const currentTrackId = usePlayerStore(selectCurrentTrackId);
@@ -70,18 +84,12 @@ export const PlaylistPage = () => {
     const { data: track } = useTrack(heroTrackId);
     const { data: waveform } = useWaveform(track?.waveformSrc);
 
-    const sentinelRef = useInfiniteSentinel({
-        hasNextPage: !!hasNextPage,
-        isFetchingNextPage,
-        fetchNextPage,
-    });
-
     const handleRowClick = useCallback(
         (index: number) => {
             const trackId = trackIds[index];
             if (trackId === undefined) return;
             if (isCurrentPlaylist && currentTrackId === trackId) togglePlay();
-            else play(index);
+            else void play(index);
         },
         [trackIds, isCurrentPlaylist, currentTrackId, togglePlay, play],
     );
@@ -97,7 +105,7 @@ export const PlaylistPage = () => {
                 track={track}
                 isCurrentTrack={isCurrentPlaylist}
                 waveformData={waveform}
-                onTogglePlay={() => (isCurrentPlaylist ? togglePlay() : play())}
+                onTogglePlay={() => void (isCurrentPlaylist ? togglePlay() : play())}
                 onAddToPlaylistClick={() => {
                     if (!track?.trackId) return;
                     openModal("addToPlaylist", { trackId: track.trackId });
@@ -112,10 +120,10 @@ export const PlaylistPage = () => {
                 <Button variant="secondary" onClick={edit}>
                     <Icon name="action-edit" size={20} />
                 </Button>
-                <Button variant="secondary" onClick={addAllToQueue}>
+                <Button variant="secondary" onClick={() => void addAllToQueue()}>
                     <Icon name="player-list-end" size={20} />
                 </Button>
-                <Button variant="secondary" onClick={deletePlaylist}>
+                <Button variant="secondary" onClick={() => void handleDeletePlaylist()}>
                     <Icon name="action-delete" size={20} />
                 </Button>
             </Flex>
@@ -146,12 +154,11 @@ export const PlaylistPage = () => {
                 </Flex>
             </DraggableList>
 
-            <div ref={sentinelRef} />
-
-            <Flex align="center" justify="center">
-                <SpinnerLoader isLoading={isFetchingNextPage} />
-                {!hasNextPage && <Icon name="zelefy" color="var(--text-muted)" size={18} />}
-            </Flex>
+            <InfiniteScrollFooter
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+            />
         </>
     );
 };

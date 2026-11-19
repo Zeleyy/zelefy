@@ -30,7 +30,7 @@ pub struct PlaylistTrackCursor {
     pub position: f64,
 }
 
-pub type PlaylistTrackPage = CursorPage<PlaylistTrack, PlaylistTrackCursor>;
+pub type PlaylistTracksPage = CursorPage<PlaylistTrack, PlaylistTrackCursor>;
 
 pub struct NewPlaylistTrack {
     pub playlist_id: i64,

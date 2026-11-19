@@ -1,5 +1,5 @@
 import { TrackHero, type TrackHeroProps } from "@zelefy/ui";
-import { usePlayerStore } from "@/features/player";
+import { usePlayerStore } from "../../model";
 
 type PlayerTrackHeroProps = Omit<
     TrackHeroProps,

@@ -6,6 +6,7 @@ import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
 import { PlayerBar } from "@/widgets/PlayerBar";
 import { ModalHost } from "@/widgets/modal";
+import { ConfirmHost } from "@/widgets/ConfirmHost";
 
 export const MainLayout = () => {
     return (
@@ -29,6 +30,8 @@ export const MainLayout = () => {
 
                 <div id="modal-root" className={styles.modalRoot}>
                     <ModalHost />
+
+                    <ConfirmHost />
                 </div>
 
                 <AppToaster />

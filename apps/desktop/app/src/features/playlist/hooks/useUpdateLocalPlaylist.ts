@@ -7,9 +7,9 @@ export const useUpdateLocalPlaylist = () => {
     return useMutation({
         mutationFn: ({ playlistId, update }: { playlistId: number; update: UpdatePlaylist }) =>
             invoke<number>("update_local_playlist", { playlistId, update }),
-        onSuccess: (_data, { playlistId }) => {
-            queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: playlistKeys.detail(playlistId) });
+        onSuccess: async (_data, { playlistId }) => {
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.detail(playlistId) });
         },
     });
 };

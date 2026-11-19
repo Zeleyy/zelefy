@@ -1,6 +1,9 @@
 use desktop_core::{
     db::{repository, DbState},
-    models::tracks::{LocalTrackIdResponse, LocalTrackResponse, UpdateTrackRequest},
+    models::tracks::{
+        LocalTrackCursor, LocalTrackIdResponse, LocalTrackResponse, LocalTracksPage,
+        UpdateTrackRequest,
+    },
     services::{self, tracks::ImportOutcome},
 };
 use tauri::{ipc::Channel, AppHandle, Manager, State};
@@ -31,8 +34,39 @@ pub async fn import_tracks(
 
 #[tauri::command]
 pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse>, String> {
+    let conn = db.lock();
+    repository::tracks::tracks::get_all_local_with_files(&conn).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_local_tracks_paged(
+    db: State<'_, DbState>,
+    after: Option<LocalTrackCursor>,
+    limit: Option<u32>,
+) -> Result<LocalTracksPage, String> {
+    let limit = limit.unwrap_or(50).clamp(1, 200);
+    let fetch = limit.saturating_add(1);
+
     let mut conn = db.lock();
-    services::tracks::get_local_tracks(&mut conn).map_err(|e| e.to_string())
+
+    let mut tracks = services::tracks::get_local_tracks_paged(&mut conn, after, fetch)
+        .map_err(|e| e.to_string())?;
+
+    let has_more = tracks.len() > limit as usize;
+    tracks.truncate(limit as usize);
+
+    let next_cursor = if has_more {
+        tracks.last().map(|t| LocalTrackCursor {
+            track_id: t.track_id,
+        })
+    } else {
+        None
+    };
+
+    Ok(LocalTracksPage {
+        items: tracks,
+        next_cursor,
+    })
 }
 
 #[tauri::command]

@@ -71,12 +71,16 @@ export const NetworkSettings = () => {
                         inputSize="md"
                     />
 
-                    <Button variant="outline" onClick={handleReset} disabled={isDefault}>
+                    <Button
+                        variant="outline"
+                        onClick={() => void handleReset()}
+                        disabled={isDefault}
+                    >
                         {t("common.reset")}
                     </Button>
 
                     {isDirty && (
-                        <Button variant="primary" onClick={handleSave}>
+                        <Button variant="primary" onClick={() => void handleSave()}>
                             {t("common.save")}
                         </Button>
                     )}

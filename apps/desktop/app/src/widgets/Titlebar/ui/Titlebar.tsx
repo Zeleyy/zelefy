@@ -2,7 +2,7 @@ import styles from "./Titlebar.module.scss";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
 import { Button, Flex, Icon, Input } from "@zelefy/ui";
-import { useSettingsStore } from "@/shared/lib/stores";
+import { Theme, useSettingsStore } from "@/shared/lib/stores";
 import { useBlurOnOutsideClick, useHistoryNavigation } from "../hooks";
 import { TasksDrawer } from "@/widgets/drawer";
 import { useState } from "react";
@@ -35,7 +35,7 @@ export const Titlebar = () => {
                         <Button
                             variant="ghost"
                             aria-label={t("titlebar.back")}
-                            onClick={goBack}
+                            onClick={() => void goBack()}
                             disabled={!canGoBack}
                             square
                         >
@@ -45,7 +45,7 @@ export const Titlebar = () => {
                         <Button
                             variant="ghost"
                             aria-label={t("titlebar.forward")}
-                            onClick={goForward}
+                            onClick={() => void goForward()}
                             disabled={!canGoForward}
                             square
                         >
@@ -80,13 +80,13 @@ export const Titlebar = () => {
                         square
                         onClick={toggleTheme}
                         aria-label={
-                            currentTheme === "dark"
+                            currentTheme === Theme.dark
                                 ? t("titlebar.theme.switch_to_light")
                                 : t("titlebar.theme.switch_to_dark")
                         }
                     >
                         <Icon
-                            name={currentTheme === "dark" ? "common-sun" : "common-moon"}
+                            name={currentTheme === Theme.dark ? "common-sun" : "common-moon"}
                             width={16}
                             height={16}
                         />
@@ -96,7 +96,7 @@ export const Titlebar = () => {
 
                     <Button
                         variant="ghost"
-                        onClick={() => appWindow.minimize()}
+                        onClick={() => void appWindow.minimize()}
                         aria-label={t("titlebar.minimize")}
                         square
                     >
@@ -105,7 +105,7 @@ export const Titlebar = () => {
 
                     <Button
                         variant="ghost"
-                        onClick={() => appWindow.toggleMaximize()}
+                        onClick={() => void appWindow.toggleMaximize()}
                         aria-label={t("titlebar.maximize")}
                         square
                     >
@@ -114,7 +114,7 @@ export const Titlebar = () => {
 
                     <Button
                         variant="ghost"
-                        onClick={() => appWindow.close()}
+                        onClick={() => void appWindow.close()}
                         colorScheme={{
                             colorHover: "white",
                             bgColorHover: "var(--danger)",

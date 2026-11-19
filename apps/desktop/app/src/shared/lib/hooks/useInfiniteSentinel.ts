@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 
-type Params = { hasNextPage: boolean; isFetchingNextPage: boolean; fetchNextPage: () => void };
+type Params = {
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    fetchNextPage: () => Promise<unknown> | void;
+};
 
 export const useInfiniteSentinel = ({ hasNextPage, isFetchingNextPage, fetchNextPage }: Params) => {
     const ref = useRef<HTMLDivElement>(null);
@@ -10,7 +14,8 @@ export const useInfiniteSentinel = ({ hasNextPage, isFetchingNextPage, fetchNext
         if (!el) return;
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage();
+                if (entry.isIntersecting && hasNextPage && !isFetchingNextPage)
+                    void fetchNextPage();
             },
             { rootMargin: "200px" },
         );

@@ -37,10 +37,10 @@ export const PlaylistCardWithTrack = ({ playlist }: { playlist: PlaylistWithFirs
                     return;
                 }
                 if (!playlist.trackId) return;
-                handlePlay();
+                void handlePlay();
             }}
             onOpen={() => {
-                navigate(`/playlist/${playlist.playlistId}`);
+                void navigate(`/playlist/${playlist.playlistId}`);
             }}
         />
     );

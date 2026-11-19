@@ -17,7 +17,7 @@ export const AudioSettings = () => {
         <>
             <h1>{t("settings.audio.title")}</h1>
 
-            <SettingsSection title={t("settings.audio.output.title")}>
+            <SettingsSection icon="player-volume-high" title={t("settings.audio.output.title")}>
                 <Select
                     options={options}
                     value={activeDevice?.id}

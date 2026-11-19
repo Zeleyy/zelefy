@@ -5,7 +5,7 @@ import {
     useDeleteLocalPlaylist,
     useRemoveLocalPlaylistTrack,
     useReplaceLocalPlaylistTrack,
-} from "@/features/playlist";
+} from "../hooks";
 import { getMoveNeighbors } from "../lib/getMoveNeighbors";
 import type { PlaylistBackend } from "./types";
 

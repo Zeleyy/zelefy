@@ -1,4 +1,4 @@
-import type { NullablePatch, PlayerTrack } from "@zelefy/types";
+import type { CursorPage, NullablePatch, PlayerTrack } from "@zelefy/types";
 import type { Library } from "@/shared/types";
 import { trackFilePath, trackFileSrc } from "../lib";
 
@@ -83,3 +83,9 @@ export interface LocalTrack extends Track {
     fileId: number | null;
     fileSizeBytes: number;
 }
+
+export interface LocalTrackCursor {
+    trackId: number;
+}
+
+export type LocalTracksPage = CursorPage<LocalTrackIdResponse, LocalTrackCursor>;

@@ -2,16 +2,21 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { invoke } from "@tauri-apps/api/core";
 import { tauriStorage } from "@/shared/lib/storage";
-import i18n from "@/shared/config/i18n";
+import i18n, { type Language } from "@/shared/config/i18n";
 import { invokeTry } from "./helpers";
 
-export type Theme = "dark" | "light";
+export const Theme = {
+    dark: "dark",
+    light: "light",
+} as const;
+export type Theme = (typeof Theme)[keyof typeof Theme];
+
 export type ColorScheme = "orange" | "green" | "purple" | "blue";
 
 interface SettingsState {
     theme?: Theme;
     colorScheme: ColorScheme;
-    language?: string;
+    language?: Language;
     isSidebarMinified: boolean;
     isMuted: boolean;
     volume: number;
@@ -23,7 +28,7 @@ interface SettingsState {
     setTheme: (theme: Theme) => void;
     toggleTheme: () => void;
     setColorScheme: (scheme: ColorScheme) => void;
-    setLanguage: (lang: string) => void;
+    setLanguage: (lang: Language) => void;
     toggleSidebar: () => void;
     setIsMuted: (isMuted: boolean) => void;
     setVolume: (volume: number) => void;
@@ -56,7 +61,7 @@ export const useSettingsStore = create<SettingsState>()(
             _hasHydrated: false,
 
             toggleTheme: () => {
-                const nextTheme = get().theme === "dark" ? "light" : "dark";
+                const nextTheme = get().theme === Theme.dark ? Theme.light : Theme.dark;
                 get().setTheme(nextTheme);
             },
             setTheme: (theme) => {
@@ -68,7 +73,7 @@ export const useSettingsStore = create<SettingsState>()(
                 set({ colorScheme });
             },
             setLanguage: (language) => {
-                i18n.changeLanguage(language);
+                void i18n.changeLanguage(language);
                 set({ language });
             },
             toggleSidebar: () => set((state) => ({ isSidebarMinified: !state.isSidebarMinified })),
@@ -128,8 +133,8 @@ export const useSettingsStore = create<SettingsState>()(
             storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);
-                state?.initGatewayUrl();
-                state?.initDefaultGatewayUrl();
+                void state?.initGatewayUrl();
+                void state?.initDefaultGatewayUrl();
             },
         },
     ),

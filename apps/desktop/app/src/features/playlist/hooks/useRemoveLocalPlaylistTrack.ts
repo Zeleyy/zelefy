@@ -7,9 +7,9 @@ export const useRemoveLocalPlaylistTrack = () => {
     return useMutation({
         mutationFn: ({ playlistId, trackId }: { playlistId: number; trackId: number }) =>
             invoke<number | null>("remove_local_playlist_track", { playlistId, trackId }),
-        onSuccess: (_data, { playlistId }) => {
-            queryClient.invalidateQueries({ queryKey: playlistKeys.feed(playlistId) });
-            queryClient.invalidateQueries({ queryKey: playlistKeys.trackIdsOf(playlistId) });
+        onSuccess: async (_data, { playlistId }) => {
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.feed(playlistId) });
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.trackIdsOf(playlistId) });
         },
     });
 };

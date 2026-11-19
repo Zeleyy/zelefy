@@ -6,7 +6,7 @@ import { useModalStore } from "@/shared/lib/stores";
 import { useAddToQueue } from "@/features/queue";
 
 export const TrackPage = () => {
-    const { trackId } = useLoaderData() as { trackId: TrackId };
+    const { trackId } = useLoaderData<{ trackId: TrackId }>();
 
     const openModal = useModalStore((s) => s.openModal);
     const addToQueue = useAddToQueue();

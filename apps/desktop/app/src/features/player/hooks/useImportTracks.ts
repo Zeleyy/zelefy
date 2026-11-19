@@ -26,9 +26,11 @@ export const useImportTracks = () => {
             };
             return invoke<ImportOutcome[]>("import_tracks", { paths, libraryId, onProgress });
         },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: trackKeys.all });
+        },
         onSettled: () => {
             setProgress(null);
-            queryClient.invalidateQueries({ queryKey: trackKeys.all });
         },
     });
 

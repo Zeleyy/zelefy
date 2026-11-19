@@ -1,7 +1,7 @@
 use rusqlite::Row;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use zelefy_common::double_option;
+use zelefy_common::{CursorPage, double_option};
 
 use crate::models::{tracks::TrackFilesResponse, utils::TimestampMs};
 
@@ -55,6 +55,14 @@ pub struct LocalTrackIdResponse {
     #[serde(flatten)]
     pub track_files: TrackFilesResponse,
 }
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalTrackCursor {
+    pub track_id: i64,
+}
+
+pub type LocalTracksPage = CursorPage<LocalTrackIdResponse, LocalTrackCursor>;
 
 #[derive(Debug, Default)]
 pub struct NewTrack {

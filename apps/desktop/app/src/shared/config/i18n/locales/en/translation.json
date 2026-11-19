@@ -4,18 +4,16 @@
         "add": "Add",
         "added": "Added",
         "reset": "Reset",
+        "delete": "Delete",
+        "deleted": "Deleted",
         "loading": "Loading...",
         "default": "Default",
         "cancel": "Cancel",
+        "update": "Update",
         "in_development": "Coming soon"
     },
     "feature": {
         "not_implemented": "Not available yet"
-    },
-    "language": {
-        "current": "English",
-        "ru": "Русский",
-        "en": "English"
     },
     "titlebar": {
         "back": "Back",
@@ -170,6 +168,9 @@
     "settings": {
         "general": {
             "title": "General",
+            "language": {
+                "title": "Language"
+            },
             "updates": {
                 "title": "App Updates",
                 "current_version": "Current version",
@@ -177,17 +178,25 @@
                 "status": {
                     "idle": "Click the button to check for updates",
                     "checking": "Checking for updates...",
-                    "available": "New update available!",
+                    "available": "Version {{version}} is available",
                     "not_available": "You are using the latest version"
                 },
-                "actions": {
+                "action": {
                     "check": "Check for updates",
                     "install": "Install update"
                 }
             }
         },
         "appearance": {
-            "title": "Appearance"
+            "title": "Appearance",
+            "appearance": {
+                "title": "Appearance",
+                "theme": {
+                    "title": "Theme",
+                    "dark": "Dark",
+                    "light": "Light"
+                }
+            }
         },
         "audio": {
             "title": "Audio",
@@ -233,6 +242,9 @@
             },
             "errors": {
                 "browse_failed": "Failed to pick a folder"
+            },
+            "cache": {
+                "title": "Cache"
             }
         }
     },
@@ -240,6 +252,10 @@
         "list": {
             "error": "Failed to load tracks",
             "empty": "Tracks not found"
+        },
+        "delete": {
+            "title": "Delete playlist",
+            "description": "Are you sure you want to delete «{{title}}»? This action cannot be undone."
         }
     },
     "track": {},

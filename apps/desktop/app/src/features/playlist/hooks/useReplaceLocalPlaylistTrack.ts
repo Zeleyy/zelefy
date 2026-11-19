@@ -11,9 +11,9 @@ export const useReplaceLocalPlaylistTrack = () => {
         mutationFn: ({ playlistId, request }: { playlistId: number; request: MoveTrackRequest }) =>
             invoke("replace_local_playlist_track", { playlistId, request }),
 
-        onSettled: (_data, _err, { playlistId }) => {
+        onSettled: async (_data, _err, { playlistId }) => {
             if (queryClient.isMutating({ mutationKey: MUTATION_KEY }) > 1) return;
-            return Promise.all([
+            await Promise.all([
                 queryClient.invalidateQueries({ queryKey: playlistKeys.feed(playlistId) }),
                 queryClient.invalidateQueries({ queryKey: playlistKeys.trackIdsOf(playlistId) }),
             ]);

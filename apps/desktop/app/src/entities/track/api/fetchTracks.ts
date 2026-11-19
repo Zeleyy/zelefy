@@ -8,5 +8,5 @@ export const fetchLocalTracks = async (trackIds: number[]): Promise<PlayerTrack[
 };
 
 export const fetchServerTracks = async (trackIds: string[]): Promise<PlayerTrack[]> => {
-    throw new Error(`Loading remote tracks "${trackIds}" is not implemented yet`);
+    throw new Error(`Loading remote tracks "${trackIds.join(", ")}" is not implemented yet`);
 };

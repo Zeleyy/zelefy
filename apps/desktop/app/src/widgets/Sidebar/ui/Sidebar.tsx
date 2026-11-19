@@ -3,17 +3,20 @@ import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 import clsx from "clsx";
 import { Avatar, Button, Flex, Icon } from "@zelefy/ui";
+import { DEFAULT_LANGUAGE, Language, LANGUAGE_LABELS } from "@/shared/config/i18n";
 import { useSettingsStore } from "@/shared/lib/stores";
 import { navItems } from "../config";
 
 export const Sidebar = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const isMinified = useSettingsStore((state) => state.isSidebarMinified);
     const toggleSidebar = useSettingsStore((state) => state.toggleSidebar);
     const setLanguage = useSettingsStore((state) => state.setLanguage);
+    const language = useSettingsStore((state) => state.language);
+    const currentLanguage = LANGUAGE_LABELS[language ?? DEFAULT_LANGUAGE];
 
     const handleChangeLanguage = () => {
-        const nextLang = i18n.language === "ru" ? "en" : "ru";
+        const nextLang = language === Language.ru ? Language.en : Language.ru;
         setLanguage(nextLang);
     };
 
@@ -69,11 +72,11 @@ export const Sidebar = () => {
                     size="small"
                     onClick={handleChangeLanguage}
                     className={styles.navButton}
-                    title={isMinified ? t("language.current") : undefined}
-                    aria-label={t("language.current")}
+                    title={isMinified ? currentLanguage : undefined}
+                    aria-label={currentLanguage}
                 >
                     <Icon name="common-globe" width={22} height={22} />
-                    <span>{t("language.current")}</span>
+                    <span>{currentLanguage}</span>
                 </Button>
 
                 <Button

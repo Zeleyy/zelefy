@@ -11,8 +11,8 @@ export const useCreateLocalPlaylist = () => {
     return useMutation({
         mutationFn: (newPlaylist: NewPlaylistRequest) =>
             invoke<PlaylistWithFirstTrackId>("create_local_playlist", { new: newPlaylist }),
-        onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
         },
     });
 };

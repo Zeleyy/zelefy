@@ -1,7 +1,7 @@
 use desktop_core::{
     db::{repository, DbState},
     models::playlists::{
-        MoveTrackRequest, NewPlaylistRequest, Playlist, PlaylistTrackCursor, PlaylistTrackPage,
+        MoveTrackRequest, NewPlaylistRequest, Playlist, PlaylistTrackCursor, PlaylistTracksPage,
         PlaylistWithFirstTrackId, UpdatePlaylist,
     },
     services,
@@ -18,12 +18,6 @@ pub fn get_local_playlist(
 }
 
 #[tauri::command]
-pub fn get_local_playlists(db: State<'_, DbState>) -> Result<Vec<Playlist>, String> {
-    let conn = db.lock();
-    repository::playlists::get_all(&conn).map_err(|e| e.to_string())
-}
-
-#[tauri::command]
 pub fn get_local_playlists_with_first_track(
     db: State<'_, DbState>,
 ) -> Result<Vec<PlaylistWithFirstTrackId>, String> {
@@ -37,7 +31,7 @@ pub fn get_local_playlist_tracks_paged(
     playlist_id: i64,
     after: Option<PlaylistTrackCursor>,
     limit: Option<u32>,
-) -> Result<PlaylistTrackPage, String> {
+) -> Result<PlaylistTracksPage, String> {
     let limit = limit.unwrap_or(50).clamp(1, 200);
     let fetch = limit.saturating_add(1);
 
@@ -58,7 +52,7 @@ pub fn get_local_playlist_tracks_paged(
         None
     };
 
-    Ok(PlaylistTrackPage {
+    Ok(PlaylistTracksPage {
         items: tracks,
         next_cursor,
     })

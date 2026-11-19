@@ -1,10 +1,11 @@
 import styles from "./OfflinePage.module.scss";
 import { useCallback, useMemo } from "react";
-import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Button, EmptyState, Flex, Input } from "@zelefy/ui";
+import { Link } from "react-router";
+import { Button, EmptyState, Flex, Input, SpinnerLoader } from "@zelefy/ui";
 import { useModalStore } from "@/shared/lib/stores";
 import { selectAudio } from "@/shared/lib/utils/browse";
+import { InfiniteScrollFooter } from "@/shared/ui";
 import type { TrackId } from "@/entities/track";
 import {
     useDeleteLocalTrack,
@@ -19,38 +20,51 @@ export const OfflinePage = () => {
     const { t } = useTranslation();
 
     const openModal = useModalStore((s) => s.openModal);
+    const playTrack = usePlayerStore((s) => s.playTrack);
 
-    const { data } = useLocalTracks();
-    const localTracks = data ?? [];
-
-    const trackIds = useMemo(() => (data ?? []).map((t) => t.trackId), [data]);
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
+        useLocalTracks();
 
     const { mutate: importTracks, isPending, progress } = useImportTracks();
     const { mutate: deleteTrack } = useDeleteLocalTrack();
-    const playTrack = usePlayerStore((s) => s.playTrack);
+
+    const localTracks = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
+    const trackIds = useMemo<TrackId[]>(
+        () => localTracks.map((item) => item.trackId),
+        [localTracks],
+    );
 
     const handlePlay = useCallback(
         (trackId: TrackId) => playTrack(trackId, trackIds),
         [playTrack, trackIds],
     );
+
     const handleAddToPlaylist = useCallback(
         (trackId: TrackId) => openModal("addToPlaylist", { trackId }),
         [openModal],
     );
+
     const handleEdit = useCallback(
         (trackId: TrackId) => openModal("editTrack", { trackId }),
         [openModal],
     );
+
     const handleDelete = useCallback(
         (trackId: TrackId) => deleteTrack(Number(trackId)),
         [deleteTrack],
     );
 
-    const handleBrowseFiles = async (currentPath?: string) => {
-        const selected = await selectAudio(currentPath);
-        if (!selected?.length) return;
-        importTracks({ paths: selected });
-    };
+    const handleBrowseFiles = useCallback(
+        async (currentPath?: string) => {
+            const selected = await selectAudio(currentPath);
+            if (!selected?.length) return;
+            importTracks({ paths: selected });
+        },
+        [importTracks],
+    );
+
+    if (isLoading) return <SpinnerLoader isLoading />;
+    if (isError) return <EmptyState title={t("offline.list.error")} description={String(error)} />;
 
     return (
         <>
@@ -58,17 +72,12 @@ export const OfflinePage = () => {
                 <Flex as="header" justify="space-between" align="flex-end" wrap="wrap" gap="md">
                     <h1>{t("offline.title")}</h1>
                     <Flex gap="md">
-                        <Button as={Link} to={"/settings/storage"} variant="secondary">
+                        <Button as={Link} to="/settings/storage" variant="secondary">
                             {t("offline.storage.settings")}
                         </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => {
-                                handleBrowseFiles();
-                            }}
-                        >
+                        <Button variant="primary" onClick={() => void handleBrowseFiles()}>
                             {isPending && progress
-                                ? progress.done + "/" + progress.total
+                                ? `${progress.done}/${progress.total}`
                                 : t("offline.actions.add.files")}
                         </Button>
                     </Flex>
@@ -93,7 +102,7 @@ export const OfflinePage = () => {
                     </div>
                 </Flex>
 
-                {localTracks.length > 0 ? (
+                {trackIds.length > 0 ? (
                     <div className={styles.trackList}>
                         <div className={styles.header}>
                             <span className={styles.center}>#</span>
@@ -119,6 +128,12 @@ export const OfflinePage = () => {
                     <EmptyState title={t("offline.list.empty")} />
                 )}
             </Flex>
+
+            <InfiniteScrollFooter
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+            />
         </>
     );
 };

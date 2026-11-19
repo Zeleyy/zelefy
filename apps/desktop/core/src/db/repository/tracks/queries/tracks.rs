@@ -2,24 +2,12 @@ use rusqlite::{Connection, OptionalExtension, params, params_from_iter};
 use std::collections::HashMap;
 
 use crate::{
-    db::utils::placeholders,
+    db::{repository::tracks::track_files::load_files_map, utils::placeholders},
     models::tracks::{
-        LocalTrackIdResponse, LocalTrackResponse, Track, TrackFileResponse, TrackFileType,
-        TrackFilesResponse,
+        LocalTrackCursor, LocalTrackIdResponse, LocalTrackResponse, Track, TrackFileResponse,
+        TrackFileType, TrackFilesResponse,
     },
 };
-
-const TRACK_FILES_SELECT: &str = r#"
-    SELECT
-        tf.file_id, tf.track_id, tf.track_file_type_id, tf.library_id, tf.path,
-        tf.is_link, tf.size_bytes, tf.hash, tf.last_accessed_at, tf.created_at,
-        l.library_id AS lib_library_id,
-        l.path AS lib_path,
-        l.is_primary AS lib_is_primary,
-        l.created_at AS lib_created_at
-    FROM track_files tf
-    LEFT JOIN libraries l ON tf.library_id = l.library_id
-"#;
 
 pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Option<Track>> {
     conn.query_one(
@@ -32,34 +20,6 @@ pub fn get_by_id(conn: &Connection, track_id: i64) -> rusqlite::Result<Option<Tr
         Track::from_row,
     )
     .optional()
-}
-
-fn load_files_map(
-    conn: &Connection,
-    track_ids: &[i64],
-) -> rusqlite::Result<HashMap<i64, Vec<TrackFileResponse>>> {
-    if track_ids.is_empty() {
-        return Ok(HashMap::new());
-    }
-
-    let sql = format!(
-        "{} WHERE tf.track_id IN ({}) ORDER BY tf.track_file_type_id ASC",
-        TRACK_FILES_SELECT,
-        placeholders(track_ids.len())
-    );
-
-    let mut stmt = conn.prepare(&sql)?;
-    let files_iter = stmt.query_map(
-        params_from_iter(track_ids.iter()),
-        TrackFileResponse::from_row,
-    )?;
-
-    let mut map: HashMap<i64, Vec<TrackFileResponse>> = HashMap::new();
-    for file in files_iter {
-        let file = file?;
-        map.entry(file.track_file.track_id).or_default().push(file);
-    }
-    Ok(map)
 }
 
 fn attach_files(
@@ -100,7 +60,7 @@ pub fn get_all_local(conn: &Connection) -> rusqlite::Result<Vec<Track>> {
                 WHERE tf.track_id = t.track_id
                   AND tf.track_file_type_id = ?1
             )
-            ORDER BY t.created_at DESC, t.track_id DESC;
+            ORDER BY t.created_at DESC, t.track_id DESC
         "#,
     )?;
 
@@ -114,6 +74,62 @@ pub fn get_all_local_with_files(conn: &Connection) -> rusqlite::Result<Vec<Local
     let ids: Vec<i64> = tracks.iter().map(|t| t.track_id).collect();
     let files_map = load_files_map(conn, &ids)?;
     Ok(attach_files(tracks, files_map))
+}
+
+pub fn get_local_ids_page(
+    conn: &Connection,
+    after: Option<LocalTrackCursor>,
+    limit: u32,
+) -> rusqlite::Result<Vec<i64>> {
+    let mut stmt = conn.prepare_cached(
+        r#"
+            SELECT t.track_id
+            FROM tracks t
+            WHERE
+                EXISTS (
+                    SELECT 1
+                    FROM track_files tf
+                    WHERE tf.track_id = t.track_id
+                    AND tf.track_file_type_id = ?1
+                )
+                AND (?2 IS NULL OR t.track_id < ?2)
+            ORDER BY t.track_id DESC
+            LIMIT ?3
+        "#,
+    )?;
+
+    let track_id = after.map(|a| a.track_id);
+
+    let rows = stmt.query_map(params![TrackFileType::Audio, track_id, limit], |row| {
+        row.get(0)
+    })?;
+
+    rows.collect()
+}
+
+pub fn get_local_ids_with_files_page(
+    conn: &Connection,
+    after: Option<LocalTrackCursor>,
+    limit: u32,
+) -> rusqlite::Result<Vec<LocalTrackIdResponse>> {
+    let track_ids = get_local_ids_page(conn, after, limit)?;
+
+    if track_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let mut files_map = load_files_map(conn, &track_ids)?;
+
+    Ok(track_ids
+        .into_iter()
+        .map(|track_id| {
+            let files = files_map.remove(&track_id).unwrap_or_default();
+            LocalTrackIdResponse {
+                track_id,
+                track_files: TrackFilesResponse::from_rows(files),
+            }
+        })
+        .collect())
 }
 
 pub fn get_by_ids(conn: &Connection, track_ids: Vec<i64>) -> rusqlite::Result<Vec<Track>> {

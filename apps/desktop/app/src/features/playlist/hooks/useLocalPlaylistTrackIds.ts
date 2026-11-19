@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import {
     playlistKeys,
     type PlaylistTrackCursor,
-    type PlaylistTrackPage,
+    type PlaylistTracksPage,
 } from "@/entities/playlist";
 import { useEnsureTracks } from "@/features/player";
 
@@ -11,7 +11,7 @@ export const useLocalPlaylistTrackIds = (playlistId: number | null) => {
     const query = useInfiniteQuery({
         queryKey: playlistKeys.feed(playlistId!),
         queryFn: async ({ pageParam }: { pageParam: PlaylistTrackCursor | null }) => {
-            return invoke<PlaylistTrackPage>("get_local_playlist_tracks_paged", {
+            return invoke<PlaylistTracksPage>("get_local_playlist_tracks_paged", {
                 playlistId,
                 after: pageParam,
                 limit: 20,

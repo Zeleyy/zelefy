@@ -7,9 +7,9 @@ export const useDeleteLocalPlaylist = () => {
     return useMutation({
         mutationFn: (playlistId: number) =>
             invoke<number | null>("delete_local_playlist", { playlistId }),
-        onSuccess: (_data, playlistId) => {
+        onSuccess: async (_data, playlistId) => {
             queryClient.removeQueries({ queryKey: playlistKeys.detail(playlistId) });
-            queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.lists() });
         },
     });
 };

@@ -44,4 +44,4 @@ export interface PlaylistTrackCursor {
     position: number;
 }
 
-export type PlaylistTrackPage = CursorPage<PlaylistTrack, PlaylistTrackCursor>;
+export type PlaylistTracksPage = CursorPage<PlaylistTrack, PlaylistTrackCursor>;

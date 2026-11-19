@@ -99,7 +99,7 @@ export const StorageSettings = () => {
                                         variant="primary"
                                         size="small"
                                         onClick={() =>
-                                            handleBrowseFolder(library.libraryId, library.path)
+                                            void handleBrowseFolder(library.libraryId, library.path)
                                         }
                                     >
                                         {t("settings.storage.actions.browse")}
@@ -121,7 +121,7 @@ export const StorageSettings = () => {
                     <div
                         className={clsx(styles.storageRow, styles.storageRowAction)}
                         onClick={() => {
-                            handleBrowseFolder();
+                            void handleBrowseFolder();
                         }}
                     >
                         <div className={styles.actionContent}>
@@ -134,24 +134,29 @@ export const StorageSettings = () => {
                 </div>
             </SettingsSection>
 
-            <SettingsSection title="Кеш">
+            <SettingsSection
+                title={t("settings.storage.cache.title")}
+                actions={
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        disabled={cacheRoot === defaultCacheRoot}
+                        onClick={() => {
+                            void resetCacheRoot();
+                        }}
+                    >
+                        {t("common.reset")}
+                    </Button>
+                }
+            >
                 <Flex align="center" gap="xs">
                     <Input value={cacheRoot} readOnly />
                     <Button
                         onClick={() => {
-                            handleBrowseCacheFolder(cacheRoot);
+                            void handleBrowseCacheFolder(cacheRoot);
                         }}
                     >
                         {t("settings.storage.actions.browse")}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        disabled={cacheRoot === defaultCacheRoot}
-                        onClick={() => {
-                            resetCacheRoot();
-                        }}
-                    >
-                        {t("common.reset")}
                     </Button>
                 </Flex>
             </SettingsSection>

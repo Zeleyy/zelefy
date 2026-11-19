@@ -125,7 +125,7 @@ export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTr
                             alt={draft?.title}
                             size="xl"
                             action={t("modal.edit_track.cover.action")}
-                            onEditClick={() => handleBrowseImage()}
+                            onEditClick={() => void handleBrowseImage()}
                         />
 
                         <Button

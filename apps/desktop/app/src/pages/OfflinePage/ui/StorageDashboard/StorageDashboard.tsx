@@ -106,7 +106,7 @@ export const StorageDashboard = () => {
                         justify="center"
                         gap="2xs"
                         className={`${styles.storageCard} ${styles.moreCard}`}
-                        onClick={() => navigate("/settings/storage")}
+                        onClick={() => void navigate("/settings/storage")}
                     >
                         <span className={styles.moreCount}>+{remainingCount}</span>
                         <span className={styles.moreText}>Ещё хранилища</span>

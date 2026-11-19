@@ -13,9 +13,9 @@ export const useUpdateLocalTrack = () => {
     return useMutation({
         mutationFn: ({ trackId, update }: { trackId: number; update: UpdateTrackRequest }) =>
             invoke<LocalTrackResponse>("update_local_track", { trackId, update }),
-        onSuccess: (track) => {
+        onSuccess: async (track) => {
             usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
-            queryClient.invalidateQueries({ queryKey: trackKeys.local() });
+            await queryClient.invalidateQueries({ queryKey: trackKeys.locals() });
         },
     });
 };

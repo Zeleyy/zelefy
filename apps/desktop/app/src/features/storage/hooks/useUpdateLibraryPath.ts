@@ -11,8 +11,8 @@ export const useUpdateLibraryPath = () => {
         mutationFn: async ({ libraryId, path }: { libraryId: number; path: string }) => {
             return await invoke<number>("update_user_library", { libraryId, path });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["library"] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["library"] });
             toast.success(t("settings.storage.message.success_updated"));
         },
     });

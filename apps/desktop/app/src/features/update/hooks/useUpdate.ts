@@ -31,7 +31,7 @@ export const useUpdate = () => {
     });
 
     const checkForUpdates = () => {
-        checkUpdateQuery.refetch();
+        void checkUpdateQuery.refetch();
     };
 
     return {

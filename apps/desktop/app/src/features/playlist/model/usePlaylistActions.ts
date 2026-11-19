@@ -69,7 +69,7 @@ export const usePlaylistActions = (
 
     const deletePlaylist = useCallback(() => {
         if (!playlist) return;
-        navigate("/", { replace: true });
+        void navigate("/", { replace: true });
         if (isNumber(playlistId)) local.deletePlaylist(playlistId);
         else remote.deletePlaylist(playlistId);
     }, [playlistId, playlist, navigate, local, remote]);

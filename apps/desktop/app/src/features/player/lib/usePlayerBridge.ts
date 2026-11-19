@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { toast } from "sonner";
 import type { PlayerTrack } from "@zelefy/types";
 import { queryClient } from "@/shared/api";
 import { useSettingsStore } from "@/shared/lib/stores";
@@ -21,7 +22,7 @@ export const usePlayerBridge = () => {
             const id = selectCurrentTrackId(usePlayerStore.getState());
             if (id !== undefined) {
                 finished = false;
-                load(id, false);
+                void load(id, false);
             }
         };
 
@@ -31,14 +32,14 @@ export const usePlayerBridge = () => {
             if (payload.type === "position") {
                 s.setCurrentTime(payload.seconds);
             } else if (payload.type === "error") {
-                console.error("[player]", payload.message);
+                toast.error(payload.message);
             } else if (payload.type === "ended") {
                 const prevId = selectCurrentTrackId(s);
                 if (prevId === undefined) return;
 
                 if (s.repeatMode === "track") {
                     s.setCurrentTime(0);
-                    load(prevId, true);
+                    void load(prevId, true);
                     return;
                 }
 
@@ -47,7 +48,7 @@ export const usePlayerBridge = () => {
                 if (selectCurrentTrackId(after) === prevId) {
                     if (after.isPlaying) {
                         after.setCurrentTime(0);
-                        load(prevId, true);
+                        void load(prevId, true);
                     } else {
                         finished = true;
                         const durationMs = queryClient.getQueryData<PlayerTrack>(
@@ -67,16 +68,16 @@ export const usePlayerBridge = () => {
 
             if (id !== prevId) {
                 finished = false;
-                if (id !== undefined) load(id, s.isPlaying);
-                else invoke("player_stop");
+                if (id !== undefined) void load(id, s.isPlaying);
+                else void invoke("player_stop");
             } else if (s.isPlaying !== prev.isPlaying) {
                 if (id === undefined) return;
                 if (s.isPlaying && finished) {
                     finished = false;
                     s.setCurrentTime(0);
-                    load(id, true);
+                    void load(id, true);
                 } else {
-                    invoke(s.isPlaying ? "player_play" : "player_pause");
+                    void invoke(s.isPlaying ? "player_play" : "player_pause");
                 }
             }
         });
@@ -92,7 +93,7 @@ export const usePlayerBridge = () => {
         const applyVolume = () => {
             const { volume, isMuted } = useSettingsStore.getState();
             const linear = isMuted ? 0 : Math.min(Math.max(volume / 100, 0), 1);
-            invoke("player_set_volume", { volume: linear ** 2 }).catch(console.error);
+            invoke("player_set_volume", { volume: linear ** 2 }).catch(toast.error);
         };
         applyVolume();
         const unsubSettings = useSettingsStore.subscribe(applyVolume);
@@ -101,7 +102,7 @@ export const usePlayerBridge = () => {
             unsubPlayer();
             unsubHydration();
             unsubSettings();
-            unlistenPromise.then((f) => f());
+            void unlistenPromise.then((f) => f());
         };
     }, []);
 };

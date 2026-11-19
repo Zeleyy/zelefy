@@ -1,18 +1,29 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
-import { trackKeys, type LocalTrackIdResponse } from "@/entities/track";
+import { trackKeys, type LocalTrackCursor, type LocalTracksPage } from "@/entities/track";
 import { useEnsureTracks } from "./useEnsureTracks";
 
 export const useLocalTracks = () => {
-    const query = useQuery({
-        queryKey: trackKeys.local(),
-        queryFn: async () => {
-            return await invoke<LocalTrackIdResponse[]>("get_local_tracks_ids");
+    const query = useInfiniteQuery({
+        queryKey: trackKeys.feeds(),
+        queryFn: async ({ pageParam }: { pageParam: LocalTrackCursor | null }) => {
+            return invoke<LocalTracksPage>("get_local_tracks_paged", {
+                after: pageParam,
+                limit: 20,
+            });
         },
-        gcTime: 1000 * 60 * 10,
+        initialPageParam: null as LocalTrackCursor | null,
+        getNextPageParam: (lastPage, allPages) => {
+            const next = lastPage.nextCursor;
+            if (!next) return undefined;
+            const seen = allPages.slice(0, -1).some((p) => p.nextCursor?.trackId == next.trackId);
+            return seen ? undefined : next;
+        },
     });
 
-    const trackIds = query.data?.map((t) => t.trackId);
+    const trackIds = query.data?.pages
+        .flatMap((p) => p.items.map((i) => i.trackId))
+        .filter((id): id is NonNullable<typeof id> => id != null);
     useEnsureTracks(trackIds ?? []);
 
     return query;

@@ -1,5 +1,5 @@
 import { Suspense, type ComponentType } from "react";
-import { useModalStore } from "@/shared/lib/stores";
+import { useModalStore, type ModalComponentProps, type ModalName } from "@/shared/lib/stores";
 import { modalRegistry } from "../model";
 import { SpinnerLoader } from "@zelefy/ui";
 
@@ -25,7 +25,9 @@ export const ModalHost = () => {
             }
         >
             {stack.map(({ id, name, props }) => {
-                const Component = modalRegistry[name] as ComponentType<any>;
+                const Component = modalRegistry[name] as ComponentType<
+                    ModalComponentProps<ModalName>
+                >;
                 return <Component key={id} {...props} onClose={() => closeModal(id)} />;
             })}
         </Suspense>
