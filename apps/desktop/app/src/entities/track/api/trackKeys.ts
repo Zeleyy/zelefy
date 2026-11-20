@@ -13,4 +13,5 @@ export const trackKeys = {
     locals: () => [...trackKeys.lists(), "local"] as const,
 
     feeds: () => [...trackKeys.all, "feed"] as const,
+    feed: (search: string) => [...trackKeys.feeds(), search] as const,
 };

@@ -1,2 +1,2 @@
-export { ProgressBar, type ProgressBarProps } from "./ProgressBar";
+export { Slider, type SliderProps } from "./Slider";
 export { WaveformBar, type WaveformBarProps } from "./WaveformBar";

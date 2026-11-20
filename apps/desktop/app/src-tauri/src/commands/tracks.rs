@@ -41,15 +41,20 @@ pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse
 #[tauri::command]
 pub fn get_local_tracks_paged(
     db: State<'_, DbState>,
+    search: Option<String>,
     after: Option<LocalTrackCursor>,
     limit: Option<u32>,
 ) -> Result<LocalTracksPage, String> {
     let limit = limit.unwrap_or(50).clamp(1, 200);
     let fetch = limit.saturating_add(1);
 
+    let search = search
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
     let mut conn = db.lock();
 
-    let mut tracks = services::tracks::get_local_tracks_paged(&mut conn, after, fetch)
+    let mut tracks = services::tracks::get_local_tracks_paged(&mut conn, search, after, fetch)
         .map_err(|e| e.to_string())?;
 
     let has_more = tracks.len() > limit as usize;

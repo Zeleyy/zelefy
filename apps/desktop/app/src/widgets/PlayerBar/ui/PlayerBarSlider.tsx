@@ -1,12 +1,12 @@
 import { usePlayerStore } from "@/features/player";
 import type { PlayerTrack } from "@zelefy/types";
-import { Flex, formatTime, ProgressBar, useSeekProgress } from "@zelefy/ui";
+import { Flex, formatTime, Slider, useSeekProgress } from "@zelefy/ui";
 
-interface PlayerBarProgressProps {
+interface PlayerBarSliderProps {
     track: PlayerTrack | null;
 }
 
-export const PlayerBarProgress = ({ track }: PlayerBarProgressProps) => {
+export const PlayerBarSlider = ({ track }: PlayerBarSliderProps) => {
     const currentTime = usePlayerStore((state) => state.currentTime);
     const seek = usePlayerStore((state) => state.seek);
 
@@ -23,7 +23,7 @@ export const PlayerBarProgress = ({ track }: PlayerBarProgressProps) => {
                 <span>{formatTime(safeDuration / 1000)}</span>
             </Flex>
 
-            <ProgressBar
+            <Slider
                 time={displayTime}
                 duration={safeDuration / 1000}
                 onChange={handleTimeChange}

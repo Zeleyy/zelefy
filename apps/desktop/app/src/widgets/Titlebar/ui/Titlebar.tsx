@@ -1,11 +1,12 @@
 import styles from "./Titlebar.module.scss";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
-import { Button, Flex, Icon, Input } from "@zelefy/ui";
+import { Button, Flex, Icon } from "@zelefy/ui";
 import { Theme, useSettingsStore } from "@/shared/lib/stores";
 import { useBlurOnOutsideClick, useHistoryNavigation } from "../hooks";
 import { TasksDrawer } from "@/widgets/drawer";
 import { useState } from "react";
+import { Search } from "./Search";
 
 export const Titlebar = () => {
     const { t } = useTranslation();
@@ -54,14 +55,7 @@ export const Titlebar = () => {
                     </Flex>
                 </Flex>
 
-                <div className={styles.searchWrapper} data-tauri-drag-region>
-                    <Input
-                        id="titlebar-search"
-                        name="search"
-                        placeholder={t("titlebar.search_placeholder")}
-                        leftIcon={<Icon name="common-search" width={17} height={17} />}
-                    />
-                </div>
+                <Search />
 
                 <Flex gap="2xs" justify="center" align="center" data-tauri-drag-region>
                     <Button

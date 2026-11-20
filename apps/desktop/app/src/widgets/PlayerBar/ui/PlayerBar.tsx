@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Button, Cover, Flex, Icon } from "@zelefy/ui";
 import { useCurrentTrack } from "@/features/player";
 import { QueueDrawer } from "@/widgets/drawer";
-import { PlayerBarProgress } from "./PlayerBarProgress";
+import { PlayerBarSlider } from "./PlayerBarSlider";
 import { PlayerBarVolumeControl } from "./PlayerBarVolumeControl";
 import { PlayerBarControls } from "./PlayerBarControls";
 
@@ -96,7 +96,7 @@ export const PlayerBar = () => {
                                     </Flex>
                                 </div>
 
-                                <PlayerBarProgress track={displayTrack} />
+                                <PlayerBarSlider track={displayTrack} />
                             </Flex>
                         </div>
                     </Flex>

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Channel, invoke } from "@tauri-apps/api/core";
+import { queryClient } from "@/shared/api";
 import { trackKeys, type LocalTrack } from "@/entities/track";
 
 export type ImportOutcome =
@@ -15,7 +16,6 @@ type ImportVariables = {
 type ImportProgress = { done: number; total: number };
 
 export const useImportTracks = () => {
-    const queryClient = useQueryClient();
     const [progress, setProgress] = useState<ImportProgress | null>(null);
 
     const mutation = useMutation({

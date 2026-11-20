@@ -28,8 +28,9 @@
     --text-primary: var(--neutral-50);
     --text-secondary: var(--neutral-300);
     --text-muted: var(--neutral-400);
-    --text-on-accent: #ffffff;
+    --text-on-accent: var(--neutral-50);
     --text-on-primary: var(--neutral-900);
+    --text-on-danger: var(--neutral-50);
 
     --border-subtle: rgba(255, 255, 255, 0.08);
     --border-strong: var(--neutral-500);

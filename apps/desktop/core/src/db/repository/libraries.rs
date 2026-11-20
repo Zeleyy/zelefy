@@ -1,6 +1,9 @@
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter, types::Value};
 
-use crate::models::libraries::{Library, NewLibrary, UpdateLibrary};
+use crate::models::{
+    libraries::{Library, LibraryStats, NewLibrary, UpdateLibrary},
+    tracks::TrackFileType,
+};
 
 pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library> {
     conn.query_one(
@@ -19,7 +22,7 @@ pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library
 }
 
 pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Library>> {
-    let mut stmt = conn.prepare(
+    let mut stmt = conn.prepare_cached(
         r#"
             SELECT
                 library_id
@@ -34,6 +37,26 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Library>> {
     )?;
 
     let rows = stmt.query_map([], |row| Library::from_row(row, None))?;
+
+    rows.collect()
+}
+
+pub fn get_stats(conn: &Connection) -> rusqlite::Result<Vec<LibraryStats>> {
+    let mut stmt = conn.prepare_cached(
+        r#"
+            SELECT
+                library_id
+                , SUM(size_bytes) as used_size_bytes
+                , COUNT(file_id) as files_count
+            FROM track_files
+            WHERE track_file_type_id = ?1
+            GROUP BY library_id
+        "#,
+    )?;
+
+    let rows = stmt.query_map(params![TrackFileType::Audio], |row| {
+        LibraryStats::from_row(row)
+    })?;
 
     rows.collect()
 }

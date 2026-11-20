@@ -1,20 +1,26 @@
 import styles from "./StorageSettings.module.scss";
 import { Trans, useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import clsx from "clsx";
-import { Button, Flex, formatBytes, Input } from "@zelefy/ui";
+import { Button, Dropdown, Flex, formatBytes, Icon, Input } from "@zelefy/ui";
 import { selectDirectory } from "@/shared/lib/utils";
 import { useCacheStore } from "@/shared/lib/stores";
-import { useCreateLibrary, useLibraries, useUpdateLibraryPath } from "@/features/storage";
+import {
+    useCreateLibrary,
+    useLibrariesWithStats,
+    useSetLibraryPrimary,
+    useUpdateLibraryPath,
+} from "@/features/storage";
 import { SettingsSection } from "@/widgets/sections";
 
-// @TODO: переработать после удаления кеша
 export const StorageSettings = () => {
     const { t } = useTranslation();
-    const { data } = useLibraries();
+    const { data: librariesWithStats } = useLibrariesWithStats();
     const { mutate: createLibrary } = useCreateLibrary();
     const { mutate: updateLibraryPath } = useUpdateLibraryPath();
+    const { mutate: setLibraryPrimary } = useSetLibraryPrimary();
 
-    const storages = data ?? [];
+    const storages = librariesWithStats ?? [];
 
     const cacheRoot = useCacheStore((state) => state.cacheRoot);
     const defaultCacheRoot = useCacheStore((state) => state.defaultCacheRoot);
@@ -37,7 +43,7 @@ export const StorageSettings = () => {
         if (!selected) return;
 
         const ok = await setCacheRoot(selected);
-        if (!ok) alert("ошибка");
+        if (!ok) toast.error("Ошибка");
     };
 
     return (
@@ -105,14 +111,32 @@ export const StorageSettings = () => {
                                         {t("settings.storage.actions.browse")}
                                     </Button>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="small"
-                                        className={styles.moreMenuBtn}
-                                        title={t("settings.storage.actions.options")}
-                                    >
-                                        •••
-                                    </Button>
+                                    <Dropdown
+                                        trigger={
+                                            <Button
+                                                variant="ghost"
+                                                size="small"
+                                                square
+                                                className={styles.moreMenuBtn}
+                                                title={t("settings.storage.actions.options")}
+                                            >
+                                                <Icon name="common-ellipsis" size={22} />
+                                            </Button>
+                                        }
+                                        items={[
+                                            {
+                                                label: t("settings.storage.actions.set_primary"),
+                                                onClick: () => setLibraryPrimary(library.libraryId),
+                                                disabled: isPrimaryLibrary,
+                                            },
+                                            {
+                                                label: t("common.delete"),
+                                                onClick: () => console.log("delete"),
+                                                disabled: isPrimaryLibrary,
+                                                variant: "danger",
+                                            },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         );

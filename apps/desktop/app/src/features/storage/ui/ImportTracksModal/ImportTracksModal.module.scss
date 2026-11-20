@@ -1,0 +1,27 @@
+.files {
+    &__label {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-secondary);
+    }
+
+    &__list {
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        background: var(--bg-surface);
+
+        &Item {
+            padding: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            border-top: 1px solid var(--border-subtle);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:first-child {
+                border-top: none;
+            }
+        }
+    }
+}

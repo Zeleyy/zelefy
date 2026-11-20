@@ -151,6 +151,65 @@ CREATE TABLE tracks (
 
 CREATE INDEX idx_tracks_created ON tracks (created_at DESC);
 
+CREATE VIRTUAL TABLE tracks_fts USING fts5 (
+    title,
+    metadata_artist,
+    content = 'tracks',
+    content_rowid = 'track_id',
+    tokenize = 'trigram'
+);
+
+INSERT INTO
+    tracks_fts (tracks_fts)
+VALUES
+    ('rebuild');
+
+CREATE TRIGGER tracks_fts_ai
+AFTER INSERT ON tracks
+BEGIN
+INSERT INTO
+    tracks_fts (rowid, title, metadata_artist)
+VALUES
+    (new.track_id, new.title, new.metadata_artist);
+
+END;
+
+CREATE TRIGGER tracks_fts_ad
+AFTER DELETE ON tracks
+BEGIN
+INSERT INTO
+    tracks_fts (tracks_fts, rowid, title, metadata_artist)
+VALUES
+    (
+        'delete',
+        old.track_id,
+        old.title,
+        old.metadata_artist
+    );
+
+END;
+
+CREATE TRIGGER tracks_fts_au
+AFTER UPDATE OF title,
+metadata_artist ON tracks
+BEGIN
+INSERT INTO
+    tracks_fts (tracks_fts, rowid, title, metadata_artist)
+VALUES
+    (
+        'delete',
+        old.track_id,
+        old.title,
+        old.metadata_artist
+    );
+
+INSERT INTO
+    tracks_fts (rowid, title, metadata_artist)
+VALUES
+    (new.track_id, new.title, new.metadata_artist);
+
+END;
+
 CREATE TABLE remote_tracks (
     track_id INTEGER PRIMARY KEY REFERENCES tracks (track_id) ON DELETE CASCADE,
     server_id INTEGER NOT NULL REFERENCES servers (server_id) ON DELETE CASCADE,

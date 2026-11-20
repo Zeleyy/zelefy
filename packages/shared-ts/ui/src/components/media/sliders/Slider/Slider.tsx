@@ -1,7 +1,7 @@
-import styles from "./ProgressBar.module.scss";
-import * as Slider from "@radix-ui/react-slider";
+import styles from "./Slider.module.scss";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 
-export interface ProgressBarProps {
+export interface SliderProps {
     time?: number;
     duration?: number;
     step?: number;
@@ -11,7 +11,7 @@ export interface ProgressBarProps {
     orientation?: "horizontal" | "vertical";
 }
 
-export const ProgressBar = ({
+export const Slider = ({
     time = 0,
     duration = 100,
     step = 0.1,
@@ -19,9 +19,9 @@ export const ProgressBar = ({
     onChange,
     onChangeEnd,
     orientation,
-}: ProgressBarProps) => {
+}: SliderProps) => {
     return (
-        <Slider.Root
+        <SliderPrimitive.Root
             className={styles.sliderRoot}
             value={[time]}
             max={duration || 100}
@@ -29,15 +29,15 @@ export const ProgressBar = ({
             disabled={disabled}
             onValueChange={([val]) => onChange?.(val)}
             onValueCommit={([val]) => onChangeEnd?.(val)}
-            aria-label="Track progress"
+            aria-label="Seek"
             orientation={orientation}
         >
-            <Slider.Track className={styles.sliderTrack}>
-                <Slider.Range className={styles.sliderRange} />
-            </Slider.Track>
-            <Slider.Thumb className={styles.sliderThumb} aria-label="Current time">
+            <SliderPrimitive.Track className={styles.sliderTrack}>
+                <SliderPrimitive.Range className={styles.sliderRange} />
+            </SliderPrimitive.Track>
+            <SliderPrimitive.Thumb className={styles.sliderThumb} aria-label="Current time">
                 <span className={styles.thumbVisual}></span>
-            </Slider.Thumb>
-        </Slider.Root>
+            </SliderPrimitive.Thumb>
+        </SliderPrimitive.Root>
     );
 };

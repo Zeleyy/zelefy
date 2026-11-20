@@ -10,6 +10,7 @@ export type IconName =
     | "common-collapse"
     | "common-database"
     | "common-download"
+    | "common-ellipsis"
     | "common-expand"
     | "common-globe"
     | "common-headphones"

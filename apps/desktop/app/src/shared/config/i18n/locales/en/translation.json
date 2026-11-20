@@ -10,6 +10,8 @@
         "default": "Default",
         "cancel": "Cancel",
         "update": "Update",
+        "import": "Import",
+        "close": "Close",
         "in_development": "Coming soon"
     },
     "feature": {
@@ -104,6 +106,15 @@
                     "placeholder": "Describe your playlist"
                 }
             }
+        },
+        "import_tracks": {
+            "title": "Import tracks",
+            "select": {
+                "label": "Library"
+            },
+            "files": {
+                "label": "files ({{count}})"
+            }
         }
     },
     "tasks": {
@@ -162,7 +173,8 @@
                 "weight": "weight",
                 "time": "time"
             },
-            "empty": "Nothing matches your search"
+            "empty": "Nothing matches your search",
+            "error": "Failed to load local tracks"
         }
     },
     "settings": {
@@ -234,6 +246,7 @@
             "actions": {
                 "browse": "Browse",
                 "options": "Options",
+                "set_primary": "Set as primary",
                 "add_library_folder": "Add library folder"
             },
             "message": {

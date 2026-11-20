@@ -50,3 +50,21 @@ pub struct LibraryWithStats {
     pub used_size_bytes: i64,
     pub files_count: i64,
 }
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LibraryStats {
+    pub library_id: i64,
+    pub used_size_bytes: i64,
+    pub files_count: i64,
+}
+
+impl LibraryStats {
+    pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
+        Ok(Self {
+            library_id: row.get("library_id")?,
+            used_size_bytes: row.get("used_size_bytes")?,
+            files_count: row.get("files_count")?,
+        })
+    }
+}

@@ -1,7 +1,7 @@
 import styles from "./VolumeControl.module.scss";
 import { Flex } from "../../../primitives/Flex";
 import { Button } from "../../../primitives/Button";
-import { ProgressBar } from "../../progress";
+import { Slider } from "../../sliders";
 import { Icon } from "../../../primitives";
 
 export interface VolumeControlProps {
@@ -24,7 +24,7 @@ export const VolumeControl = ({
     return (
         <div className={styles.volumeWrapper}>
             <Flex align="center" justify="center" className={styles.popover}>
-                <ProgressBar
+                <Slider
                     time={isMuted ? 0 : volume}
                     duration={100}
                     step={1}

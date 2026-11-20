@@ -6,6 +6,5 @@ pub mod playlists;
 pub mod settings;
 pub mod tracks;
 
-pub use libraries::*;
 pub use openapi::*;
 pub use settings::*;

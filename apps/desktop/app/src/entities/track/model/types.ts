@@ -1,5 +1,5 @@
 import type { CursorPage, NullablePatch, PlayerTrack } from "@zelefy/types";
-import type { Library } from "@/shared/types";
+import type { Library } from "@/entities/library";
 import { trackFilePath, trackFileSrc } from "../lib";
 
 export type TrackId = string | number;

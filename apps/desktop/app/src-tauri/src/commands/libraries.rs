@@ -1,9 +1,9 @@
 use desktop_core::{
     db::{repository, DbState},
-    models::libraries::LibraryWithStats,
+    models::libraries::{Library, LibraryStats},
     services,
 };
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, State};
 
 use crate::cache::AppCache;
 
@@ -32,22 +32,15 @@ pub fn refresh_asset_scope(app: &AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn get_all_libraries(app: AppHandle) -> Result<Vec<LibraryWithStats>, String> {
-    let db = app.state::<DbState>();
-    let conn = db.conn.lock().unwrap_or_else(|e| e.into_inner());
-    let libraries = repository::libraries::get_all(&conn)
-        .map_err(|e| format!("Ошибка получения локальных хранилищ: {}", e).to_string())?;
+pub fn get_libraries(db: State<'_, DbState>) -> Result<Vec<Library>, String> {
+    let conn = db.lock();
+    repository::libraries::get_all(&conn).map_err(|e| e.to_string())
+}
 
-    let libraries_with_stats = libraries
-        .iter()
-        .map(|library| LibraryWithStats {
-            library: library.to_owned(),
-            used_size_bytes: 0,
-            files_count: 0,
-        })
-        .collect();
-
-    Ok(libraries_with_stats)
+#[tauri::command]
+pub fn get_libraries_stats(db: State<'_, DbState>) -> Result<Vec<LibraryStats>, String> {
+    let conn = db.lock();
+    repository::libraries::get_stats(&conn).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -76,8 +69,7 @@ pub fn update_user_library(app: AppHandle, library_id: i64, path: String) -> Res
 }
 
 #[tauri::command]
-pub fn set_primary_library(app: AppHandle, library_id: i64) -> Result<(), String> {
-    let db = app.state::<DbState>();
-    let mut conn = db.conn.lock().unwrap_or_else(|e| e.into_inner());
+pub fn set_primary_library(db: State<'_, DbState>, library_id: i64) -> Result<(), String> {
+    let mut conn = db.lock();
     services::libraries::set_primary_library(&mut conn, library_id).map_err(|e| e.to_string())
 }

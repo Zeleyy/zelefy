@@ -1,5 +1,5 @@
 export { VolumeControl, type VolumeControlProps } from "./volume";
-export { ProgressBar, type ProgressBarProps, WaveformBar, type WaveformBarProps } from "./progress";
+export { Slider, type SliderProps, WaveformBar, type WaveformBarProps } from "./sliders";
 export { Avatar, type AvatarProps } from "./Avatar";
 export * from "./covers";
 export { PlaylistCard } from "./PlaylistCard";

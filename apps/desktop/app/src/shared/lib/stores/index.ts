@@ -12,3 +12,5 @@ export {
     type ConfirmVariant,
     confirm,
 } from "./useConfirmStore";
+export { useSearchStore } from "./useSearchStore";
+export * from "./useSearchHistoryStore";

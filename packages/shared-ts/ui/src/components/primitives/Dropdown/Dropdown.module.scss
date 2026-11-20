@@ -1,0 +1,32 @@
+.popup {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.item {
+    user-select: none;
+    padding: var(--spacing-xs);
+    outline: none;
+
+    &[data-highlighted] {
+        cursor: pointer;
+        background-color: var(--bg-surface);
+    }
+
+    &--disabled,
+    &:disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    &--danger {
+        color: var(--danger);
+
+        &[data-highlighted] {
+            background-color: var(--danger);
+            color: var(--text-on-danger);
+        }
+    }
+}

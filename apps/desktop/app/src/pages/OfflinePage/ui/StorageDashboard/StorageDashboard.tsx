@@ -2,33 +2,32 @@ import styles from "./StorageDashboard.module.scss";
 import { useNavigate } from "react-router";
 import { Trans, useTranslation } from "react-i18next";
 import clsx from "clsx";
-import { Button, Flex, formatBytes } from "@zelefy/ui";
-import { useLibraries } from "@/features/storage";
+import { Flex, formatBytes } from "@zelefy/ui";
+import { useLibrariesWithStats } from "@/features/storage";
 
-// @TODO: переработать после удаления кеша
 export const StorageDashboard = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { data } = useLibraries();
+    const { data: librariesWithStats } = useLibrariesWithStats();
 
-    const storages = data ?? [];
+    const libraries = librariesWithStats ?? [];
 
-    const MAX_VISIBLE = storages.length === 4 ? 4 : 3;
-    const visibleStorages = storages.slice(0, MAX_VISIBLE);
-    const remainingCount = storages.length - MAX_VISIBLE;
-    const totalUsedBytes = storages.reduce((acc, s) => acc + s.usedSizeBytes, 0);
+    const MAX_VISIBLE = libraries.length === 4 ? 4 : 3;
+    const visibleLibraries = libraries.slice(0, MAX_VISIBLE);
+    const remainingCount = libraries.length - MAX_VISIBLE;
+    const totalUsedBytes = libraries.reduce((acc, s) => acc + s.usedSizeBytes, 0);
 
     return (
         <Flex as={"section"} direction="column" gap="md" className={styles.storageDashboard}>
             <Flex justify="space-between" align="center" className={styles.dashboardHeader}>
                 <span className={styles.storageTitle}>{t("offline.storage.title")}</span>
                 <div className={styles.totalInfo}>
-                    {t("offline.storage.total_used")} {formatBytes(totalUsedBytes, 2)}
+                    {t("offline.storage.total_used")} <span>{formatBytes(totalUsedBytes, 2)}</span>
                 </div>
             </Flex>
 
             <div className={styles.storageGrid}>
-                {visibleStorages.map((storage) => {
+                {visibleLibraries.map((storage) => {
                     const isPrimaryLibrary = storage.isPrimary;
 
                     return (
@@ -82,17 +81,8 @@ export const StorageDashboard = () => {
                                 <span className={styles.pathText} title={storage.path}>
                                     {storage.path}
                                 </span>
-                                {storage.isPrimary ? (
+                                {storage.isPrimary && (
                                     <span className={styles.badgePrimary}>Primary</span>
-                                ) : (
-                                    <Button
-                                        variant="ghost"
-                                        size="small"
-                                        noPadding
-                                        className={styles.actionBtn}
-                                    >
-                                        Отключить
-                                    </Button>
                                 )}
                             </Flex>
                         </Flex>

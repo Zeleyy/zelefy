@@ -76,33 +76,59 @@ pub fn get_all_local_with_files(conn: &Connection) -> rusqlite::Result<Vec<Local
     Ok(attach_files(tracks, files_map))
 }
 
+fn fts_phrase(s: &str) -> String {
+    format!("\"{}\"", s.replace('"', "\"\""))
+}
+
 pub fn get_local_ids_page(
     conn: &Connection,
+    search: Option<String>,
     after: Option<LocalTrackCursor>,
     limit: u32,
 ) -> rusqlite::Result<Vec<i64>> {
+    let (fts, short): (Option<String>, Option<String>) =
+        match search.as_deref().map(str::trim).filter(|s| !s.is_empty()) {
+            None => (None, None),
+            Some(s) if s.chars().count() >= 3 => (Some(fts_phrase(s)), None),
+            Some(s) => (None, Some(s.to_lowercase())),
+        };
+
     let mut stmt = conn.prepare_cached(
         r#"
-            SELECT t.track_id
-            FROM tracks t
-            WHERE
-                EXISTS (
-                    SELECT 1
-                    FROM track_files tf
-                    WHERE tf.track_id = t.track_id
-                    AND tf.track_file_type_id = ?1
-                )
-                AND (?2 IS NULL OR t.track_id < ?2)
-            ORDER BY t.track_id DESC
-            LIMIT ?3
+        SELECT t.track_id
+        FROM tracks t
+        WHERE EXISTS (
+            SELECT 1 FROM track_files tf
+            WHERE tf.track_id = t.track_id
+              AND tf.track_file_type_id = ?1
+        )
+        AND (?2 IS NULL OR t.track_id < ?2)
+        AND (
+            ?4 IS NULL
+            OR t.track_id IN (
+                SELECT rowid FROM tracks_fts WHERE tracks_fts MATCH ?4
+            )
+        )
+        AND (
+            ?5 IS NULL
+            OR instr(ulower(t.title), ?5) > 0
+            OR instr(ulower(t.metadata_artist), ?5) > 0
+        )
+        ORDER BY t.track_id DESC
+        LIMIT ?3
         "#,
     )?;
 
-    let track_id = after.map(|a| a.track_id);
-
-    let rows = stmt.query_map(params![TrackFileType::Audio, track_id, limit], |row| {
-        row.get(0)
-    })?;
+    let rows = stmt.query_map(
+        params![
+            TrackFileType::Audio,
+            after.map(|a| a.track_id),
+            limit,
+            fts,
+            short,
+        ],
+        |row| row.get::<_, i64>(0),
+    )?;
 
     rows.collect()
 }
@@ -112,7 +138,7 @@ pub fn get_local_ids_with_files_page(
     after: Option<LocalTrackCursor>,
     limit: u32,
 ) -> rusqlite::Result<Vec<LocalTrackIdResponse>> {
-    let track_ids = get_local_ids_page(conn, after, limit)?;
+    let track_ids = get_local_ids_page(conn, None, after, limit)?;
 
     if track_ids.is_empty() {
         return Ok(Vec::new());

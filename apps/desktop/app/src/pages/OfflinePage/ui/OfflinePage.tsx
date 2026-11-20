@@ -1,5 +1,5 @@
 import styles from "./OfflinePage.module.scss";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button, EmptyState, Flex, Input, SpinnerLoader } from "@zelefy/ui";
@@ -7,12 +7,7 @@ import { useModalStore } from "@/shared/lib/stores";
 import { selectAudio } from "@/shared/lib/utils/browse";
 import { InfiniteScrollFooter } from "@/shared/ui";
 import type { TrackId } from "@/entities/track";
-import {
-    useDeleteLocalTrack,
-    useImportTracks,
-    useLocalTracks,
-    usePlayerStore,
-} from "@/features/player";
+import { useDeleteLocalTrack, useLocalTracks, usePlayerStore } from "@/features/player";
 import { StorageDashboard } from "./StorageDashboard";
 import { TrackRow } from "./TrackRow";
 
@@ -22,10 +17,17 @@ export const OfflinePage = () => {
     const openModal = useModalStore((s) => s.openModal);
     const playTrack = usePlayerStore((s) => s.playTrack);
 
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
-        useLocalTracks();
+    const [input, setInput] = useState("");
+    const [search, setSearch] = useState("");
 
-    const { mutate: importTracks, isPending, progress } = useImportTracks();
+    useEffect(() => {
+        const id = setTimeout(() => setSearch(input.trim()), 500);
+        return () => clearTimeout(id);
+    }, [input]);
+
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
+        useLocalTracks({ search });
+
     const { mutate: deleteTrack } = useDeleteLocalTrack();
 
     const localTracks = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
@@ -58,12 +60,11 @@ export const OfflinePage = () => {
         async (currentPath?: string) => {
             const selected = await selectAudio(currentPath);
             if (!selected?.length) return;
-            importTracks({ paths: selected });
+            openModal("importTracks", { paths: selected });
         },
-        [importTracks],
+        [openModal],
     );
 
-    if (isLoading) return <SpinnerLoader isLoading />;
     if (isError) return <EmptyState title={t("offline.list.error")} description={String(error)} />;
 
     return (
@@ -76,9 +77,7 @@ export const OfflinePage = () => {
                             {t("offline.storage.settings")}
                         </Button>
                         <Button variant="primary" onClick={() => void handleBrowseFiles()}>
-                            {isPending && progress
-                                ? `${progress.done}/${progress.total}`
-                                : t("offline.actions.add.files")}
+                            {t("offline.actions.add.files")}
                         </Button>
                     </Flex>
                 </Flex>
@@ -94,15 +93,16 @@ export const OfflinePage = () => {
                 >
                     <div className={styles.search}>
                         <Input
+                            value={input}
                             placeholder={t("offline.controls.search.placeholder")}
-                            onChange={() => {
-                                // setSearch(e.target.value);
-                            }}
+                            onChange={(e) => setInput(e.target.value)}
                         />
                     </div>
                 </Flex>
 
-                {trackIds.length > 0 ? (
+                {isError ? (
+                    <EmptyState title={t("offline.list.error")} description={String(error)} />
+                ) : trackIds.length > 0 ? (
                     <div className={styles.trackList}>
                         <div className={styles.header}>
                             <span className={styles.center}>#</span>
@@ -112,17 +112,23 @@ export const OfflinePage = () => {
                             <span className={styles.center}>{t("offline.list.header.time")}</span>
                         </div>
 
-                        {localTracks.map((localTrack, i) => (
-                            <TrackRow
-                                key={localTrack.trackId}
-                                index={i}
-                                localTrack={localTrack}
-                                onPlay={handlePlay}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                                onAddToPlaylist={handleAddToPlaylist}
-                            />
-                        ))}
+                        {isLoading ? (
+                            <Flex align="center" justify="center">
+                                <SpinnerLoader isLoading />
+                            </Flex>
+                        ) : (
+                            localTracks.map((localTrack, i) => (
+                                <TrackRow
+                                    key={localTrack.trackId}
+                                    index={i}
+                                    localTrack={localTrack}
+                                    onPlay={handlePlay}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                    onAddToPlaylist={handleAddToPlaylist}
+                                />
+                            ))
+                        )}
                     </div>
                 ) : (
                     <EmptyState title={t("offline.list.empty")} />

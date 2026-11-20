@@ -1,10 +1,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
-import type { JobCursor, JobsPage } from "@/entities/job";
+import { jobKeys, type JobCursor, type JobsPage } from "@/entities/job";
 
 export const useJobs = () => {
     return useInfiniteQuery({
-        queryKey: ["jobs", "feed"],
+        queryKey: jobKeys.feeds(),
         queryFn: async ({ pageParam }: { pageParam: JobCursor | null }) => {
             return await invoke<JobsPage>("get_jobs_page", {
                 after: pageParam,

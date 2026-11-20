@@ -3,7 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { toast } from "sonner";
 import { queryClient } from "@/shared/api";
-import type { JobEvent } from "@/entities/job";
+import { jobKeys, type JobEvent } from "@/entities/job";
 import { toPlayerTrack, trackKeys, type LocalTrackResponse } from "@/entities/track";
 import { usePlayerStore } from "@/features/player";
 import { useJobsStore } from "../model";
@@ -31,7 +31,7 @@ export const useJobsBridge = () => {
 
                     usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
                     await queryClient.invalidateQueries({ queryKey: trackKeys.locals() });
-                    await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+                    await queryClient.invalidateQueries({ queryKey: jobKeys.all });
                 })().catch(toast.error);
             }
         });
