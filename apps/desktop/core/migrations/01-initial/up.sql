@@ -27,8 +27,18 @@ CREATE TABLE servers (
     server_id INTEGER PRIMARY KEY,
     server_name TEXT NOT NULL,
     server_url TEXT NOT NULL UNIQUE,
-    created_at INTEGER NOT NULL
+    is_active INTEGER NOT NULL DEFAULT 0 CHECK (is_active IN (0, 1)),
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
 ) STRICT;
+
+CREATE UNIQUE INDEX idx_servers_one_active ON servers (is_active)
+WHERE
+    is_active = 1;
+
+INSERT INTO
+    servers (server_id, server_name, server_url)
+VALUES
+    (1, 'Zelefy', 'api.zelefy.zeleyy.com');
 
 CREATE TABLE job_kinds (
     job_kind_id INTEGER PRIMARY KEY,
@@ -123,6 +133,46 @@ CREATE TABLE profiles (
 CREATE INDEX idx_profiles_permalink ON profiles (permalink);
 
 CREATE INDEX idx_profiles_user_id ON profiles (user_id);
+
+CREATE TRIGGER profiles_fts_ai
+AFTER INSERT ON profiles
+BEGIN
+INSERT INTO
+    profiles_fts (rowid, permalink, display_name)
+VALUES
+    (new.profile_id, new.permalink, new.display_name);
+
+END;
+
+CREATE TRIGGER profiles_fts_ad
+AFTER DELETE ON profiles
+BEGIN
+INSERT INTO
+    profiles_fts (profiles_fts, rowid, permalink, display_name)
+VALUES
+    (
+        'delete',
+        old.profile_id,
+        old.permalink,
+        old.display_name
+    );
+
+END;
+
+CREATE TRIGGER playlists_fts_au
+AFTER UPDATE OF title ON playlists
+BEGIN
+INSERT INTO
+    playlists_fts (playlists_fts, rowid, title)
+VALUES
+    ('delete', old.playlist_id, old.title);
+
+INSERT INTO
+    playlists_fts (rowid, title)
+VALUES
+    (new.playlist_id, new.title);
+
+END;
 
 -- 
 CREATE TABLE profile_social_links (
@@ -291,6 +341,48 @@ CREATE TABLE playlists (
     description TEXT,
     created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER))
 ) STRICT;
+
+CREATE VIRTUAL TABLE playlists_fts USING fts5 (
+    title,
+    content = 'playlists',
+    content_rowid = 'playlist_id',
+    tokenize = 'trigram'
+);
+
+INSERT INTO
+    playlists_fts (playlists_fts)
+VALUES
+    ('rebuild');
+
+CREATE TRIGGER playlists_fts_ai
+AFTER INSERT ON playlists
+BEGIN
+INSERT INTO
+    playlists_fts (rowid, title)
+VALUES
+    (new.playlist_id, new.title);
+
+END;
+
+CREATE TRIGGER playlists_fts_ad
+AFTER DELETE ON playlists
+BEGIN
+INSERT INTO
+    playlists_fts (playlists_fts, rowid, title)
+VALUES
+    ('delete', old.playlist_id, old.title);
+
+END;
+
+CREATE TRIGGER playlists_fts_au
+AFTER UPDATE OF title ON playlists
+BEGIN
+INSERT INTO
+    playlists_fts (playlists_fts, rowid, title)
+VALUES
+    ('delete', old.playlist_id, old.title);
+
+END;
 
 CREATE TABLE remote_playlists (
     playlist_id INTEGER PRIMARY KEY REFERENCES playlists (playlist_id) ON DELETE CASCADE,

@@ -2,6 +2,8 @@ import styles from "./Tabs.module.scss";
 import clsx from "clsx";
 
 type TabVariant = "primary" | "secondary";
+type TabShape = "segmented" | "underline";
+type TabsSize = "sm" | "md";
 
 export interface TabItem<T extends string = string> {
     label: string;
@@ -14,6 +16,8 @@ export interface TabsProps<T extends string = string> {
     active?: T;
     onTabClick?: (value: T) => void;
     variant?: TabVariant;
+    shape?: TabShape;
+    size?: TabsSize;
     className?: string;
 }
 
@@ -22,12 +26,23 @@ export const Tabs = <T extends string = string>({
     active,
     onTabClick,
     variant = "primary",
+    shape = "segmented",
+    size = "md",
     className,
 }: TabsProps<T>) => {
     if (!tabs.length) return null;
 
     return (
-        <div role="tablist" className={clsx(styles.tabs, styles[`tabs--${variant}`], className)}>
+        <div
+            role="tablist"
+            className={clsx(
+                styles.tabs,
+                styles[`tabs--${shape}`],
+                styles[`tabs--${variant}`],
+                styles[`tabs--${size}`],
+                className,
+            )}
+        >
             {tabs.map((tab) => {
                 const isActive = tab.value === active;
 

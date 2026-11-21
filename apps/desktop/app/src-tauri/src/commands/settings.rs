@@ -1,10 +1,10 @@
 use tauri::State;
 
-use crate::state::{AppState, DEFAULT_GATEWAY_URL};
+use crate::state::{AppState, DEFAULT_SERVER_URL};
 
 #[tauri::command]
 pub fn get_default_gateway_url() -> &'static str {
-    DEFAULT_GATEWAY_URL
+    DEFAULT_SERVER_URL
 }
 
 #[tauri::command]
@@ -23,6 +23,6 @@ pub fn set_gateway_url(state: State<'_, AppState>, new_url: String) -> Result<()
 #[tauri::command]
 pub fn reset_gateway_url(state: State<'_, AppState>) -> String {
     let mut url = state.gateway_url.blocking_lock();
-    *url = DEFAULT_GATEWAY_URL.to_string();
+    *url = DEFAULT_SERVER_URL.to_string();
     url.clone()
 }

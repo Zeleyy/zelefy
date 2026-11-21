@@ -4,7 +4,7 @@ import { trackKeys, type LocalTrackResponse } from "@/entities/track";
 
 export const useLocalTrackDetails = (trackId: number | null) => {
     return useQuery({
-        queryKey: trackKeys.detail(trackId!),
+        queryKey: trackKeys.localDetail(trackId!),
         queryFn: () => invoke<LocalTrackResponse>("get_local_track", { trackId }),
         enabled: trackId !== null,
     });

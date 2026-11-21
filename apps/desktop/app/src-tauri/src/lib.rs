@@ -2,15 +2,15 @@ use desktop_core::{
     audio::state::AudioState,
     db::{init_db, DbState},
     jobs,
+    servers::state::AppServers,
 };
-use state::AppState;
 use tauri::{Emitter, Manager};
 
 pub mod cache;
 pub mod commands;
 pub mod state;
 
-use crate::{cache::AppCache, commands::refresh_asset_scope};
+use crate::{cache::AppCache, commands::libraries::refresh_asset_scope};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -47,17 +47,20 @@ pub fn run() {
 
             let cache = AppCache::init(local_root.join("cache"), config_root.join("cache.json"));
             let db_path = data_root.join("zelefy.db");
-            let conn = init_db(&db_path.to_string_lossy()).expect("Failed to initialize database");
+            let mut conn =
+                init_db(&db_path.to_string_lossy()).expect("Failed to initialize database");
+            let servers = AppServers::init(&mut conn)?;
             let db = DbState::new(conn);
 
             app.manage(cache);
+            app.manage(servers);
             app.manage(db.clone());
             let handle = app.handle().clone();
             let jobs = jobs::spawn_worker(db, move |e| {
                 let _ = handle.emit("jobs://event", e);
             });
             app.manage(jobs);
-            app.manage(AppState::default());
+
             let handle = app.handle().clone();
             app.manage(AudioState::new(move |event| {
                 let _ = handle.emit("player://event", event);
@@ -76,6 +79,8 @@ pub fn run() {
             commands::get_default_gateway_url,
             commands::get_available_services,
             commands::get_available_endpoints,
+            commands::servers::get_servers,
+            commands::servers::switch_server,
             commands::libraries::get_libraries,
             commands::libraries::get_libraries_stats,
             commands::libraries::add_user_library,
@@ -94,6 +99,7 @@ pub fn run() {
             commands::tracks::get_local_tracks_ids,
             commands::tracks::get_local_track,
             commands::tracks::get_local_tracks_by_ids,
+            commands::tracks::get_local_track_ids_paged,
             commands::tracks::get_local_tracks_paged,
             commands::tracks::update_local_track,
             commands::tracks::delete_local_track,

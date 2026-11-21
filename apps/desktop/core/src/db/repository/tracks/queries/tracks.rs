@@ -3,9 +3,12 @@ use std::collections::HashMap;
 
 use crate::{
     db::{repository::tracks::track_files::load_files_map, utils::placeholders},
-    models::tracks::{
-        LocalTrackCursor, LocalTrackIdResponse, LocalTrackResponse, Track, TrackFileResponse,
-        TrackFileType, TrackFilesResponse,
+    models::{
+        tracks::{
+            LocalTrackCursor, LocalTrackIdResponse, LocalTrackResponse, Track, TrackFileResponse,
+            TrackFileType, TrackFilesResponse,
+        },
+        utils::SearchQuery,
     },
 };
 
@@ -76,46 +79,40 @@ pub fn get_all_local_with_files(conn: &Connection) -> rusqlite::Result<Vec<Local
     Ok(attach_files(tracks, files_map))
 }
 
-fn fts_phrase(s: &str) -> String {
-    format!("\"{}\"", s.replace('"', "\"\""))
-}
-
 pub fn get_local_ids_page(
     conn: &Connection,
-    search: Option<String>,
+    search: Option<&SearchQuery>,
     after: Option<LocalTrackCursor>,
     limit: u32,
 ) -> rusqlite::Result<Vec<i64>> {
-    let (fts, short): (Option<String>, Option<String>) =
-        match search.as_deref().map(str::trim).filter(|s| !s.is_empty()) {
-            None => (None, None),
-            Some(s) if s.chars().count() >= 3 => (Some(fts_phrase(s)), None),
-            Some(s) => (None, Some(s.to_lowercase())),
-        };
-
     let mut stmt = conn.prepare_cached(
         r#"
-        SELECT t.track_id
-        FROM tracks t
-        WHERE EXISTS (
-            SELECT 1 FROM track_files tf
-            WHERE tf.track_id = t.track_id
-              AND tf.track_file_type_id = ?1
-        )
-        AND (?2 IS NULL OR t.track_id < ?2)
-        AND (
-            ?4 IS NULL
-            OR t.track_id IN (
-                SELECT rowid FROM tracks_fts WHERE tracks_fts MATCH ?4
+            SELECT t.track_id
+            FROM tracks t
+            WHERE EXISTS (
+                SELECT 1 FROM track_files tf
+                WHERE tf.track_id = t.track_id
+                AND tf.track_file_type_id = ?1
             )
-        )
-        AND (
-            ?5 IS NULL
-            OR instr(ulower(t.title), ?5) > 0
-            OR instr(ulower(t.metadata_artist), ?5) > 0
-        )
-        ORDER BY t.track_id DESC
-        LIMIT ?3
+            AND (?2 IS NULL OR t.track_id < ?2)
+            AND (
+                ?4 IS NULL
+                OR t.track_id IN (
+                    SELECT rowid FROM tracks_fts WHERE tracks_fts MATCH ?4
+                )
+            )
+            AND (
+                ?5 IS NULL
+                OR instr(ulower(t.title), ?5) > 0
+                OR instr(ulower(t.metadata_artist), ?5) > 0
+            )
+            AND (
+                ?6 IS NULL
+                OR instr(ulower(t.title), ?6) > 0
+                OR instr(ulower(t.metadata_artist), ?6) > 0
+            )
+            ORDER BY t.track_id DESC
+            LIMIT ?3
         "#,
     )?;
 
@@ -124,8 +121,9 @@ pub fn get_local_ids_page(
             TrackFileType::Audio,
             after.map(|a| a.track_id),
             limit,
-            fts,
-            short,
+            search.and_then(SearchQuery::fts),
+            search.and_then(SearchQuery::short1),
+            search.and_then(SearchQuery::short2),
         ],
         |row| row.get::<_, i64>(0),
     )?;

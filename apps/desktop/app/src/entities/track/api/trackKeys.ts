@@ -3,15 +3,18 @@ import type { TrackId } from "../model";
 export const trackKeys = {
     all: ["track"] as const,
 
-    lists: () => [...trackKeys.all, "list"] as const,
-
     details: () => [...trackKeys.all, "detail"] as const,
     detail: (trackId: TrackId) => [...trackKeys.details(), trackId] as const,
-
+    localDetail: (trackId: TrackId) => [...trackKeys.detail(trackId), "local"] as const,
     batch: (ids: TrackId[]) => [...trackKeys.all, "batch", ids] as const,
 
-    locals: () => [...trackKeys.lists(), "local"] as const,
-
     feeds: () => [...trackKeys.all, "feed"] as const,
-    feed: (search: string) => [...trackKeys.feeds(), search] as const,
+
+    localFeeds: () => [...trackKeys.feeds(), "local"] as const,
+    localFeed: (search: string) => [...trackKeys.localFeeds(), { search }] as const,
+    localIdsFeed: (search: string) => [...trackKeys.localFeeds(), "ids", { search }] as const,
+
+    remoteFeeds: () => [...trackKeys.feeds(), "remote"] as const,
+    remoteFeed: (search: string) => [...trackKeys.remoteFeeds(), { search }] as const,
+    remoteIdsFeed: (search: string) => [...trackKeys.remoteFeeds(), "ids", { search }] as const,
 };

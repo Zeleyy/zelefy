@@ -3,11 +3,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { trackKeys, type LocalTrackCursor, type LocalTracksPage } from "@/entities/track";
 import { useEnsureTracks } from "./useEnsureTracks";
 
-export const useLocalTracks = ({ search = "" }) => {
-    const normalized = search.trim();
+export const useLocalTracks = ({ search = "", enabled = true }) => {
+    const normalized = search.trim().replace(/\s+/g, " ").toLowerCase();
 
     const query = useInfiniteQuery({
-        queryKey: trackKeys.feed(normalized),
+        queryKey: trackKeys.localFeed(normalized),
         queryFn: async ({ pageParam }: { pageParam: LocalTrackCursor | null }) => {
             return invoke<LocalTracksPage>("get_local_tracks_paged", {
                 search: normalized === "" ? null : normalized,
@@ -22,6 +22,7 @@ export const useLocalTracks = ({ search = "" }) => {
             const seen = allPages.slice(0, -1).some((p) => p.nextCursor?.trackId == next.trackId);
             return seen ? undefined : next;
         },
+        enabled,
     });
 
     const trackIds = query.data?.pages

@@ -89,3 +89,4 @@ export interface LocalTrackCursor {
 }
 
 export type LocalTracksPage = CursorPage<LocalTrackIdResponse, LocalTrackCursor>;
+export type LocalTrackIdsPage = CursorPage<number, LocalTrackCursor>;

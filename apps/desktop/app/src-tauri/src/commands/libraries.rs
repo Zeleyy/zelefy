@@ -17,7 +17,7 @@ pub fn refresh_asset_scope(app: &AppHandle) -> Result<(), String> {
 
     let libraries = {
         let db = app.state::<DbState>();
-        let conn = db.conn.lock().unwrap_or_else(|e| e.into_inner());
+        let conn = db.lock();
         repository::libraries::get_all(&conn)
             .map_err(|e| format!("Ошибка получения локальных хранилищ: {e}"))?
     };
@@ -47,7 +47,7 @@ pub fn get_libraries_stats(db: State<'_, DbState>) -> Result<Vec<LibraryStats>, 
 pub fn add_user_library(app: AppHandle, path: String) -> Result<i64, String> {
     let new_library_id = {
         let db = app.state::<DbState>();
-        let mut conn = db.conn.lock().unwrap_or_else(|e| e.into_inner());
+        let mut conn = db.lock();
 
         services::libraries::create_user_library(&mut conn, path).map_err(|e| e.to_string())?
     };
@@ -61,7 +61,7 @@ pub fn add_user_library(app: AppHandle, path: String) -> Result<i64, String> {
 pub fn update_user_library(app: AppHandle, library_id: i64, path: String) -> Result<(), String> {
     {
         let db = app.state::<DbState>();
-        let mut conn = db.conn.lock().unwrap_or_else(|e| e.into_inner());
+        let mut conn = db.lock();
         services::libraries::update_user_library(&mut conn, library_id, path)
             .map_err(|e| e.to_string())?;
     }

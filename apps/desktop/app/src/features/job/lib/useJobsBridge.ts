@@ -30,7 +30,7 @@ export const useJobsBridge = () => {
                     });
 
                     usePlayerStore.getState().patchTrack(track.trackId, toPlayerTrack(track));
-                    await queryClient.invalidateQueries({ queryKey: trackKeys.locals() });
+                    await queryClient.invalidateQueries({ queryKey: trackKeys.localFeeds() });
                     await queryClient.invalidateQueries({ queryKey: jobKeys.all });
                 })().catch(toast.error);
             }

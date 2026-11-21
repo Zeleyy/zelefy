@@ -6,7 +6,8 @@ import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/
 import clsx from "clsx";
 import { Button, Cover, DragButton, Flex, formatTime, Icon, SpinnerLoader } from "@zelefy/ui";
 import type { TrackId } from "@/entities/track";
-import { usePlayerStore, useTrack } from "@/features/player";
+import { useTrack } from "@/features/player";
+import { useAddToQueue } from "@/features/queue";
 
 interface PlaylistTrackRowProps {
     index: number;
@@ -40,7 +41,7 @@ export const PlaylistTrackRow = memo(
     }: PlaylistTrackRowProps) => {
         const { t } = useTranslation();
         const { data: track } = useTrack(trackId);
-        const addToQueue = usePlayerStore((s) => s.addToQueue);
+        const addToQueue = useAddToQueue();
 
         return (
             <div
@@ -97,7 +98,8 @@ export const PlaylistTrackRow = memo(
                         square
                         onClick={(e) => {
                             e.stopPropagation();
-                            addToQueue(trackId);
+                            if (!track) return;
+                            addToQueue(track);
                         }}
                     >
                         <Icon name="player-list-end" size={13} />

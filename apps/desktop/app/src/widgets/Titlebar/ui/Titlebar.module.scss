@@ -3,7 +3,6 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--spacing-sm);
-    user-select: none;
 
     padding: var(--spacing-xs) var(--spacing-sm);
     background-color: var(--bg-secondary);
@@ -24,7 +23,6 @@
     svg,
     span {
         pointer-events: none;
-        user-select: none;
     }
 }
 

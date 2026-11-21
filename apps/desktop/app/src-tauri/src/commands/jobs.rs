@@ -10,26 +10,17 @@ pub fn get_jobs_page(
     after: Option<JobCursor>,
     limit: Option<u32>,
 ) -> Result<JobsPage, String> {
-    let limit = limit.unwrap_or(50).clamp(1, 200);
-    let fetch = limit.saturating_add(1);
+    let (limit, fetch) = JobsPage::resolve_limits(limit, 50, 200);
 
     let conn = db.lock();
 
-    let mut jobs = repository::jobs::get_page(&conn, after, fetch).map_err(|e| e.to_string())?;
+    let jobs = repository::jobs::get_page(&conn, after, fetch).map_err(|e| e.to_string())?;
 
-    let has_more = jobs.len() > limit as usize;
-    jobs.truncate(limit as usize);
-
-    let next_cursor = if has_more {
-        jobs.last().map(|j| JobCursor { job_id: j.job_id })
-    } else {
-        None
-    };
-
-    Ok(JobsPage {
-        items: jobs.iter().map(JobEvent::from).collect(),
-        next_cursor,
-    })
+    Ok(JobsPage::from_fetched(
+        jobs.iter().map(JobEvent::from).collect(),
+        limit,
+        |j| JobCursor { job_id: j.job_id },
+    ))
 }
 
 #[tauri::command]

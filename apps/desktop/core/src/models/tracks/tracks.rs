@@ -63,6 +63,7 @@ pub struct LocalTrackCursor {
 }
 
 pub type LocalTracksPage = CursorPage<LocalTrackIdResponse, LocalTrackCursor>;
+pub type LocalTrackIdsPage = CursorPage<i64, LocalTrackCursor>;
 
 #[derive(Debug, Default)]
 pub struct NewTrack {

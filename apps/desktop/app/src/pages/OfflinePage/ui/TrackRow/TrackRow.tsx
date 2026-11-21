@@ -20,7 +20,7 @@ export const TrackRow = memo(
         const { data: track } = useTrack(trackId);
         const addToQueue = usePlayerStore((s) => s.addToQueue);
         const isPlaying = usePlayerStore((s) => selectCurrentTrackId(s) === trackId);
-        const isLinked = localTrack.cover?.library === null;
+        const isLinked = localTrack.audio?.library === null;
 
         return (
             <div
@@ -49,7 +49,7 @@ export const TrackRow = memo(
                 </div>
 
                 <span className={clsx(styles.center, styles.size)}>
-                    {formatBytes(localTrack.audio.sizeBytes)}
+                    {formatBytes(localTrack.audio?.sizeBytes)}
                 </span>
                 <span className={clsx(styles.center, styles.duration)}>
                     {formatTime(track?.durationMs ? track.durationMs / 1000 : 0)}

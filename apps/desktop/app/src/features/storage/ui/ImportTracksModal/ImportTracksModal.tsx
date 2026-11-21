@@ -12,7 +12,7 @@ export const ImportTracksModal = ({ paths, onClose }: ModalComponentProps<"impor
     const { mutate: importTracks, progress, isSuccess, isError } = useImportTracks();
 
     const primaryLibrary = libraries.find((l) => l.isPrimary);
-    const [selectedId, setSelectedId] = useState<string | undefined>();
+    const [selectedId, setSelectedId] = useState<number | undefined>();
 
     const activeLibraryId = selectedId ?? primaryLibrary?.libraryId;
     const options = libraries.map((l) => ({ value: l.libraryId, label: l.path }));
@@ -38,7 +38,11 @@ export const ImportTracksModal = ({ paths, onClose }: ModalComponentProps<"impor
                                 <Button variant="secondary" onClick={onClose}>
                                     {t("common.cancel")}
                                 </Button>
-                                <Button onClick={() => importTracks({ paths })}>
+                                <Button
+                                    onClick={() =>
+                                        importTracks({ paths, libraryId: activeLibraryId })
+                                    }
+                                >
                                     {t("common.import")}
                                 </Button>
                             </>

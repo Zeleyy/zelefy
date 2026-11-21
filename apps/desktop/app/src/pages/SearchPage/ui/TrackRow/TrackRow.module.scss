@@ -1,0 +1,28 @@
+.row {
+    background-image:
+        linear-gradient(
+            color-mix(in srgb, var(--bg-primary) 80%, transparent),
+            color-mix(in srgb, var(--bg-primary) 80%, transparent)
+        ),
+        var(--cover-url, none);
+    background-size: cover;
+    background-position: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-xs);
+
+    &__meta {
+        flex: 1;
+    }
+
+    &__title {
+        font-weight: var(--font-weight-semibold);
+
+        &:hover {
+            color: var(--text-secondary);
+        }
+    }
+
+    &__artist {
+        color: var(--text-secondary);
+    }
+}

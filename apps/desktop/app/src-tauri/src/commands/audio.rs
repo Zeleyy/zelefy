@@ -14,7 +14,7 @@ pub async fn player_load_local(
     db: State<'_, DbState>,
 ) -> Result<(), String> {
     let path = {
-        let conn = db.conn.lock().map_err(|e| e.to_string())?;
+        let conn = db.lock();
         let response = services::tracks::load_track(&conn, track_id).map_err(|e| e.to_string())?;
 
         let file = response

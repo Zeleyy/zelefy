@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Channel, invoke } from "@tauri-apps/api/core";
 import { queryClient } from "@/shared/api";
 import { trackKeys, type LocalTrack } from "@/entities/track";
+import { libraryKeys } from "@/entities/library";
 
 export type ImportOutcome =
     | { status: "imported"; path: string; track: LocalTrack }
@@ -28,6 +29,7 @@ export const useImportTracks = () => {
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: trackKeys.all });
+            await queryClient.invalidateQueries({ queryKey: libraryKeys.stats() });
         },
         onSettled: () => {
             setProgress(null);

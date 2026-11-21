@@ -19,6 +19,7 @@
 
     &__headerContainer {
         min-width: 0;
+        user-select: text;
     }
 
     &__header {

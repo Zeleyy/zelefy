@@ -14,6 +14,7 @@ body,
     width: 100%;
     height: 100%;
     overflow: hidden;
+    user-select: none;
 }
 
 #root {
@@ -123,4 +124,9 @@ canvas {
             background-color: var(--primary);
         }
     }
+}
+
+::selection {
+    background-color: var(--primary);
+    color: var(--text-on-primary);
 }

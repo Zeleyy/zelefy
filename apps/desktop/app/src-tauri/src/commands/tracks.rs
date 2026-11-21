@@ -1,8 +1,11 @@
 use desktop_core::{
     db::{repository, DbState},
-    models::tracks::{
-        LocalTrackCursor, LocalTrackIdResponse, LocalTrackResponse, LocalTracksPage,
-        UpdateTrackRequest,
+    models::{
+        tracks::{
+            LocalTrackCursor, LocalTrackIdResponse, LocalTrackIdsPage, LocalTrackResponse,
+            LocalTracksPage, UpdateTrackRequest,
+        },
+        utils::SearchQuery,
     },
     services::{self, tracks::ImportOutcome},
 };
@@ -39,39 +42,44 @@ pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse
 }
 
 #[tauri::command]
+pub fn get_local_track_ids_paged(
+    db: State<'_, DbState>,
+    search: Option<SearchQuery>,
+    after: Option<LocalTrackCursor>,
+    limit: Option<u32>,
+) -> Result<LocalTrackIdsPage, String> {
+    let (limit, fetch) = LocalTrackIdsPage::resolve_limits(limit, 50, 200);
+
+    let conn = db.lock();
+
+    let track_ids =
+        repository::tracks::tracks::get_local_ids_page(&conn, search.as_ref(), after, fetch)
+            .map_err(|e| e.to_string())?;
+
+    Ok(LocalTrackIdsPage::from_fetched(track_ids, limit, |id| {
+        LocalTrackCursor { track_id: *id }
+    }))
+}
+
+#[tauri::command]
 pub fn get_local_tracks_paged(
     db: State<'_, DbState>,
-    search: Option<String>,
+    search: Option<SearchQuery>,
     after: Option<LocalTrackCursor>,
     limit: Option<u32>,
 ) -> Result<LocalTracksPage, String> {
-    let limit = limit.unwrap_or(50).clamp(1, 200);
-    let fetch = limit.saturating_add(1);
-
-    let search = search
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty());
+    let (limit, fetch) = LocalTracksPage::resolve_limits(limit, 50, 200);
 
     let mut conn = db.lock();
 
-    let mut tracks = services::tracks::get_local_tracks_paged(&mut conn, search, after, fetch)
+    let tracks = services::tracks::get_local_tracks_paged(&mut conn, search.as_ref(), after, fetch)
         .map_err(|e| e.to_string())?;
 
-    let has_more = tracks.len() > limit as usize;
-    tracks.truncate(limit as usize);
-
-    let next_cursor = if has_more {
-        tracks.last().map(|t| LocalTrackCursor {
+    Ok(LocalTracksPage::from_fetched(tracks, limit, |t| {
+        LocalTrackCursor {
             track_id: t.track_id,
-        })
-    } else {
-        None
-    };
-
-    Ok(LocalTracksPage {
-        items: tracks,
-        next_cursor,
-    })
+        }
+    }))
 }
 
 #[tauri::command]

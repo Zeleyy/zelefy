@@ -142,6 +142,26 @@
     "home": {
         "title": "Home"
     },
+    "search": {
+        "start": "Start typing to search",
+        "source": {
+            "all": "All",
+            "local": "Local"
+        },
+        "type": {
+            "tracks": "Tracks",
+            "playlists": "Playlists",
+            "users": "Users"
+        },
+        "result": {
+            "empty": "Nothing found",
+            "empty_description": "Try searching for something else",
+            "error": "Failed to load search results"
+        },
+        "local": {
+            "error": "Failed to load local tracks"
+        }
+    },
     "library": {
         "title": "Library",
         "your": "Your playlists",

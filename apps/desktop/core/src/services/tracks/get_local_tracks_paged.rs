@@ -2,13 +2,16 @@ use rusqlite::Connection;
 
 use crate::{
     db::repository::{self, tracks::track_files::load_files_map},
-    models::tracks::{LocalTrackCursor, LocalTrackIdResponse, TrackFilesResponse},
+    models::{
+        tracks::{LocalTrackCursor, LocalTrackIdResponse, TrackFilesResponse},
+        utils::SearchQuery,
+    },
     services::errors::CoreError,
 };
 
 pub fn get_local_tracks_paged(
     conn: &mut Connection,
-    search: Option<String>,
+    search: Option<&SearchQuery>,
     after: Option<LocalTrackCursor>,
     limit: u32,
 ) -> Result<Vec<LocalTrackIdResponse>, CoreError> {

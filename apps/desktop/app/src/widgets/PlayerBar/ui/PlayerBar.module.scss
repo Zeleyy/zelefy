@@ -37,7 +37,6 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     max-width: 750px;
     background-color: var(--bg-primary);
     pointer-events: all;
-    user-select: none;
 }
 
 .mainControls {
@@ -80,6 +79,10 @@ $easing: cubic-bezier(0.16, 1, 0.3, 1);
     &:hover {
         color: var(--text-secondary);
     }
+}
+
+.author {
+    color: var(--text-secondary);
 }
 
 .tertiaryControl {
