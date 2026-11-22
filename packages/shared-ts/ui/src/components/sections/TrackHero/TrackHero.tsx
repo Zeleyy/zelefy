@@ -82,7 +82,7 @@ export const TrackHero = ({
                 </Flex>
 
                 <WaveformBar
-                    data={waveformData ?? new Uint8Array()}
+                    data={waveformData}
                     time={displayTime}
                     duration={safeDuration / 1000}
                     onChange={handleTimeChange}

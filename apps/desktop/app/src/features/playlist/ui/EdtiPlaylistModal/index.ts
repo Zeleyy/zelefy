@@ -1,1 +1,1 @@
-export { EdtiPlaylistModal } from "./EdtiPlaylistModal";
+export { EdtiPlaylistModal as default } from "./EdtiPlaylistModal";

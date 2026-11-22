@@ -30,6 +30,7 @@ pub fn create_local_playlist(
     Ok(PlaylistWithFirstTrackId {
         playlist: playlist,
         track_id: Some(new.track_id),
+        rank: None,
     })
 }
 

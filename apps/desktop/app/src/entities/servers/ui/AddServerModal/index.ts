@@ -1,1 +1,1 @@
-export { AddServerModal } from "./AddServerModal";
+export { AddServerModal as default } from "./AddServerModal";

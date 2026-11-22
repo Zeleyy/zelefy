@@ -5,8 +5,7 @@ import { AppToaster } from "@/shared/ui";
 import { Titlebar } from "@/widgets/Titlebar";
 import { Sidebar } from "@/widgets/Sidebar";
 import { PlayerBar } from "@/widgets/PlayerBar";
-import { ModalHost } from "@/widgets/modal";
-import { ConfirmHost } from "@/widgets/ConfirmHost";
+import { ConfirmHost, ModalHost } from "@/app/providers";
 
 export const MainLayout = () => {
     return (

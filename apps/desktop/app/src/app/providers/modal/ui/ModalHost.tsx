@@ -1,7 +1,7 @@
 import { Suspense, type ComponentType } from "react";
+import { SpinnerLoader } from "@zelefy/ui";
 import { useModalStore, type ModalComponentProps, type ModalName } from "@/shared/lib/stores";
 import { modalRegistry } from "../model";
-import { SpinnerLoader } from "@zelefy/ui";
 
 export const ModalHost = () => {
     const stack = useModalStore((s) => s.stack);

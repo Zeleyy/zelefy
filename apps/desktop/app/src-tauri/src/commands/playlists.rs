@@ -1,8 +1,11 @@
 use desktop_core::{
     db::{repository, DbState},
-    models::playlists::{
-        MoveTrackRequest, NewPlaylistRequest, Playlist, PlaylistTrackCursor, PlaylistTracksPage,
-        PlaylistWithFirstTrackId, UpdatePlaylist,
+    models::{
+        playlists::{
+            MoveTrackRequest, NewPlaylistRequest, Playlist, PlaylistCursor, PlaylistTrackCursor,
+            PlaylistTracksPage, PlaylistWithFirstTrackId, PlaylistsPage, UpdatePlaylist,
+        },
+        utils::SearchQuery,
     },
     services,
 };
@@ -26,36 +29,52 @@ pub fn get_local_playlists_with_first_track(
 }
 
 #[tauri::command]
+pub fn get_local_playlists_paged(
+    db: State<'_, DbState>,
+    search: Option<SearchQuery>,
+    after: Option<PlaylistCursor>,
+    limit: Option<u32>,
+) -> Result<PlaylistsPage, String> {
+    let (limit, fetch) = PlaylistsPage::resolve_limits(limit, 50, 200);
+
+    let conn = db.lock();
+
+    let playlists = repository::playlists::get_all_with_first_track_id_paged(
+        &conn,
+        search.as_ref(),
+        after,
+        fetch,
+    )
+    .map_err(|e| e.to_string())?;
+
+    Ok(PlaylistsPage::from_fetched(playlists, limit, |p| {
+        PlaylistCursor {
+            playlist_id: p.playlist.playlist_id,
+            created_at: p.playlist.created_at,
+            rank: p.rank,
+        }
+    }))
+}
+
+#[tauri::command]
 pub fn get_local_playlist_tracks_paged(
     db: State<'_, DbState>,
     playlist_id: i64,
     after: Option<PlaylistTrackCursor>,
     limit: Option<u32>,
 ) -> Result<PlaylistTracksPage, String> {
-    let limit = limit.unwrap_or(50).clamp(1, 200);
-    let fetch = limit.saturating_add(1);
+    let (limit, fetch) = PlaylistTracksPage::resolve_limits(limit, 50, 200);
 
     let conn = db.lock();
 
-    let mut tracks =
-        repository::playlists::playlist_tracks::get_page(&conn, playlist_id, after, fetch)
-            .map_err(|e| e.to_string())?;
+    let tracks = repository::playlists::playlist_tracks::get_page(&conn, playlist_id, after, fetch)
+        .map_err(|e| e.to_string())?;
 
-    let has_more = tracks.len() > limit as usize;
-    tracks.truncate(limit as usize);
-
-    let next_cursor = if has_more {
-        tracks.last().map(|t| PlaylistTrackCursor {
-            position: t.position,
-        })
-    } else {
-        None
-    };
-
-    Ok(PlaylistTracksPage {
-        items: tracks,
-        next_cursor,
-    })
+    Ok(PlaylistTracksPage::from_fetched(tracks, limit, |pt| {
+        PlaylistTrackCursor {
+            position: pt.position,
+        }
+    }))
 }
 
 #[tauri::command]

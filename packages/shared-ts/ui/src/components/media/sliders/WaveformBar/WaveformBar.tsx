@@ -8,7 +8,7 @@ import { WaveformPaths } from "./WaveformPaths";
 import { buildPaths, downsample } from "./waveform";
 
 export interface WaveformBarProps {
-    data: Uint8Array;
+    data?: Uint8Array;
     duration?: number;
     time?: number;
     height?: number;
@@ -37,9 +37,11 @@ export const WaveformBar = ({
     const step = barWidth + gap;
     const bars = Math.max(0, Math.floor((width + gap) / step));
 
+    const waveform = data ?? new Uint8Array();
+
     const peaks = useMemo(() => {
         if (bars === 0) return [];
-        const sampled = downsample(data, bars);
+        const sampled = downsample(waveform, bars);
         let max = 0;
         for (const v of sampled) if (v > max) max = v;
         return sampled.map((v) => (max === 0 ? 0 : v / max));

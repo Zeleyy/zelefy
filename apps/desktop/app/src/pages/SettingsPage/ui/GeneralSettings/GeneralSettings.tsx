@@ -2,7 +2,7 @@ import styles from "./GeneralSettings.module.scss";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import clsx from "clsx";
 import { Button, Flex, Icon, Select, SpinnerLoader, type Option } from "@zelefy/ui";
 import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from "@/shared/config/i18n";
@@ -31,13 +31,13 @@ export const GeneralSettings = () => {
         installUpdate,
     } = useUpdate();
 
-    const handleOpen = async (url: string) => {
-        try {
-            await openUrl(url);
-        } catch (error) {
-            toast.error(`Не удалось открыть ссылку: ${url}`);
-        }
-    };
+    // const handleOpen = async (url: string) => {
+    //     try {
+    //         await openUrl(url);
+    //     } catch (error) {
+    //         toast.error(`Не удалось открыть ссылку: ${url}`);
+    //     }
+    // };
 
     const links = useMemo(
         () => [
@@ -126,11 +126,12 @@ export const GeneralSettings = () => {
                 <div className={styles.links}>
                     {links.map((l) => (
                         <Flex
+                            key={l.url}
                             align="center"
                             justify="space-between"
                             gap="sm"
                             className={styles.link}
-                            onClick={() => void handleOpen(l.url)}
+                            onClick={() => void openUrl(l.url)}
                         >
                             <Flex gap="sm" align="center">
                                 <div className={styles.link__icon}>

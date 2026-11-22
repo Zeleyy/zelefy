@@ -1,1 +1,1 @@
-export { ImportTracksModal } from "./ImportTracksModal";
+export { ImportTracksModal as default } from "./ImportTracksModal";

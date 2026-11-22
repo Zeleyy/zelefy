@@ -61,7 +61,7 @@ export const AddServerModal = ({ onClose }: ModalComponentProps<"addServer">) =>
                 value={name}
                 onChange={(e) => {
                     setName(e.target.value);
-                    setTouched((t) => (t.name ? t : { ...t, name: true }));
+                    setTouched((prev) => (prev.name ? prev : { ...prev, name: true }));
                 }}
                 error={showNameError ? t("modal.add_server.field.name.error") : undefined}
                 disabled={isPending}
@@ -74,7 +74,7 @@ export const AddServerModal = ({ onClose }: ModalComponentProps<"addServer">) =>
                 value={url}
                 onChange={(e) => {
                     setUrl(e.target.value);
-                    setTouched((t) => (t.url ? t : { ...t, url: true }));
+                    setTouched((prev) => (prev.url ? prev : { ...prev, url: true }));
                 }}
                 error={showUrlError ? t("modal.add_server.field.url.error") : undefined}
                 disabled={isPending}

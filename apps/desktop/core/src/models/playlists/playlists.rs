@@ -1,6 +1,6 @@
 use rusqlite::Row;
 use serde::{Deserialize, Serialize};
-use zelefy_common::double_option;
+use zelefy_common::{CursorPage, double_option};
 
 use crate::models::utils::TimestampMs;
 
@@ -30,6 +30,8 @@ pub struct PlaylistWithFirstTrackId {
     #[serde(flatten)]
     pub playlist: Playlist,
     pub track_id: Option<i64>,
+    #[serde(skip_serializing)]
+    pub rank: Option<f64>,
 }
 
 impl PlaylistWithFirstTrackId {
@@ -37,9 +39,21 @@ impl PlaylistWithFirstTrackId {
         Ok(Self {
             playlist: Playlist::from_row(row)?,
             track_id: row.get("track_id")?,
+            rank: row.get("rank")?,
         })
     }
 }
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PlaylistCursor {
+    pub playlist_id: i64,
+    pub created_at: TimestampMs,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rank: Option<f64>,
+}
+
+pub type PlaylistsPage = CursorPage<PlaylistWithFirstTrackId, PlaylistCursor>;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct NewPlaylist {

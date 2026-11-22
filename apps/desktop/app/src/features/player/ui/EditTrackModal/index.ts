@@ -1,1 +1,1 @@
-export { EditTrackModal } from "./EditTrackModal";
+export { EditTrackModal as default } from "./EditTrackModal";

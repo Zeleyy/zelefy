@@ -45,3 +45,11 @@ export interface PlaylistTrackCursor {
 }
 
 export type PlaylistTracksPage = CursorPage<PlaylistTrack, PlaylistTrackCursor>;
+
+export interface PlaylistCursor {
+    playlistId: number;
+    createdAt: string;
+    rank?: number | null;
+}
+
+export type PlaylistsPage = CursorPage<PlaylistWithFirstTrackId, PlaylistCursor>;

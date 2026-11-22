@@ -1,4 +1,5 @@
 export { useLocalPlaylist } from "./useLocalPlaylist";
+export { useLocalPlaylistsPaged } from "./useLocalPlaylistsPaged";
 export { useLocalPlaylistsWithFirstTrackId } from "./useLocalPlaylistsWithFirstTrackId";
 export { useLocalPlaylistTrackIds } from "./useLocalPlaylistTrackIds";
 export { useLocalPlaylistAllTrackIds } from "./useLocalPlaylistAllTrackIds";

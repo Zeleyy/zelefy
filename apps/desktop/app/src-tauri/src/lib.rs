@@ -113,6 +113,7 @@ pub fn run() {
             commands::jobs::get_jobs_page,
             commands::jobs::get_active_jobs,
             commands::playlists::get_local_playlist,
+            commands::playlists::get_local_playlists_paged,
             commands::playlists::get_local_playlist_tracks_paged,
             commands::playlists::get_local_playlist_track_ids,
             commands::playlists::get_local_playlists_with_first_track,
