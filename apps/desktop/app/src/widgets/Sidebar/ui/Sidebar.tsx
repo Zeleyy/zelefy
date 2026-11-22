@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 import clsx from "clsx";
 import { Avatar, Button, Flex, Icon } from "@zelefy/ui";
-import { DEFAULT_LANGUAGE, Language, LANGUAGE_LABELS } from "@/shared/config/i18n";
+import { DEFAULT_LANGUAGE, Language, LANGUAGE_LABELS } from "@/shared/config";
 import { useSettingsStore } from "@/shared/lib/stores";
 import { navItems } from "../config";
 

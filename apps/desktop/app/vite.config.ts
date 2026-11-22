@@ -46,19 +46,43 @@ export default defineConfig((): UserConfig => ({
     build: {
         target: "esnext",
         cssMinify: "lightningcss",
-        cssCodeSplit: true,
+        cssCodeSplit: false,
         chunkSizeWarningLimit: 1000,
         sourcemap: false,
 
         rolldownOptions: {
+            treeshake: {
+                moduleSideEffects: (id) => /\.(css|scss|sass)$/.test(id),
+            },
             output: {
+                strictExecutionOrder: true,
                 codeSplitting: {
-                    minSize: 10000,
+                    minSize: 15000,
                     groups: [
                         {
                             name: "vendor-react",
                             test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+                            priority: 60,
+                        },
+                        {
+                            name: "vendor-router",
+                            test: /node_modules[\\/](react-router|@remix-run)[\\/]/,
+                            priority: 50,
+                        },
+                        {
+                            name: "vendor-motion",
+                            test: /node_modules[\\/](motion|framer-motion)[\\/]/,
+                            priority: 45,
+                        },
+                        {
+                            name: "vendor-data",
+                            test: /node_modules[\\/](@tanstack[\\/]react-query|zustand)[\\/]/,
                             priority: 40,
+                        },
+                        {
+                            name: "vendor-dnd",
+                            test: /node_modules[\\/]@dnd-kit[\\/]/,
+                            priority: 35,
                         },
                         {
                             name: "vendor-tauri",
@@ -74,6 +98,13 @@ export default defineConfig((): UserConfig => ({
                             name: "vendor-others",
                             test: /node_modules[\\/]/,
                             priority: 10,
+                        },
+                        {
+                            name: "app-common",
+                            test: /([\\/]src[\\/](shared|entities|features)[\\/]|[\\/]packages[\\/])/,
+                            minShareCount: 2,
+                            minSize: 0,
+                            priority: 5,
                         },
                     ],
                 },

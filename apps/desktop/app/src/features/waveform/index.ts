@@ -1,1 +1,1 @@
-export { useWaveform } from "./hooks";
+export { useWaveform } from "./model";

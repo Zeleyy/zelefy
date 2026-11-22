@@ -1,6 +1,6 @@
 import "./app/styles/index.scss";
 import { createRoot } from "react-dom/client";
-import { QueryProvider } from "./app/providers";
+import { QueryProvider } from "./app/query";
 import { bootstrapApp } from "./app/init";
 import App from "./app/App";
 

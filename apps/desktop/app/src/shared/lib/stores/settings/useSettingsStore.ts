@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { tauriStorage } from "@/shared/lib/storage";
-import i18n, { type Language } from "@/shared/config/i18n";
+import { i18n, type Language } from "@/shared/config";
 
 export const Theme = {
     dark: "dark",

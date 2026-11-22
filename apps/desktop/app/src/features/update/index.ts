@@ -1,1 +1,1 @@
-export { useUpdate } from "./hooks";
+export { useUpdate } from "./lib";

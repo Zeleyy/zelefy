@@ -1,6 +1,6 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { locale } from "@tauri-apps/plugin-os";
-import i18n, { initI18n, isLanguage, Language } from "@/shared/config/i18n";
+import { i18n, initI18n, isLanguage, Language } from "@/shared/config";
 import { Theme, useCacheStore, useSettingsStore } from "@/shared/lib/stores";
 
 const waitForHydration = () =>

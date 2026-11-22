@@ -3,7 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
 import { Button, Flex, Icon } from "@zelefy/ui";
 import { Theme, useSettingsStore } from "@/shared/lib/stores";
-import { useBlurOnOutsideClick, useHistoryNavigation } from "../hooks";
+import { useBlurOnOutsideClick, useHistoryNavigation } from "../model";
 import { TasksDrawer } from "@/widgets/drawer";
 import { useState } from "react";
 import { Search } from "./Search";

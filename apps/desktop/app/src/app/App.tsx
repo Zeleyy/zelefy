@@ -1,5 +1,5 @@
 import { RouterProvider } from "react-router";
-import { router } from "./providers";
+import { router } from "./router";
 import { usePlayerBridge } from "@/features/player";
 import { useJobsBridge } from "@/features/job";
 

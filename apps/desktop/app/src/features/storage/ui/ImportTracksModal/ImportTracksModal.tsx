@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button, Flex, Modal, ProgressBar, Select } from "@zelefy/ui";
 import type { ModalComponentProps } from "@/shared/lib/stores";
 import { useImportTracks } from "@/features/player";
-import { useLibraries } from "../../hooks";
+import { useLibraries } from "../../model";
 
 export const ImportTracksModal = ({ paths, onClose }: ModalComponentProps<"importTracks">) => {
     const { t } = useTranslation();
