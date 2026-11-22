@@ -1,10 +1,11 @@
 import styles from "./OfflinePage.module.scss";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button, EmptyState, Flex, Input, SpinnerLoader } from "@zelefy/ui";
 import { useModalStore } from "@/shared/lib/stores";
 import { selectAudio } from "@/shared/lib/utils/browse";
+import { useDebounce } from "@/shared/lib/hooks";
 import { InfiniteScrollFooter } from "@/shared/ui";
 import type { TrackId } from "@/entities/track";
 import { useDeleteLocalTrack, useLocalTracks, usePlayerStore } from "@/features/player";
@@ -18,12 +19,7 @@ export const OfflinePage = () => {
     const playTrack = usePlayerStore((s) => s.playTrack);
 
     const [input, setInput] = useState("");
-    const [search, setSearch] = useState("");
-
-    useEffect(() => {
-        const id = setTimeout(() => setSearch(input.trim()), 500);
-        return () => clearTimeout(id);
-    }, [input]);
+    const search = useDebounce(input.trim(), 500, "");
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
         useLocalTracks({ search });

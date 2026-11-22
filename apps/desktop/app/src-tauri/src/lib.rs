@@ -8,7 +8,6 @@ use tauri::{Emitter, Manager};
 
 pub mod cache;
 pub mod commands;
-pub mod state;
 
 use crate::{cache::AppCache, commands::libraries::refresh_asset_scope};
 
@@ -73,14 +72,14 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            commands::get_gateway_url,
-            commands::set_gateway_url,
-            commands::reset_gateway_url,
-            commands::get_default_gateway_url,
             commands::get_available_services,
             commands::get_available_endpoints,
+            commands::servers::get_active_server,
+            commands::servers::get_default_server_url,
             commands::servers::get_servers,
             commands::servers::switch_server,
+            commands::servers::add_server,
+            commands::servers::reset_server,
             commands::libraries::get_libraries,
             commands::libraries::get_libraries_stats,
             commands::libraries::add_user_library,

@@ -7,6 +7,7 @@ export interface ModalPropsMap {
     editPlaylist: { playlistId: PlaylistId };
     editTrack: { trackId: TrackId };
     importTracks: { paths: string[] };
+    addServer: {};
 }
 
 export type ModalName = keyof ModalPropsMap;

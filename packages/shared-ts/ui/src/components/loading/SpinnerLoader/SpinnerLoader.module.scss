@@ -1,11 +1,12 @@
 .spinner {
     border: 3px solid;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: spin 1s linear infinite;
     display: inline-block;
 
     border-color: var(--primary);
     border-top-color: transparent;
+    flex-shrink: 0;
 
     &--size-xs {
         width: 16px;

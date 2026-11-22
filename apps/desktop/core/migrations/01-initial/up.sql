@@ -28,7 +28,7 @@ CREATE TABLE servers (
     server_name TEXT NOT NULL,
     server_url TEXT NOT NULL UNIQUE,
     is_active INTEGER NOT NULL DEFAULT 0 CHECK (is_active IN (0, 1)),
-    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER)),
+    created_at INTEGER NOT NULL DEFAULT (CAST(unixepoch ('subsec') * 1000 AS INTEGER))
 ) STRICT;
 
 CREATE UNIQUE INDEX idx_servers_one_active ON servers (is_active)
@@ -134,6 +134,19 @@ CREATE INDEX idx_profiles_permalink ON profiles (permalink);
 
 CREATE INDEX idx_profiles_user_id ON profiles (user_id);
 
+CREATE VIRTUAL TABLE profiles_fts USING fts5 (
+    permalink,
+    display_name,
+    content = 'profiles',
+    content_rowid = 'profile_id',
+    tokenize = 'trigram'
+);
+
+INSERT INTO
+    profiles_fts (profiles_fts)
+VALUES
+    ('rebuild');
+
 CREATE TRIGGER profiles_fts_ai
 AFTER INSERT ON profiles
 BEGIN
@@ -159,18 +172,24 @@ VALUES
 
 END;
 
-CREATE TRIGGER playlists_fts_au
-AFTER UPDATE OF title ON playlists
+CREATE TRIGGER profiles_fts_au
+AFTER UPDATE OF permalink,
+display_name ON profiles
 BEGIN
 INSERT INTO
-    playlists_fts (playlists_fts, rowid, title)
+    profiles_fts (profiles_fts, rowid, permalink, display_name)
 VALUES
-    ('delete', old.playlist_id, old.title);
+    (
+        'delete',
+        old.profile_id,
+        old.permalink,
+        old.display_name
+    );
 
 INSERT INTO
-    playlists_fts (rowid, title)
+    profiles_fts (rowid, permalink, display_name)
 VALUES
-    (new.playlist_id, new.title);
+    (new.profile_id, new.permalink, new.display_name);
 
 END;
 
@@ -381,6 +400,11 @@ INSERT INTO
     playlists_fts (playlists_fts, rowid, title)
 VALUES
     ('delete', old.playlist_id, old.title);
+
+INSERT INTO
+    playlists_fts (rowid, title)
+VALUES
+    (new.playlist_id, new.title);
 
 END;
 

@@ -1,9 +1,10 @@
 use rusqlite::Row;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::utils::TimestampMs;
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Server {
     pub server_id: i64,
     pub server_name: String,
@@ -24,7 +25,8 @@ impl Server {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NewServer {
     pub server_name: String,
     pub server_url: String,

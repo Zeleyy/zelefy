@@ -21,9 +21,59 @@
 }
 
 .updateButton {
-    opacity: 0;
+    display: none;
 
     &--active {
-        opacity: 1;
+        display: block;
+    }
+}
+
+.links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.link {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-primary);
+    padding: var(--spacing-sm);
+    transition: border var(--transition-fast);
+
+    &:hover {
+        border-color: var(--primary);
+        cursor: pointer;
+
+        .link__icon {
+            box-shadow: 0 0 16px 4px var(--primary-subtle-border);
+        }
+    }
+
+    &__icon {
+        color: var(--primary);
+        padding: var(--spacing-xs);
+        border: 1px solid var(--primary);
+        border-radius: var(--radius-md);
+        flex-shrink: 0;
+        transition: box-shadow var(--transition-fast);
+    }
+
+    &__meta {
+        min-width: 0;
+        flex: 1;
+    }
+
+    &__title {
+        font-size: var(--font-size-sm);
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    &__desc {
+        font-size: var(--font-size-xs);
+        color: var(--text-secondary);
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 }

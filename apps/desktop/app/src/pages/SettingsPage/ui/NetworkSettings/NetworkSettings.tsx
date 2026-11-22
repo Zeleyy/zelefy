@@ -1,37 +1,69 @@
 import styles from "./NetworkSettings.module.scss";
-import { useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import clsx from "clsx";
-import { Button, Flex, Input } from "@zelefy/ui";
-import { useServices, useEndpoints } from "../../hooks";
+import { Button, Flex, Select } from "@zelefy/ui";
+import { confirm, useModalStore } from "@/shared/lib/stores";
+import {
+    useActiveServer,
+    useDefaultServerUrl,
+    useResetServer,
+    useServers,
+    useSwitchServer,
+} from "@/entities/servers";
 import { SettingsSection } from "@/widgets/sections";
-import { useSettingsStore } from "@/shared/lib/stores";
+import { useServices, useEndpoints } from "../../hooks";
 
-// @TODO: Add validation on gateway url
 export const NetworkSettings = () => {
     const { t } = useTranslation();
     const [params, setParams] = useSearchParams();
+    const openModal = useModalStore((s) => s.openModal);
 
-    const gatewayUrl = useSettingsStore((state) => state.gatewayUrl);
-    const defaultGatewayUrl = useSettingsStore((state) => state.defaultGatewayUrl);
-    const setGatewayUrl = useSettingsStore((state) => state.setGatewayUrl);
-    const resetGatewayUrl = useSettingsStore((state) => state.resetGatewayUrl);
-    const [draft, setDraft] = useState<string | null>(null);
-    const localGatewayUrl = draft ?? gatewayUrl;
+    const active = useActiveServer();
+    const servers = useServers();
+    const defaultUrl = useDefaultServerUrl();
+    const switchServer = useSwitchServer();
+    const { mutateAsync: resetServer } = useResetServer();
 
-    const isDirty = localGatewayUrl !== gatewayUrl;
-    const isDefault = gatewayUrl === defaultGatewayUrl;
+    const options = useMemo(
+        () =>
+            servers.data?.map((s) => ({
+                label: `${s.serverName} (${s.serverUrl})`,
+                value: s.serverId,
+            })) ?? [],
+        [servers],
+    );
 
-    const handleSave = async () => {
-        await setGatewayUrl(localGatewayUrl);
-        setDraft(null);
-    };
+    const currentUrl = active.data?.serverUrl ?? "";
+    const defaultUrlValue = defaultUrl.data ?? "";
 
-    const handleReset = async () => {
-        await resetGatewayUrl();
-        setDraft(null);
-    };
+    const isDefault = currentUrl === defaultUrlValue;
+
+    const handleSwitch = useCallback(
+        async (serverId: number) => {
+            const ok = await confirm({
+                title: t("settings.network.servers.switch.title"),
+                description: t("settings.network.servers.switch.description"),
+                confirmLabel: t("settings.network.servers.switch.confirm"),
+                cancelLabel: t("common.cancel"),
+            });
+            if (!ok) return;
+            await switchServer.mutateAsync(serverId);
+        },
+        [t, switchServer],
+    );
+
+    const handleReset = useCallback(async () => {
+        const ok = await confirm({
+            title: t("settings.network.servers.reset.title"),
+            description: t("settings.network.servers.reset.description"),
+            confirmLabel: t("settings.network.servers.reset.confirm"),
+            cancelLabel: t("common.cancel"),
+        });
+        if (!ok) return;
+        await resetServer();
+    }, [t, resetServer]);
 
     const {
         data: services = [],
@@ -59,38 +91,29 @@ export const NetworkSettings = () => {
             <h1>{t("settings.network.title")}</h1>
 
             <SettingsSection
-                title={t("settings.network.connection.title")}
-                description={t("settings.network.connection.description")}
-            >
-                <Flex align="center" gap="xs">
-                    <Input
-                        key={gatewayUrl}
-                        defaultValue={gatewayUrl}
-                        placeholder={defaultGatewayUrl}
-                        onChange={(e) => setDraft(e.target.value)}
-                        inputSize="md"
-                    />
-
+                icon="common-cloud"
+                title={t("settings.network.servers.title")}
+                description={t("settings.network.servers.description")}
+                actions={
                     <Button
-                        variant="outline"
+                        variant="secondary"
                         onClick={() => void handleReset()}
                         disabled={isDefault}
+                        size="small"
                     >
                         {t("common.reset")}
                     </Button>
+                }
+            >
+                <Flex align="center" gap="xs">
+                    <Select
+                        options={options}
+                        value={active.data?.serverId}
+                        onChange={(value) => void handleSwitch(value)}
+                    />
 
-                    {isDirty && (
-                        <Button variant="primary" onClick={() => void handleSave()}>
-                            {t("common.save")}
-                        </Button>
-                    )}
+                    <Button onClick={() => openModal("addServer", {})}>{t("common.add")}</Button>
                 </Flex>
-
-                {!isDefault && defaultGatewayUrl && (
-                    <p>
-                        {t("settings.network.connection.default_hint", { url: defaultGatewayUrl })}
-                    </p>
-                )}
             </SettingsSection>
 
             <SettingsSection

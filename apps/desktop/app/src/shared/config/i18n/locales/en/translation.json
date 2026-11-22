@@ -115,6 +115,21 @@
             "files": {
                 "label": "files ({{count}})"
             }
+        },
+        "add_server": {
+            "title": "Add server",
+            "field": {
+                "name": {
+                    "label": "Name",
+                    "placeholder": "e.g. Zelefy",
+                    "error": "Enter a server name"
+                },
+                "url": {
+                    "label": "Server URL",
+                    "placeholder": "e.g. api.example.com",
+                    "error": "Enter a valid URL"
+                }
+            }
         }
     },
     "tasks": {
@@ -204,7 +219,7 @@
                 "title": "Language"
             },
             "updates": {
-                "title": "App Updates",
+                "title": "Updates",
                 "current_version": "Current version",
                 "latest_version": "Latest version",
                 "status": {
@@ -216,6 +231,13 @@
                 "action": {
                     "check": "Check for updates",
                     "install": "Install update"
+                }
+            },
+            "about": {
+                "title": "About",
+                "github": {
+                    "title": "Project on Github",
+                    "description": "Open source: {{url}}"
                 }
             }
         },
@@ -238,10 +260,19 @@
         },
         "network": {
             "title": "Network",
-            "connection": {
-                "title": "Server Connection",
-                "description": "Specify the host address to connect the application to the backend",
-                "default_hint": "Default value: {{url}}"
+            "servers": {
+                "title": "Server",
+                "description": "Host address to connect to",
+                "switch": {
+                    "title": "Switch server?",
+                    "description": "The active server will change. Data tied to the current server may become unavailable until you switch back.",
+                    "confirm": "Switch"
+                },
+                "reset": {
+                    "title": "Reset to the default server?",
+                    "description": "The default server will become active and its name will be restored. Your current active server will stay in the list.",
+                    "confirm": "Reset"
+                }
             },
             "services": {
                 "title": "Services & Endpoints",

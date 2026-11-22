@@ -4,26 +4,40 @@ import { useModalStore, useSearchStore } from "@/shared/lib/stores";
 import { useCurrentTrack, useLocalTrackIds } from "@/features/player";
 import { useTranslation } from "react-i18next";
 import { InfiniteScrollFooter } from "@/shared/ui";
-import { TrackRow } from "./TrackRow";
+import { useDebounce } from "@/shared/lib/hooks";
 import type { TrackId } from "@/entities/track";
+import { useActiveServer } from "@/entities/servers";
+import { TrackRow } from "./TrackRow";
 
-type SearchSource = "all" | "local" | "zelefy";
+type SearchSource = "all" | "local" | "remote";
 type SearchType = "tracks" | "playlists" | "users";
 
 export const SearchPage = () => {
     const { t } = useTranslation();
     const [source, setSource] = useState<SearchSource>("all");
     const [type, setType] = useState<SearchType>("tracks");
-    const q = useSearchStore((s) => s.q);
     const openModal = useModalStore((s) => s.openModal);
     const currentTrack = useCurrentTrack();
 
-    const hasQuery = q.trim().length > 0;
+    const q = useSearchStore((s) => s.q);
+    const debouncedQ = useDebounce(q, 500, "");
+
+    const { data: activeServer } = useActiveServer();
+    const activeServerName = activeServer?.serverName ?? "";
+
+    const trimmedQ = q.trim();
+    const hasQuery = trimmedQ.length > 0;
+    const trimmedDebouncedQ = debouncedQ.trim();
+
+    const isTyping = trimmedQ !== trimmedDebouncedQ;
+    const hasDebouncedQuery = trimmedDebouncedQ.length > 0;
     const isTrackSearch = type === "tracks";
 
+    const canFetch = hasDebouncedQuery && !isTyping && isTrackSearch && source !== "remote";
+
     const local = useLocalTrackIds({
-        search: q,
-        enabled: hasQuery && isTrackSearch && source !== "zelefy",
+        search: canFetch ? trimmedDebouncedQ : undefined,
+        enabled: canFetch,
     });
     const remote = useMemo(
         () => ({
@@ -37,26 +51,26 @@ export const SearchPage = () => {
         [],
     );
 
-    const localIds = local.data?.pages.flatMap((p) => p.items) ?? [];
-    const remoteIds = remote.data?.pages.flatMap((p) => p.items) ?? [];
+    const localIds = canFetch ? (local.data?.pages.flatMap((p) => p.items) ?? []) : [];
+    const remoteIds = canFetch ? (remote.data?.pages.flatMap((p) => p.items) ?? []) : [];
 
     const visibleTrackIds: TrackId[] =
         source === "local"
             ? localIds
-            : source === "zelefy"
+            : source === "remote"
               ? remoteIds
               : [...localIds, ...remoteIds];
 
     const activeSources =
         source === "all" ? [local, remote] : source === "local" ? [local] : [remote];
 
-    const isLoading = activeSources.every((s) => s.isLoading);
-    const isError = activeSources.every((s) => s.isError);
-    const hasNextPage = activeSources.some((s) => s.hasNextPage);
-    const isFetchingNextPage = activeSources.some((s) => s.isFetchingNextPage);
+    const isLoading = isTyping || activeSources.some((s) => s.isLoading);
+    const isError = !isTyping && activeSources.every((s) => s.isError);
+    const hasNextPage = canFetch && activeSources.some((s) => s.hasNextPage);
+    const isFetchingNextPage = canFetch && activeSources.some((s) => s.isFetchingNextPage);
 
     const fetchNextPage = useCallback(() => {
-        if (source !== "zelefy" && local.hasNextPage) void local.fetchNextPage();
+        if (source !== "remote" && local.hasNextPage) void local.fetchNextPage();
         if (source !== "local" && remote.hasNextPage) remote.fetchNextPage();
     }, [source, local, remote]);
 
@@ -72,13 +86,13 @@ export const SearchPage = () => {
                     tabs={[
                         { label: t("search.source.all"), value: "all" },
                         { label: t("search.source.local"), value: "local" },
-                        { label: "Zelefy", value: "zelefy" },
+                        { label: activeServerName, value: "remote" },
                     ]}
                     active={source}
                     onTabClick={setSource}
                 />
 
-                {hasQuery && source !== "zelefy" && (
+                {hasDebouncedQuery && source !== "remote" && (
                     <Tabs<SearchType>
                         variant="primary"
                         shape="underline"
@@ -95,7 +109,7 @@ export const SearchPage = () => {
 
             {!hasQuery ? (
                 <EmptyState title={t("search.start")} />
-            ) : source === "zelefy" ? (
+            ) : source === "remote" ? (
                 <EmptyState title={t("common.in_development")} />
             ) : (
                 <>

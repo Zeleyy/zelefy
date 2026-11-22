@@ -1,4 +1,4 @@
-import { Navigate, type RouteObject } from "react-router";
+import { redirect, type RouteObject } from "react-router";
 import type { PlaylistId } from "@/entities/playlist";
 import type { TrackId } from "@/entities/track";
 import { HomePage } from "@/pages/HomePage";
@@ -46,7 +46,7 @@ export const routes: RouteObject[] = [
                 children: [
                     {
                         index: true,
-                        element: <Navigate to="general" replace />,
+                        loader: () => redirect("general"),
                     },
                     {
                         path: "general",

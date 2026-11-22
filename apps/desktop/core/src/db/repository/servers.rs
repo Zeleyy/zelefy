@@ -1,4 +1,4 @@
-use rusqlite::{Connection, OptionalExtension, params};
+use rusqlite::{Connection, OptionalExtension, Transaction, params};
 
 use crate::models::servers::{NewServer, Server};
 
@@ -18,6 +18,24 @@ pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Server>> {
     let rows = stmt.query_map([], Server::from_row)?;
 
     rows.collect()
+}
+
+pub fn get_by_url(conn: &Connection, url: &str) -> rusqlite::Result<Option<Server>> {
+    conn.query_one(
+        r#"
+            SELECT
+                server_id
+                , server_name
+                , server_url
+                , is_active
+                , created_at
+            FROM servers
+            WHERE server_url = ?1
+        "#,
+        params![url],
+        Server::from_row,
+    )
+    .optional()
 }
 
 pub fn get_active(conn: &Connection) -> rusqlite::Result<Option<Server>> {
@@ -41,7 +59,7 @@ pub fn get_active(conn: &Connection) -> rusqlite::Result<Option<Server>> {
 pub fn create(conn: &Connection, new: NewServer) -> rusqlite::Result<i64> {
     conn.query_one(
         r#"
-            INSERT INTO (server_name, server_url)
+            INSERT INTO servers (server_name, server_url)
             VALUES (?1, ?2)
             RETURNING server_id
         "#,
@@ -50,14 +68,33 @@ pub fn create(conn: &Connection, new: NewServer) -> rusqlite::Result<i64> {
     )
 }
 
-pub fn set_active(conn: &Connection, server_id: i64) -> rusqlite::Result<bool> {
+pub fn set_active(tx: &Transaction, server_id: i64) -> rusqlite::Result<bool> {
+    deactivate_others(tx, server_id)?;
+    Ok(activate(&tx, server_id)? > 0)
+}
+
+fn deactivate_others(conn: &Connection, keep_id: i64) -> rusqlite::Result<usize> {
+    conn.execute(
+        "UPDATE servers SET is_active = 0 WHERE is_active = 1 AND server_id != ?1",
+        params![keep_id],
+    )
+}
+
+fn activate(conn: &Connection, server_id: i64) -> rusqlite::Result<usize> {
+    conn.execute(
+        "UPDATE servers SET is_active = 1 WHERE server_id = ?1 AND is_active = 0",
+        params![server_id],
+    )
+}
+
+pub fn set_name(conn: &Connection, server_id: i64, new_name: &str) -> rusqlite::Result<bool> {
     Ok(conn.execute(
         r#"
             UPDATE servers
-            SET is_active = (server_id = ?1)
-            WHERE is_active = 1 OR server_id = ?1
+            SET server_name = ?2
+            WHERE server_id = ?1
         "#,
-        params![server_id],
+        params![server_id, new_name],
     )? > 0)
 }
 

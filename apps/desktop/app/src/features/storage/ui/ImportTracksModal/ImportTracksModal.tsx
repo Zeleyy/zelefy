@@ -42,6 +42,7 @@ export const ImportTracksModal = ({ paths, onClose }: ModalComponentProps<"impor
                                     onClick={() =>
                                         importTracks({ paths, libraryId: activeLibraryId })
                                     }
+                                    disabled={activeLibraryId === undefined}
                                 >
                                     {t("common.import")}
                                 </Button>

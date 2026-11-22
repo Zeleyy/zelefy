@@ -20,4 +20,8 @@ export const modalRegistry: Registry = {
         const { ImportTracksModal } = await import("@/features/storage");
         return { default: ImportTracksModal };
     }),
+    addServer: lazy(async () => {
+        const { AddServerModal } = await import("@/entities/servers");
+        return { default: AddServerModal };
+    }),
 };

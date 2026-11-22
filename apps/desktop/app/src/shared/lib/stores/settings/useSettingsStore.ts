@@ -1,9 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { invoke } from "@tauri-apps/api/core";
 import { tauriStorage } from "@/shared/lib/storage";
 import i18n, { type Language } from "@/shared/config/i18n";
-import { invokeTry } from "./helpers";
 
 export const Theme = {
     dark: "dark",
@@ -20,8 +18,6 @@ interface SettingsState {
     isSidebarMinified: boolean;
     isMuted: boolean;
     volume: number;
-    gatewayUrl: string;
-    defaultGatewayUrl: string;
 
     _hasHydrated: boolean;
 
@@ -32,11 +28,6 @@ interface SettingsState {
     toggleSidebar: () => void;
     setIsMuted: (isMuted: boolean) => void;
     setVolume: (volume: number) => void;
-
-    setGatewayUrl: (newUrl: string) => Promise<void>;
-    resetGatewayUrl: () => Promise<void>;
-    initGatewayUrl: () => Promise<void>;
-    initDefaultGatewayUrl: () => Promise<void>;
 
     setHasHydrated: (hasHydrated: boolean) => void;
 }
@@ -55,8 +46,6 @@ export const useSettingsStore = create<SettingsState>()(
             isSidebarMinified: false,
             isMuted: false,
             volume: 50,
-            gatewayUrl: "",
-            defaultGatewayUrl: "",
 
             _hasHydrated: false,
 
@@ -81,42 +70,6 @@ export const useSettingsStore = create<SettingsState>()(
             setIsMuted: (isMuted) => set({ isMuted: isMuted }),
             setVolume: (volume) => set({ volume: volume }),
 
-            setGatewayUrl: async (newUrl) => {
-                try {
-                    await invoke("set_gateway_url", { newUrl });
-                    set({ gatewayUrl: newUrl });
-                } catch (error) {
-                    console.error("Failed to update gateway URL in backend:", error);
-                }
-            },
-
-            resetGatewayUrl: async () => {
-                try {
-                    const url = await invoke<string>("reset_gateway_url");
-                    set({ gatewayUrl: url });
-                } catch (error) {
-                    console.error("Failed to reset gateway URL from backend:", error);
-                }
-            },
-
-            initGatewayUrl: async () => {
-                try {
-                    const url = await invoke<string>("get_gateway_url");
-                    set({ gatewayUrl: url });
-                } catch (error) {
-                    console.error("Failed to fetch gateway URL from backend:", error);
-                }
-            },
-
-            initDefaultGatewayUrl: async () => {
-                const url = await invokeTry<string>(
-                    "get_default_gateway_url",
-                    {},
-                    "Failed to fetch default gateway:",
-                );
-                if (url !== null) set({ defaultGatewayUrl: url });
-            },
-
             setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
         }),
         {
@@ -128,13 +81,10 @@ export const useSettingsStore = create<SettingsState>()(
                 isSidebarMinified: state.isSidebarMinified,
                 isMuted: state.isMuted,
                 volume: state.volume,
-                gatewayUrl: state.gatewayUrl,
             }),
             storage: createJSONStorage(() => tauriStorage),
             onRehydrateStorage: () => (state) => {
                 state?.setHasHydrated(true);
-                void state?.initGatewayUrl();
-                void state?.initDefaultGatewayUrl();
             },
         },
     ),

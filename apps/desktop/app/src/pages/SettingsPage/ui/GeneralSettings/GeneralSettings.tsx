@@ -1,5 +1,8 @@
 import styles from "./GeneralSettings.module.scss";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { openUrl } from "@tauri-apps/plugin-opener";
+import { toast } from "sonner";
 import clsx from "clsx";
 import { Button, Flex, Icon, Select, SpinnerLoader, type Option } from "@zelefy/ui";
 import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES } from "@/shared/config/i18n";
@@ -11,6 +14,8 @@ const languages: Option[] = SUPPORTED_LANGUAGES.map((lang) => ({
     label: LANGUAGE_LABELS[lang],
     value: lang,
 }));
+
+const GITHUB_URL = "https://github.com/zeleyy/zelefy";
 
 export const GeneralSettings = () => {
     const { t } = useTranslation();
@@ -25,6 +30,25 @@ export const GeneralSettings = () => {
         checkForUpdates,
         installUpdate,
     } = useUpdate();
+
+    const handleOpen = async (url: string) => {
+        try {
+            await openUrl(url);
+        } catch (error) {
+            toast.error(`Не удалось открыть ссылку: ${url}`);
+        }
+    };
+
+    const links = useMemo(
+        () => [
+            {
+                url: GITHUB_URL,
+                title: t("settings.general.about.github.title"),
+                description: t("settings.general.about.github.description", { url: GITHUB_URL }),
+            },
+        ],
+        [t],
+    );
 
     return (
         <>
@@ -97,44 +121,33 @@ export const GeneralSettings = () => {
                     </Button>
                 </Flex>
             </SettingsSection>
-            {/* 
-            <Flex direction="column" gap="sm">
-                <Flex justify="space-between" align="center">
-                    <span>{t("settings.general.updates.current_version")}:</span>
-                    <strong>{currentVersion || "..."}</strong>
-                </Flex>
 
-                {updateInfo && (
-                    <Flex justify="space-between" align="center">
-                        <span>{t("settings.general.updates.latest_version")}:</span>
-                        <strong>{hasUpdate ? latestVersion : currentVersion}</strong>
-                    </Flex>
-                )}
+            <SettingsSection icon="common-info" title={t("settings.general.about.title")}>
+                <div className={styles.links}>
+                    {links.map((l) => (
+                        <Flex
+                            align="center"
+                            justify="space-between"
+                            gap="sm"
+                            className={styles.link}
+                            onClick={() => void handleOpen(l.url)}
+                        >
+                            <Flex gap="sm" align="center">
+                                <div className={styles.link__icon}>
+                                    <Icon name="common-link" size={20} />
+                                </div>
 
-                <div>
-                    {!updateInfo && !isChecking && t("settings.general.updates.status.idle")}
-                    {isChecking && t("settings.general.updates.status.checking")}
-                    {updateInfo && hasUpdate && t("settings.general.updates.status.available")}
-                    {updateInfo && !hasUpdate && t("settings.general.updates.status.not_available")}
+                                <Flex direction="column" gap="xs" className={styles.link__meta}>
+                                    <span className={styles.link__title}>{l.title}</span>
+                                    <span className={styles.link__desc}>{l.description}</span>
+                                </Flex>
+                            </Flex>
+
+                            <Icon name="common-link" size={18} />
+                        </Flex>
+                    ))}
                 </div>
-            </Flex>
-            <Flex gap="md" align="center">
-                {!hasUpdate ? (
-                    <>
-                        <Button onClick={checkForUpdates} disabled={isChecking}>
-                            {t("settings.general.updates.actions.check")}
-                        </Button>
-                        <SpinnerLoader isLoading={isChecking} />
-                    </>
-                ) : (
-                    <>
-                        <Button onClick={() => installUpdate()} disabled={isInstalling}>
-                            {t("settings.general.updates.actions.install")}
-                        </Button>
-                        <SpinnerLoader isLoading={isInstalling} />
-                    </>
-                )}
-            </Flex> */}
+            </SettingsSection>
         </>
     );
 };
