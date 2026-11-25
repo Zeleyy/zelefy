@@ -1,7 +1,8 @@
 import { memo, useCallback } from "react";
+import type { TrackId } from "@zelefy/types";
 import { Flex } from "@zelefy/ui";
-import type { TrackId } from "@/entities/track";
-import type { PlaylistWithFirstTrackId } from "@/entities/playlist";
+import { toSrc } from "@/shared/lib/utils";
+import type { PlaylistWithFirstTrackIds } from "@/entities/playlist";
 import {
     selectCurrentPlaylistId,
     useCurrentTrack,
@@ -9,33 +10,48 @@ import {
     useTrack,
 } from "@/features/player";
 import { usePlaylistActions } from "@/features/playlist";
-import { PlaylistTrackRow } from "@/pages/playlist/ui/playlist-track-row";
+import { PlaylistTrackRow } from "@/widgets/playlist-tracks";
 import { SearchRow } from "../search-row";
 
 interface PlaylistRowProps {
-    playlist: PlaylistWithFirstTrackId;
+    playlist: PlaylistWithFirstTrackIds;
 }
 
 export const PlaylistRow = memo(({ playlist }: PlaylistRowProps) => {
     const currentTrack = useCurrentTrack();
     const isCurrentPlaylist = usePlayerStore(selectCurrentPlaylistId) === playlist.playlistId;
-    const { data: firstTrack } = useTrack(playlist.trackId ?? undefined);
+    const togglePlay = usePlayerStore((s) => s.togglePlay);
+    const { data: firstTrack } = useTrack(playlist.trackIds[0] ?? undefined);
 
     const { play, addToPlaylist } = usePlaylistActions(playlist.playlistId, playlist);
 
-    const trackIds: TrackId[] = playlist.trackId ? [playlist.trackId] : [];
-    const isCurrent = Boolean(
-        firstTrack && currentTrack?.trackId === firstTrack.trackId && isCurrentPlaylist,
+    const trackIds: TrackId[] = playlist.trackIds;
+
+    const isPlayingFromThisPlaylist = Boolean(
+        isCurrentPlaylist && currentTrack && trackIds.includes(currentTrack.trackId),
     );
+
+    const activeTrack = isPlayingFromThisPlaylist ? currentTrack : firstTrack;
 
     const onPlay = useCallback(() => play(), [play]);
 
+    const handleRowClick = useCallback(
+        (index: number) => {
+            const trackId = trackIds[index];
+            if (trackId === undefined) return;
+            if (isCurrentPlaylist && currentTrack?.trackId === trackId) togglePlay();
+            else void play(index);
+        },
+        [trackIds, isCurrentPlaylist, currentTrack, togglePlay, play],
+    );
+
     return (
         <SearchRow
-            track={firstTrack}
+            track={activeTrack}
+            coverSrc={toSrc(playlist.coverPath) ?? firstTrack?.coverSrc}
             title={playlist.title}
             href={`/playlist/${playlist.playlistId}`}
-            isCurrent={isCurrent}
+            isCurrent={isPlayingFromThisPlaylist}
             onPlay={onPlay}
             onAddToPlaylist={() => firstTrack && addToPlaylist(firstTrack.trackId)}
         >
@@ -46,7 +62,8 @@ export const PlaylistRow = memo(({ playlist }: PlaylistRowProps) => {
                             key={id}
                             index={index}
                             trackId={id}
-                            onRowClick={(i) => void play(i)}
+                            isActive={isCurrentPlaylist && currentTrack?.trackId === id}
+                            onRowClick={handleRowClick}
                             onAddToPlaylist={addToPlaylist}
                             onRemoveFromPlaylist={() => {}}
                         />

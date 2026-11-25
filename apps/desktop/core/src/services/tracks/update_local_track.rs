@@ -5,16 +5,17 @@ use std::{
 use uuid::Uuid;
 
 use crate::{
+    constants::IMAGE_EXTENSIONS,
     db::{DbState, repository},
-    models::tracks::{
-        LocalTrackResponse, NewTrackFile, TrackFileType, UpdateTrackFile, UpdateTrackRequest,
+    models::{
+        files::{FileType, NewFile, UpdateFile},
+        libraries::Library,
+        tracks::{LocalTrackResponse, NewTrackFile, TrackFilesWithPath, UpdateTrackRequest},
     },
     services::{errors::CoreError, tracks::load_track},
     storage::dirs::{image_rel_path, to_db_path},
     utils::files::{Written, copy_file},
 };
-
-const IMAGE_EXTENSIONS: &[&str] = &["jpg", "jpeg", "png", "webp"];
 
 struct StagedCover {
     abs: PathBuf,
@@ -42,36 +43,27 @@ pub fn update_local_track(
     match &update.new_cover_path {
         None => {}
         Some(Some(p)) => {
-            let track = {
-                let conn = db.lock();
-                repository::tracks::tracks::get_local_by_id_with_files(&conn, track_id)?
-                    .ok_or(CoreError::NotFound(track_id))?
-            };
-            staged = Some(stage_cover(&track, Path::new(p))?);
+            let mut conn = db.lock();
+            let tx = conn.transaction()?;
+            let files = repository::tracks::track_files::get_by_track_id_with_paths(&tx, track_id)?;
+            let library_id = files
+                .image
+                .as_ref()
+                .and_then(|c| c.library_id)
+                .or_else(|| files.audio.as_ref().and_then(|a| a.library_id))
+                .ok_or_else(|| {
+                    CoreError::Validation("cannot determine library for cover".into())
+                })?;
+            let library = repository::libraries::get_by_id(&tx, library_id)?
+                .ok_or_else(|| CoreError::Validation("library not found".into()))?;
+            staged = Some(stage_cover(&files, &library, Path::new(p))?);
         }
         Some(None) => {
-            let track = {
-                let conn = db.lock();
-                repository::tracks::tracks::get_local_by_id_with_files(&conn, track_id)?
-                    .ok_or(CoreError::NotFound(track_id))?
-            };
-            if let Some(c) = track.track_files.cover.as_ref() {
-                let library_path =
-                    c.library
-                        .as_ref()
-                        .map(|l| PathBuf::from(&l.path))
-                        .or_else(|| {
-                            track
-                                .track_files
-                                .audio
-                                .as_ref()
-                                .and_then(|a| a.library.as_ref())
-                                .map(|l| PathBuf::from(&l.path))
-                        });
-                let abs = library_path
-                    .map(|p| p.join(&c.track_file.path))
-                    .unwrap_or_else(|| PathBuf::from(&c.track_file.path));
-                cover_to_delete = Some((c.track_file.file_id, abs));
+            let conn = db.lock();
+            let files =
+                repository::tracks::track_files::get_by_track_id_with_paths(&conn, track_id)?;
+            if let Some(image) = files.image {
+                cover_to_delete = Some((image.track_file.file_id, PathBuf::from(image.full_path)));
             }
         }
     }
@@ -95,10 +87,10 @@ pub fn update_local_track(
         if let Some(s) = &staged {
             match &s.old {
                 Some((file_id, _)) => {
-                    repository::tracks::track_files::update(
+                    repository::files::update(
                         &tx,
                         *file_id,
-                        &UpdateTrackFile {
+                        &UpdateFile {
                             path: Some(to_db_path(&s.rel)),
                             size_bytes: Some(s.size),
                             ..Default::default()
@@ -106,11 +98,10 @@ pub fn update_local_track(
                     )?;
                 }
                 None => {
-                    repository::tracks::track_files::create(
+                    let file_id = repository::files::create(
                         &tx,
-                        &NewTrackFile {
-                            track_id,
-                            track_file_type: TrackFileType::Cover,
+                        &NewFile {
+                            file_type: FileType::Image,
                             library_id: Some(s.library_id),
                             path: to_db_path(&s.rel),
                             is_link: false,
@@ -118,12 +109,21 @@ pub fn update_local_track(
                             hash: None,
                         },
                     )?;
+
+                    repository::tracks::track_files::create(
+                        &tx,
+                        &NewTrackFile {
+                            track_id,
+                            file_id,
+                            file_type: FileType::Image,
+                        },
+                    )?;
                 }
             }
         }
 
         if let Some((file_id, _)) = &cover_to_delete {
-            repository::tracks::track_files::delete(&tx, *file_id)?;
+            repository::files::delete(&tx, *file_id)?; // track_file удаляется за счёт CASCADE
         }
 
         let response = load_track(&tx, track_id)?;
@@ -148,25 +148,17 @@ pub fn update_local_track(
     Ok(response)
 }
 
-fn stage_cover(track: &LocalTrackResponse, src: &Path) -> Result<StagedCover, CoreError> {
+fn stage_cover(
+    files: &TrackFilesWithPath,
+    library: &Library,
+    src: &Path,
+) -> Result<StagedCover, CoreError> {
     let ext = src
         .extension()
         .and_then(|e| e.to_str())
         .map(str::to_lowercase)
         .filter(|e| IMAGE_EXTENSIONS.contains(&e.as_str()))
         .ok_or_else(|| CoreError::Validation(format!("unsupported image: {}", src.display())))?;
-
-    let cover = track.track_files.cover.as_ref();
-    let library = cover
-        .and_then(|c| c.library.as_ref())
-        .or_else(|| {
-            track
-                .track_files
-                .audio
-                .as_ref()
-                .and_then(|a| a.library.as_ref())
-        })
-        .ok_or_else(|| CoreError::Validation("cannot determine library for cover".into()))?;
 
     let rel = image_rel_path(Uuid::new_v4(), &ext);
     let abs = Path::new(&library.path).join(&rel);
@@ -177,11 +169,9 @@ fn stage_cover(track: &LocalTrackResponse, src: &Path) -> Result<StagedCover, Co
         rel,
         size,
         library_id: library.library_id,
-        old: cover.map(|c| {
-            (
-                c.track_file.file_id,
-                Path::new(&library.path).join(&c.track_file.path),
-            )
-        }),
+        old: files
+            .image
+            .as_ref()
+            .map(|c| (c.track_file.file_id, PathBuf::from(&c.full_path))),
     })
 }

@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import type { TrackId } from "@/entities/track";
+import type { TrackId } from "@zelefy/types";
 import { usePlayerStore, useTrack } from "@/features/player";
 import { SearchRow } from "../search-row";
 
@@ -20,6 +20,7 @@ export const TrackRow = memo(({ trackId, isCurrent = false, onAddToPlaylist }: T
         <SearchRow
             track={track}
             title={track.title}
+            subtitle={track.metadataArtist}
             href={`/track/${trackId}`}
             isCurrent={isCurrent}
             onPlay={onPlay}

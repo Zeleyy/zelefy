@@ -1,10 +1,12 @@
 import { useLocalPlaylistsPaged } from "@/features/playlist";
-import type { SearchTabProps } from "../../model/types";
 import { PlaylistRow } from "../playlist-row";
 import { SearchResults } from "../SearchResults";
+import { useSearchContext } from "../../model/useSearchContext";
 
-export const SearchPlaylists = ({ query, isTyping }: SearchTabProps) => {
-    const canFetch = query.length > 0 && !isTyping;
+export const SearchPlaylists = () => {
+    const { query, isTyping } = useSearchContext();
+
+    const canFetch = query.length > 0;
 
     const local = useLocalPlaylistsPaged({
         search: canFetch ? query : undefined,
@@ -15,9 +17,10 @@ export const SearchPlaylists = ({ query, isTyping }: SearchTabProps) => {
 
     return (
         <SearchResults
-            isLoading={isTyping || local.isLoading}
-            isError={!isTyping && local.isError}
+            isLoading={local.isLoading}
+            isError={local.isError}
             isEmpty={playlists.length === 0}
+            isStale={isTyping}
             hasNextPage={canFetch && local.hasNextPage}
             isFetchingNextPage={canFetch && local.isFetchingNextPage}
             fetchNextPage={() => void local.fetchNextPage()}

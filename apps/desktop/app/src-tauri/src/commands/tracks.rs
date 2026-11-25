@@ -2,8 +2,8 @@ use desktop_core::{
     db::{repository, DbState},
     models::{
         tracks::{
-            LocalTrackCursor, LocalTrackIdResponse, LocalTrackIdsPage, LocalTrackResponse,
-            LocalTracksPage, UpdateTrackRequest,
+            LocalTrackCursor, LocalTrackIdsPage, LocalTrackResponse, LocalTracksPage,
+            UpdateTrackRequest,
         },
         utils::SearchQuery,
     },
@@ -33,12 +33,6 @@ pub async fn import_tracks(
     .await
     .map_err(|e| e.to_string())?
     .map_err(|e| e.to_string())
-}
-
-#[tauri::command]
-pub fn get_local_tracks(db: State<'_, DbState>) -> Result<Vec<LocalTrackResponse>, String> {
-    let conn = db.lock();
-    repository::tracks::tracks::get_all_local_with_files(&conn).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -80,12 +74,6 @@ pub fn get_local_tracks_paged(
             track_id: t.track_id,
         }
     }))
-}
-
-#[tauri::command]
-pub fn get_local_tracks_ids(db: State<'_, DbState>) -> Result<Vec<LocalTrackIdResponse>, String> {
-    let mut conn = db.lock();
-    repository::tracks::tracks::get_local_ids_with_files(&mut conn).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

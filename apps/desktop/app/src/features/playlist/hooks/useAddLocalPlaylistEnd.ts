@@ -9,6 +9,7 @@ export const useAddLocalPlaylistEnd = () => {
             invoke<number>("add_local_playlist_track_end", { playlistId, trackId }),
         onSuccess: async (_data, { playlistId }) => {
             await queryClient.invalidateQueries({ queryKey: playlistKeys.feed(playlistId) });
+            await queryClient.invalidateQueries({ queryKey: playlistKeys.localFeeds() });
             await queryClient.invalidateQueries({ queryKey: playlistKeys.trackIdsOf(playlistId) });
         },
     });

@@ -5,6 +5,7 @@ export type PlaylistId = string | number;
 export interface Playlist {
     playlistId: number;
     title: string;
+    coverPath: string | null;
     description: string | null;
     createdAt: string;
 }
@@ -22,9 +23,10 @@ export interface NewPlaylistRequest extends NewPlaylist {
     trackId: number;
 }
 
-export interface UpdatePlaylist {
+export interface UpdatePlaylistRequest {
     title?: string;
     description?: NullablePatch<string>;
+    newCoverPath?: NullablePatch<string>;
 }
 
 export interface MoveTrackRequest {
@@ -52,4 +54,10 @@ export interface PlaylistCursor {
     rank?: number | null;
 }
 
-export type PlaylistsPage = CursorPage<PlaylistWithFirstTrackId, PlaylistCursor>;
+export interface PlaylistWithFirstTrackIds extends Playlist {
+    trackIds: number[];
+    hasMore: boolean;
+    rank?: number | null;
+}
+
+export type PlaylistsPage = CursorPage<PlaylistWithFirstTrackIds, PlaylistCursor>;

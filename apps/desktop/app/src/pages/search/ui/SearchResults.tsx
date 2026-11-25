@@ -7,6 +7,7 @@ interface SearchResultsProps {
     isLoading: boolean;
     isError: boolean;
     isEmpty: boolean;
+    isStale?: boolean;
     errorTitle?: string;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
@@ -18,6 +19,7 @@ export const SearchResults = ({
     isLoading,
     isError,
     isEmpty,
+    isStale,
     errorTitle,
     hasNextPage,
     isFetchingNextPage,
@@ -38,7 +40,12 @@ export const SearchResults = ({
             )}
 
             {!isEmpty && (
-                <Flex direction="column" gap="xs" fullWidth>
+                <Flex
+                    direction="column"
+                    gap="xs"
+                    fullWidth
+                    style={{ opacity: isStale ? 0.6 : 1, transition: "opacity 150ms" }}
+                >
                     {children}
                 </Flex>
             )}

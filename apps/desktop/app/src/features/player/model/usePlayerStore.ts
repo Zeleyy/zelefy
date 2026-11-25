@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { createJSONStorage, persist, subscribeWithSelector } from "zustand/middleware";
 import { invoke } from "@tauri-apps/api/core";
-import type { PlayerTrack } from "@zelefy/types";
+import type { PlayerTrack, TrackId } from "@zelefy/types";
 import { queryClient } from "@/shared/api";
 import { tauriStorage } from "@/shared/lib/storage";
-import { trackKeys, type TrackId } from "@/entities/track";
+import { trackKeys } from "@/entities/track";
 import type { PlaylistId } from "@/entities/playlist";
 
 type RepeatMode = "off" | "queue" | "track";

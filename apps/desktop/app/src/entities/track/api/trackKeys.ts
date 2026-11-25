@@ -1,4 +1,4 @@
-import type { TrackId } from "../model";
+import type { TrackId } from "@zelefy/types";
 
 export const trackKeys = {
     all: ["track"] as const,

@@ -1,8 +1,9 @@
 import styles from "./TrackRow.module.scss";
 import { memo } from "react";
 import clsx from "clsx";
+import type { TrackId } from "@zelefy/types";
 import { Button, Cover, Flex, formatBytes, formatTime, Icon } from "@zelefy/ui";
-import type { LocalTrackIdResponse, TrackId } from "@/entities/track";
+import type { LocalTrackIdResponse } from "@/entities/track";
 import { selectCurrentTrackId, usePlayerStore, useTrack } from "@/features/player";
 
 interface TrackRowProps {
@@ -20,7 +21,7 @@ export const TrackRow = memo(
         const { data: track } = useTrack(trackId);
         const addToQueue = usePlayerStore((s) => s.addToQueue);
         const isPlaying = usePlayerStore((s) => selectCurrentTrackId(s) === trackId);
-        const isLinked = localTrack.audio?.library === null;
+        const isLinked = localTrack.audio?.isLink;
 
         return (
             <div

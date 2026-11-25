@@ -1,124 +1,74 @@
-use rusqlite::{
-    Row, ToSql,
-    types::{FromSql, FromSqlError, ToSqlOutput},
-};
-use serde::{Deserialize, Serialize};
+use rusqlite::Row;
+use serde::Serialize;
 
-use crate::models::{libraries::Library, utils::TimestampMs};
-
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum TrackFileType {
-    Audio = 0,
-    Cover = 1,
-    Waveform = 2,
-}
-
-impl ToSql for TrackFileType {
-    fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(ToSqlOutput::from(*self as u8))
-    }
-}
-
-impl FromSql for TrackFileType {
-    fn column_result(value: rusqlite::types::ValueRef<'_>) -> rusqlite::types::FromSqlResult<Self> {
-        let int_val = u8::column_result(value)?;
-        match int_val {
-            0 => Ok(TrackFileType::Audio),
-            1 => Ok(TrackFileType::Cover),
-            2 => Ok(TrackFileType::Waveform),
-            other => Err(FromSqlError::OutOfRange(other as i64)),
-        }
-    }
-}
+use crate::models::files::FileType;
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TrackFile {
-    pub file_id: i64,
     pub track_id: i64,
-    pub track_file_type: TrackFileType,
-
-    pub library_id: Option<i64>,
-    pub path: String,
-    pub is_link: bool,
-    pub size_bytes: i64,
-    pub hash: Option<String>,
-
-    pub last_accessed_at: TimestampMs,
-    pub created_at: TimestampMs,
+    pub file_id: i64,
+    pub file_type: FileType,
 }
 
 impl TrackFile {
     pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
         Ok(Self {
-            file_id: row.get("file_id")?,
             track_id: row.get("track_id")?,
-            track_file_type: row.get("track_file_type_id")?,
-            library_id: row.get("library_id")?,
-            path: row.get("path")?,
-            is_link: row.get("is_link")?,
-            size_bytes: row.get("size_bytes")?,
-            hash: row.get("hash")?,
-            last_accessed_at: row.get("last_accessed_at")?,
-            created_at: row.get("created_at")?,
+            file_id: row.get("file_id")?,
+            file_type: row.get("file_type_id")?,
         })
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TrackFileResponse {
+pub struct TrackFileWithPath {
     #[serde(flatten)]
     pub track_file: TrackFile,
-    pub library: Option<Library>,
+    pub library_id: Option<i64>,
+    pub is_link: bool,
+    pub size_bytes: i64,
+    pub full_path: String,
 }
 
-impl TrackFileResponse {
+impl TrackFileWithPath {
     pub fn from_row(row: &Row<'_>) -> rusqlite::Result<Self> {
-        let track_file = TrackFile::from_row(row)?;
-
-        let library_id: Option<i64> = row.get("lib_library_id")?;
-
-        let library = if library_id.is_some() {
-            Some(Library::from_row(row, Some("lib_"))?)
-        } else {
-            None
-        };
-
         Ok(Self {
-            track_file,
-            library,
+            track_file: TrackFile::from_row(row)?,
+            library_id: row.get("library_id")?,
+            is_link: row.get("is_link")?,
+            size_bytes: row.get("size_bytes")?,
+            full_path: row.get("full_path")?,
         })
     }
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TrackFilesResponse {
-    pub audio: Option<TrackFileResponse>,
-    pub cover: Option<TrackFileResponse>,
-    pub waveform: Option<TrackFileResponse>,
+pub struct TrackFilesWithPath {
+    pub audio: Option<TrackFileWithPath>,
+    pub image: Option<TrackFileWithPath>,
+    pub waveform: Option<TrackFileWithPath>,
 }
 
-impl TrackFilesResponse {
-    pub fn from_rows(mut rows: Vec<TrackFileResponse>) -> Self {
+impl TrackFilesWithPath {
+    pub fn from_rows(mut rows: Vec<TrackFileWithPath>) -> Self {
         let mut audio = None;
-        let mut cover = None;
+        let mut image = None;
         let mut waveform = None;
 
         for tf in rows.drain(..) {
-            match tf.track_file.track_file_type {
-                TrackFileType::Audio => audio = Some(tf),
-                TrackFileType::Cover => cover = Some(tf),
-                TrackFileType::Waveform => waveform = Some(tf),
+            match tf.track_file.file_type {
+                FileType::Audio => audio = Some(tf),
+                FileType::Image => image = Some(tf),
+                FileType::Waveform => waveform = Some(tf),
             }
         }
 
         Self {
             audio,
-            cover,
+            image,
             waveform,
         }
     }
@@ -127,19 +77,6 @@ impl TrackFilesResponse {
 #[derive(Debug)]
 pub struct NewTrackFile {
     pub track_id: i64,
-    pub track_file_type: TrackFileType,
-
-    pub library_id: Option<i64>,
-    pub path: String,
-    pub is_link: bool,
-    pub size_bytes: i64,
-    pub hash: Option<String>,
-}
-
-#[derive(Debug, Default)]
-pub struct UpdateTrackFile {
-    pub library_id: Option<Option<i64>>,
-    pub path: Option<String>,
-    pub size_bytes: Option<i64>,
-    pub hash: Option<Option<String>>,
+    pub file_id: i64,
+    pub file_type: FileType,
 }

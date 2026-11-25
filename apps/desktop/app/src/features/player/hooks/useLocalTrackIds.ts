@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
 import { trackKeys, type LocalTrackCursor, type LocalTrackIdsPage } from "@/entities/track";
 import { useEnsureTracks } from "./useEnsureTracks";
@@ -23,6 +23,7 @@ export const useLocalTrackIds = ({ search = "", enabled = true }) => {
             return seen ? undefined : next;
         },
         enabled,
+        placeholderData: keepPreviousData,
     });
 
     const trackIds = query.data?.pages

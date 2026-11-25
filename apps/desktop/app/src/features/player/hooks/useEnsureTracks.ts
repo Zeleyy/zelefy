@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import type { TrackId } from "@zelefy/types";
 import { queryClient } from "@/shared/api";
-import { fetchLocalTracks, fetchServerTracks, trackKeys, type TrackId } from "@/entities/track";
+import { fetchLocalTracks, fetchServerTracks, trackKeys } from "@/entities/track";
 
 export const useEnsureTracks = (ids: TrackId[]) => {
     const sortedIds = [...new Set(ids)].sort((a, b) => String(a).localeCompare(String(b)));

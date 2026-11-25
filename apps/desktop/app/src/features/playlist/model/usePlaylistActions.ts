@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
+import type { TrackId } from "@zelefy/types";
 import { useModalStore } from "@/shared/lib/stores";
 import type { Playlist, PlaylistId } from "@/entities/playlist";
-import type { TrackId } from "@/entities/track";
 import { usePlayerStore } from "@/features/player";
 import { useAddManyToQueue } from "@/features/queue";
 import { useLocalPlaylistBackend } from "./useLocalPlaylistBackend";

@@ -1,16 +1,13 @@
 import type { CursorPage, NullablePatch, PlayerTrack } from "@zelefy/types";
-import type { Library } from "@/entities/library";
-import { trackFilePath, trackFileSrc } from "../lib";
+import { toSrc } from "@/shared/lib/utils";
 
-export type TrackId = string | number;
-
-export const TrackFileType = {
+export const FileType = {
     audio: 0,
-    cover: 1,
+    image: 1,
     waveform: 2,
 } as const;
 
-export type TrackFileType = (typeof TrackFileType)[keyof typeof TrackFileType];
+export type FileType = (typeof FileType)[keyof typeof FileType];
 
 export interface Track {
     trackId: number;
@@ -27,7 +24,7 @@ export interface Track {
 export interface TrackFile {
     fileId: number;
     trackId: number;
-    trackFileType: TrackFileType;
+    FileType: FileType;
 
     libraryId: number | null;
     path: string;
@@ -39,30 +36,32 @@ export interface TrackFile {
     createdAt: string;
 }
 
-export interface TrackFileResponse extends TrackFile {
-    library: Library;
+export interface TrackFileWithPath extends TrackFile {
+    fullPath: string;
+    isLink: boolean;
+    sizeBytes: number;
 }
 
-export interface TrackFilesResponse {
-    audio: TrackFileResponse;
-    cover: TrackFileResponse | null;
-    waveform: TrackFileResponse | null;
+export interface TrackFilesWithPath {
+    audio: TrackFileWithPath;
+    image: TrackFileWithPath | null;
+    waveform: TrackFileWithPath | null;
 }
 
-export interface LocalTrackResponse extends Track, TrackFilesResponse {}
+export interface LocalTrackResponse extends Track, TrackFilesWithPath {}
 
 export const toPlayerTrack = (track: LocalTrackResponse): PlayerTrack => ({
     trackId: track.trackId,
     title: track.title,
     metadataArtist: track.metadataArtist,
-    audioSrc: trackFilePath(track.audio)!,
-    coverSrc: trackFileSrc(track.cover),
-    waveformSrc: trackFileSrc(track.waveform),
+    audioSrc: toSrc(track.audio.fullPath)!,
+    coverSrc: toSrc(track.image?.fullPath),
+    waveformSrc: toSrc(track.waveform?.fullPath),
     durationMs: track.durationMs,
     genre: track.genre,
 });
 
-export interface LocalTrackIdResponse extends TrackFilesResponse {
+export interface LocalTrackIdResponse extends TrackFilesWithPath {
     trackId: number;
 }
 
@@ -76,7 +75,7 @@ export interface UpdateTrack {
 }
 
 export interface UpdateTrackRequest extends UpdateTrack {
-    newCoverPath?: string | null;
+    newCoverPath?: NullablePatch<string>;
 }
 
 export interface LocalTrack extends Track {

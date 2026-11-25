@@ -1,15 +1,17 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import type { TrackId } from "@zelefy/types";
 import { useModalStore } from "@/shared/lib/stores";
-import type { TrackId } from "@/entities/track";
 import { useCurrentTrack, useLocalTrackIds } from "@/features/player";
 import { SearchResults } from "../SearchResults";
 import { TrackRow } from "../track-row";
-import type { SearchTabProps } from "../../model";
+import { useSearchContext } from "../../model/useSearchContext";
 
-export const SearchTracks = ({ query, source, isTyping }: SearchTabProps) => {
+export const SearchTracks = () => {
+    const { query, source, isTyping } = useSearchContext();
+
     const { t } = useTranslation();
-    const canFetch = query.length > 0 && !isTyping;
+    const canFetch = query.length > 0;
 
     const openModal = useModalStore((s) => s.openModal);
     const currentTrack = useCurrentTrack();
@@ -49,9 +51,10 @@ export const SearchTracks = ({ query, source, isTyping }: SearchTabProps) => {
 
     return (
         <SearchResults
-            isLoading={isTyping || activeSources.some((s) => s.isLoading)}
-            isError={!isTyping && activeSources.every((s) => s.isError)}
+            isLoading={activeSources.some((s) => s.isLoading)}
+            isError={activeSources.every((s) => s.isError)}
             isEmpty={trackIds.length === 0}
+            isStale={isTyping}
             errorTitle={source === "local" ? t("search.local.error") : undefined}
             hasNextPage={canFetch && activeSources.some((s) => s.hasNextPage)}
             isFetchingNextPage={canFetch && activeSources.some((s) => s.isFetchingNextPage)}

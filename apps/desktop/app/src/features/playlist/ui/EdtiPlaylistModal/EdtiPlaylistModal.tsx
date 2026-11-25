@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Button, Flex, InputLabel, Modal, SpinnerLoader } from "@zelefy/ui";
 import type { ModalComponentProps } from "@/shared/lib/stores";
 import { useLocalPlaylist, useUpdateLocalPlaylist } from "../../hooks";
-import type { UpdatePlaylist } from "@/entities/playlist";
+import type { UpdatePlaylistRequest } from "@/entities/playlist";
+import { CoverEditor, type CoverDraft } from "@/shared/ui/cover-editor";
 
 type EditableField = "title" | "description";
 
@@ -23,7 +24,9 @@ export const EdtiPlaylistModal = ({ playlistId, onClose }: ModalComponentProps<"
 
     const { mutate: updateLocalPlaylist } = useUpdateLocalPlaylist();
 
-    const [draft, setDraft] = useState<UpdatePlaylist>({
+    const [coverDraft, setCoverDraft] = useState<CoverDraft>(undefined);
+
+    const [draft, setDraft] = useState<UpdatePlaylistRequest>({
         title: undefined,
         description: undefined,
     });
@@ -52,6 +55,7 @@ export const EdtiPlaylistModal = ({ playlistId, onClose }: ModalComponentProps<"
                 update: {
                     title: draft.title || undefined,
                     description: draft.description || null,
+                    newCoverPath: coverDraft,
                 },
             },
             {
@@ -77,19 +81,30 @@ export const EdtiPlaylistModal = ({ playlistId, onClose }: ModalComponentProps<"
             {isLoading || !playlist ? (
                 <SpinnerLoader isLoading />
             ) : (
-                <Flex direction="column" gap="md" fullWidth>
-                    {fields.map((field) => (
-                        <InputLabel
-                            key={field.name}
-                            label={t(`modal.edit_playlist.field.${field.i18nKey}.label`)}
-                            placeholder={t(
-                                `modal.edit_playlist.field.${field.i18nKey}.placeholder`,
-                            )}
-                            value={draft[field.name] ?? undefined}
-                            onChange={update(field.name)}
-                            required={field.required}
-                        />
-                    ))}
+                <Flex as="form" gap="lg">
+                    <CoverEditor
+                        imageSrc={playlist.coverPath}
+                        value={coverDraft}
+                        onSelect={setCoverDraft}
+                        onClear={() => setCoverDraft(null)}
+                        onRestore={() => setCoverDraft(undefined)}
+                        alt={draft.title}
+                    />
+
+                    <Flex direction="column" gap="md" fullWidth>
+                        {fields.map((field) => (
+                            <InputLabel
+                                key={field.name}
+                                label={t(`modal.edit_playlist.field.${field.i18nKey}.label`)}
+                                placeholder={t(
+                                    `modal.edit_playlist.field.${field.i18nKey}.placeholder`,
+                                )}
+                                value={draft[field.name] ?? undefined}
+                                onChange={update(field.name)}
+                                required={field.required}
+                            />
+                        ))}
+                    </Flex>
                 </Flex>
             )}
         </Modal>

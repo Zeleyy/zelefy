@@ -13,9 +13,10 @@ use uuid::Uuid;
 use crate::{
     db::{DbState, repository},
     models::{
+        files::{FileType, NewFile},
         jobs::NewJob,
         libraries::Library,
-        tracks::{LocalTrackResponse, NewTrack, NewTrackFile, TrackFileType},
+        tracks::{LocalTrackResponse, NewTrack, NewTrackFile},
     },
     services::{errors::CoreError, tracks::load_track},
     storage::dirs::{audio_rel_path, image_rel_path, to_db_path},
@@ -62,7 +63,7 @@ pub fn import_tracks(
 }
 
 struct StoredFile {
-    kind: TrackFileType,
+    kind: FileType,
     path: String,
     size: i64,
 }
@@ -94,7 +95,7 @@ fn import_one(
     written.file(audio_dest.clone());
     let size = copy_file(src, &audio_dest)?;
     files.push(StoredFile {
-        kind: TrackFileType::Audio,
+        kind: FileType::Audio,
         path: to_db_path(&audio_rel),
         size,
     });
@@ -104,7 +105,7 @@ fn import_one(
         files.push(save_asset(
             root,
             &mut written,
-            TrackFileType::Cover,
+            FileType::Image,
             rel,
             &c.data,
         )?);
@@ -130,7 +131,7 @@ fn import_one(
 fn save_asset(
     root: &Path,
     written: &mut Written,
-    kind: TrackFileType,
+    kind: FileType,
     rel: PathBuf,
     data: &[u8],
 ) -> Result<StoredFile, CoreError> {
@@ -165,16 +166,24 @@ fn register(
     )?;
 
     for f in info.files {
-        repository::tracks::track_files::create(
+        let file_id = repository::files::create(
             &tx,
-            &NewTrackFile {
-                track_id,
-                track_file_type: f.kind,
+            &NewFile {
+                file_type: f.kind,
                 library_id: Some(library_id),
                 path: f.path,
                 is_link: false,
                 size_bytes: f.size,
                 hash: None,
+            },
+        )?;
+
+        repository::tracks::track_files::create(
+            &tx,
+            &NewTrackFile {
+                track_id,
+                file_id,
+                file_type: f.kind,
             },
         )?;
     }
@@ -216,10 +225,9 @@ fn file_title(src: &Path) -> String {
 
 fn resolve_library(conn: &Connection, library_id: Option<i64>) -> Result<Library, CoreError> {
     match library_id {
-        Some(id) => repository::libraries::get_by_id(conn, id).map_err(|e| match e {
-            rusqlite::Error::QueryReturnedNoRows => CoreError::NotFound(id),
-            e => e.into(),
-        }),
+        Some(id) => {
+            repository::libraries::get_by_id(conn, id)?.ok_or_else(|| CoreError::NotFound(id))
+        }
         None => repository::libraries::get_primary(conn)?
             .ok_or_else(|| CoreError::Validation("no primary library".into())),
     }

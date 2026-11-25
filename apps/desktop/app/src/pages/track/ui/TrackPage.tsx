@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router";
-import type { TrackId } from "@/entities/track";
+import type { TrackId } from "@zelefy/types";
 import { PlayerTrackHero, useCurrentTrack, usePlayerStore, useTrack } from "@/features/player";
 import { useWaveform } from "@/features/waveform";
 import { useModalStore } from "@/shared/lib/stores";

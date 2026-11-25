@@ -1,6 +1,6 @@
 import { create } from "zustand";
+import type { TrackId } from "@zelefy/types";
 import type { PlaylistId } from "@/entities/playlist";
-import type { TrackId } from "@/entities/track";
 
 export interface ModalPropsMap {
     addToPlaylist: { trackId: TrackId };

@@ -7,21 +7,25 @@ use std::{fs::File, path::Path};
 use crate::{
     db::{DbState, repository},
     jobs::JobError,
-    models::tracks::{NewTrackFile, TrackFileType},
+    models::{
+        files::{FileType, NewFile},
+        tracks::NewTrackFile,
+    },
     storage::dirs::{to_db_path, waveform_rel_path},
     utils::files::{Written, create_file_with_data},
 };
 
 pub fn run(db: &DbState, track_id: i64) -> Result<(), JobError> {
     let (local_uuid, audio_path, lib) = {
-        let conn = db.lock();
+        let mut conn = db.lock();
+        let tx = conn.transaction()?;
 
-        let Some(resp) = repository::tracks::tracks::get_local_by_id_with_files(&conn, track_id)?
-        else {
+        let Some(track) = repository::tracks::tracks::get_by_id(&tx, track_id)? else {
             return Err(JobError::TrackGone);
         };
 
-        let files = &resp.track_files;
+        let files = repository::tracks::track_files::get_by_track_id_with_paths(&tx, track_id)?;
+
         if files.waveform.is_some() {
             return Ok(());
         }
@@ -31,17 +35,14 @@ pub fn run(db: &DbState, track_id: i64) -> Result<(), JobError> {
             .as_ref()
             .ok_or_else(|| JobError::Failed("track has no audio file".into()))?;
 
-        let lib = match &audio.library {
-            Some(l) => l.clone(),
-            None => repository::libraries::get_primary(&conn)?
+        let lib = match audio.library_id {
+            Some(lib_id) => repository::libraries::get_by_id(&tx, lib_id)?
+                .ok_or_else(|| JobError::Failed("no library".into()))?,
+            None => repository::libraries::get_primary(&tx)?
                 .ok_or_else(|| JobError::Failed("no primary library".into()))?,
         };
 
-        (
-            resp.track.local_uuid,
-            Path::new(&lib.path).join(&audio.track_file.path),
-            lib,
-        )
+        (track.local_uuid, audio.full_path.clone(), lib)
     };
 
     let file = File::open(audio_path)?;
@@ -56,12 +57,13 @@ pub fn run(db: &DbState, track_id: i64) -> Result<(), JobError> {
     create_file_with_data(&dest, &bytes)?;
 
     {
-        let conn = db.lock();
-        repository::tracks::track_files::create(
-            &conn,
-            &NewTrackFile {
-                track_id,
-                track_file_type: TrackFileType::Waveform,
+        let mut conn = db.lock();
+        let tx = conn.transaction()?;
+
+        let file_id = repository::files::create(
+            &tx,
+            &NewFile {
+                file_type: FileType::Waveform,
                 library_id: Some(lib.library_id),
                 path: to_db_path(&rel),
                 is_link: false,
@@ -69,6 +71,17 @@ pub fn run(db: &DbState, track_id: i64) -> Result<(), JobError> {
                 hash: None,
             },
         )?;
+
+        repository::tracks::track_files::create(
+            &tx,
+            &NewTrackFile {
+                track_id,
+                file_id,
+                file_type: FileType::Waveform,
+            },
+        )?;
+
+        tx.commit()?;
     }
     written.keep();
     Ok(())

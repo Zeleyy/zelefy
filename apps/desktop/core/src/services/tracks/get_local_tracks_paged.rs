@@ -3,7 +3,7 @@ use rusqlite::Connection;
 use crate::{
     db::repository::{self, tracks::track_files::load_files_map},
     models::{
-        tracks::{LocalTrackCursor, LocalTrackIdResponse, TrackFilesResponse},
+        tracks::{LocalTrackCursor, LocalTrackIdResponse, TrackFilesWithPath},
         utils::SearchQuery,
     },
     services::errors::CoreError,
@@ -27,7 +27,7 @@ pub fn get_local_tracks_paged(
             let files = files_map.remove(&track_id).unwrap_or_default();
             LocalTrackIdResponse {
                 track_id,
-                track_files: TrackFilesResponse::from_rows(files),
+                track_files: TrackFilesWithPath::from_rows(files),
             }
         })
         .collect())

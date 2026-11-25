@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import type { TrackId } from "@zelefy/types";
 import { truncateWords } from "@zelefy/ui";
-import type { TrackId } from "@/entities/track";
 import type { Playlist } from "@/entities/playlist";
 import { usePlayerStore } from "@/features/player";
 

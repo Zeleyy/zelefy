@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useLoaderData } from "react-router";
+import type { TrackId } from "@zelefy/types";
 import {
     Button,
     DraggableItem,
@@ -10,10 +11,10 @@ import {
     Icon,
     SpinnerLoader,
 } from "@zelefy/ui";
+import { InfiniteScrollFooter } from "@/shared/ui";
 import { confirm, useModalStore } from "@/shared/lib/stores";
 import { useOptimisticOrder } from "@/shared/lib/hooks";
 import { type PlaylistId } from "@/entities/playlist";
-import type { TrackId } from "@/entities/track";
 import {
     useLocalPlaylist,
     useLocalPlaylistTrackIds,
@@ -28,8 +29,7 @@ import {
     useTrack,
 } from "@/features/player";
 import { useAddToQueue } from "@/features/queue";
-import { PlaylistTrackRow } from "./playlist-track-row";
-import { InfiniteScrollFooter } from "@/shared/ui";
+import { PlaylistTrackRow } from "@/widgets/playlist-tracks";
 
 export const PlaylistPage = () => {
     const { t } = useTranslation();
@@ -42,6 +42,8 @@ export const PlaylistPage = () => {
     const { data: playlist } = useLocalPlaylist(localId ?? null);
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
         useLocalPlaylistTrackIds(localId ?? null);
+
+    const isLocal = typeof playlistId === "number";
 
     const serverIds = useMemo<TrackId[]>(
         () => data?.pages.flatMap((p) => p.items.map((i) => i.trackId)) ?? [],
@@ -139,6 +141,7 @@ export const PlaylistPage = () => {
                                     isActive={
                                         isPlaying && isCurrentPlaylist && currentTrackId === trackId
                                     }
+                                    canEdit={isLocal}
                                     onRowClick={handleRowClick}
                                     onAddToPlaylist={addToPlaylist}
                                     onRemoveFromPlaylist={removeTrack}

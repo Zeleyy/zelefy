@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zelefy_common::{CursorPage, double_option};
 
-use crate::models::{tracks::TrackFilesResponse, utils::TimestampMs};
+use crate::models::{tracks::TrackFilesWithPath, utils::TimestampMs};
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -45,7 +45,7 @@ pub struct LocalTrackResponse {
     #[serde(flatten)]
     pub track: Track,
     #[serde(flatten)]
-    pub track_files: TrackFilesResponse,
+    pub track_files: TrackFilesWithPath,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -53,7 +53,7 @@ pub struct LocalTrackResponse {
 pub struct LocalTrackIdResponse {
     pub track_id: i64,
     #[serde(flatten)]
-    pub track_files: TrackFilesResponse,
+    pub track_files: TrackFilesWithPath,
 }
 
 #[derive(Clone, Copy, Deserialize, Serialize)]

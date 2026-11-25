@@ -1,11 +1,11 @@
 use rusqlite::{Connection, OptionalExtension, params, params_from_iter, types::Value};
 
 use crate::models::{
+    files::FileType,
     libraries::{Library, LibraryStats, NewLibrary, UpdateLibrary},
-    tracks::TrackFileType,
 };
 
-pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library> {
+pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Option<Library>> {
     conn.query_one(
         r#"
             SELECT
@@ -19,6 +19,7 @@ pub fn get_by_id(conn: &Connection, library_id: i64) -> rusqlite::Result<Library
         params![library_id],
         |row| Library::from_row(row, None),
     )
+    .optional()
 }
 
 pub fn get_all(conn: &Connection) -> rusqlite::Result<Vec<Library>> {
@@ -45,18 +46,17 @@ pub fn get_stats(conn: &Connection) -> rusqlite::Result<Vec<LibraryStats>> {
     let mut stmt = conn.prepare_cached(
         r#"
             SELECT
-                library_id
-                , SUM(size_bytes) as used_size_bytes
-                , COUNT(file_id) as files_count
-            FROM track_files
-            WHERE track_file_type_id = ?1
+                vfr.library_id
+                , SUM(vfr.size_bytes) as used_size_bytes
+                , COUNT(tf.file_id) as files_count
+            FROM track_files tf
+            JOIN v_files_resolved vfr ON vfr.file_id = tf.file_id
+            WHERE tf.file_type_id = ?1
             GROUP BY library_id
         "#,
     )?;
 
-    let rows = stmt.query_map(params![TrackFileType::Audio], |row| {
-        LibraryStats::from_row(row)
-    })?;
+    let rows = stmt.query_map(params![FileType::Audio], |row| LibraryStats::from_row(row))?;
 
     rows.collect()
 }

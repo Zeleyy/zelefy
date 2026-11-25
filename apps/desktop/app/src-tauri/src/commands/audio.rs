@@ -21,12 +21,8 @@ pub async fn player_load_local(
             .track_files
             .audio
             .ok_or("no audio file for track")?;
-        let library = file
-            .library
-            .as_ref()
-            .ok_or("audio file library not found")?;
 
-        PathBuf::from(&library.path).join(&file.track_file.path)
+        PathBuf::from(&file.full_path)
     };
 
     if !path.is_file() {

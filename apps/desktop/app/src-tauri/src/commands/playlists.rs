@@ -3,7 +3,7 @@ use desktop_core::{
     models::{
         playlists::{
             MoveTrackRequest, NewPlaylistRequest, Playlist, PlaylistCursor, PlaylistTrackCursor,
-            PlaylistTracksPage, PlaylistWithFirstTrackId, PlaylistsPage, UpdatePlaylist,
+            PlaylistTracksPage, PlaylistWithFirstTrackId, PlaylistsPage, UpdatePlaylistRequest,
         },
         utils::SearchQuery,
     },
@@ -39,13 +39,9 @@ pub fn get_local_playlists_paged(
 
     let conn = db.lock();
 
-    let playlists = repository::playlists::get_all_with_first_track_id_paged(
-        &conn,
-        search.as_ref(),
-        after,
-        fetch,
-    )
-    .map_err(|e| e.to_string())?;
+    let playlists =
+        repository::playlists::get_page_with_top_track_ids(&conn, search.as_ref(), after, fetch)
+            .map_err(|e| e.to_string())?;
 
     Ok(PlaylistsPage::from_fetched(playlists, limit, |p| {
         PlaylistCursor {
@@ -100,11 +96,12 @@ pub fn create_local_playlist(
 pub fn update_local_playlist(
     db: State<'_, DbState>,
     playlist_id: i64,
-    update: UpdatePlaylist,
+    library_id: Option<i64>,
+    update: UpdatePlaylistRequest,
 ) -> Result<i64, String> {
-    let conn = db.lock();
-    repository::playlists::update(&conn, playlist_id, &update).map_err(|e| e.to_string())?;
-    Ok(playlist_id)
+    let mut conn = db.lock();
+    services::playlists::update_local_playlist(&mut conn, playlist_id, library_id, update)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { toast } from "sonner";
-import type { PlayerTrack } from "@zelefy/types";
+import type { PlayerTrack, TrackId } from "@zelefy/types";
 import { queryClient } from "@/shared/api";
 import { useSettingsStore } from "@/shared/lib/stores";
-import { trackKeys, type TrackId } from "@/entities/track";
+import { trackKeys } from "@/entities/track";
 import { selectCurrentTrackId, usePlayerStore } from "../model";
 
 type PlayerEvent =

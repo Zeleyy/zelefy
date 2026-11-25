@@ -1,4 +1,4 @@
-import type { TrackId } from "@/entities/track";
+import type { TrackId } from "@zelefy/types";
 
 export type ReorderOptions = { onSettled?: () => void };
 

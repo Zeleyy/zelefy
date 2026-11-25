@@ -44,8 +44,10 @@ export interface PublicTrack extends BaseTrack, TrackStats {
     durationMs: number;
 }
 
+export type TrackId = string | number;
+
 export interface PlayerTrack {
-    trackId: string | number;
+    trackId: TrackId;
     title: string;
     metadataArtist: string | null;
     audioSrc: string;

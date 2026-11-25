@@ -9,8 +9,10 @@ import { useWaveform } from "@/features/waveform";
 import { useTrackPlayback } from "./useTrackPlayback";
 
 interface SearchRowProps {
-    track: PlayerTrack | undefined;
+    track?: PlayerTrack | null;
+    coverSrc?: string | null;
     title?: string | null;
+    subtitle?: string | null;
     href: string;
     isCurrent: boolean;
     onPlay: () => void | Promise<void>;
@@ -21,7 +23,9 @@ interface SearchRowProps {
 
 export const SearchRow = ({
     track,
+    coverSrc,
     title,
+    subtitle,
     href,
     isCurrent,
     onPlay,
@@ -32,15 +36,16 @@ export const SearchRow = ({
     const addToQueue = useAddToQueue();
     const { isActive, toggle, seekTo } = useTrackPlayback(isCurrent, onPlay);
 
-    const coverSrc = track?.coverSrc ?? undefined;
+    const bgCoverSrc = track?.coverSrc ?? undefined;
+    const resolvedCoverSrc = coverSrc ?? track?.coverSrc ?? undefined;
 
     return (
         <Flex
             className={styles.row}
             gap="md"
-            style={{ "--cover-url": coverSrc ? `url(${coverSrc})` : "none" } as CSSProperties}
+            style={{ "--cover-url": bgCoverSrc ? `url(${bgCoverSrc})` : "none" } as CSSProperties}
         >
-            <Cover src={coverSrc} alt={title ?? ""} size="lg" />
+            <Cover src={resolvedCoverSrc} alt={title ?? ""} size="lg" />
 
             <Flex direction="column" justify="space-between" gap="sm" className={styles.row__meta}>
                 <Flex gap="sm" align="flex-start">
@@ -52,9 +57,7 @@ export const SearchRow = ({
                         <Link to={href} className={styles.row__title}>
                             {title}
                         </Link>
-                        {track?.metadataArtist && (
-                            <span className={styles.row__artist}>{track.metadataArtist}</span>
-                        )}
+                        {subtitle && <span className={styles.row__artist}>{subtitle}</span>}
                     </Flex>
                 </Flex>
 

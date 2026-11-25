@@ -94,8 +94,6 @@ pub fn run() {
             cache::commands::get_default_cache_limit,
             cache::commands::reset_cache_limit,
             commands::tracks::import_tracks,
-            commands::tracks::get_local_tracks,
-            commands::tracks::get_local_tracks_ids,
             commands::tracks::get_local_track,
             commands::tracks::get_local_tracks_by_ids,
             commands::tracks::get_local_track_ids_paged,

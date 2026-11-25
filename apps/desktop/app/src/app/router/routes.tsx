@@ -1,10 +1,13 @@
 import { redirect, type RouteObject } from "react-router";
+import type { TrackId } from "@zelefy/types";
 import type { PlaylistId } from "@/entities/playlist";
-import type { TrackId } from "@/entities/track";
 import { HomePage } from "@/pages/home";
 import { NotFoundPage } from "@/pages/not-found";
 import { MainLayout } from "../layouts";
 import { HydrateFallback } from "./hydrate-fallback";
+import { SearchTracks } from "@/pages/search/ui/search-tracks";
+import { SearchPlaylists } from "@/pages/search/ui/search-playlists";
+import { SearchUsers } from "@/pages/search/ui/search-users";
 
 export const routes: RouteObject[] = [
     {
@@ -22,6 +25,15 @@ export const routes: RouteObject[] = [
                     const { SearchPage } = await import("@/pages/search");
                     return { Component: SearchPage };
                 },
+                children: [
+                    {
+                        index: true,
+                        loader: () => redirect("tracks"),
+                    },
+                    { path: "tracks", element: <SearchTracks /> },
+                    { path: "playlists", element: <SearchPlaylists /> },
+                    { path: "users", element: <SearchUsers /> },
+                ],
             },
             {
                 path: "library",

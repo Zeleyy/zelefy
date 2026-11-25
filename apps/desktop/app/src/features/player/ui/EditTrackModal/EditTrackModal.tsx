@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, EditableCover, Flex, InputLabel, Modal, SpinnerLoader } from "@zelefy/ui";
+import { Button, Flex, InputLabel, Modal, SpinnerLoader } from "@zelefy/ui";
 import type { ModalComponentProps } from "@/shared/lib/stores";
-import { selectImage } from "@/shared/lib/utils";
-import { toSrc, trackFileSrc } from "@/entities/track";
 import { useLocalTrackDetails, useUpdateLocalTrack } from "../../hooks";
+import { CoverEditor, type CoverDraft } from "@/shared/ui";
 
 type EditableField = "title" | "metadataArtist" | "genre" | "bpm" | "keySignature" | "description";
-type CoverAction = "clear" | "delete" | "restore";
 
 const fields: {
     name: EditableField;
@@ -29,7 +27,7 @@ export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTr
     const { data: track, isLoading } = useLocalTrackDetails(numericId);
 
     const { mutate: updateLocalTrack } = useUpdateLocalTrack();
-    const [draftImagePath, setDraftImagePath] = useState<string | null | undefined>(undefined);
+    const [coverDraft, setCoverDraft] = useState<CoverDraft>(undefined);
 
     const [draft, setDraft] = useState({
         title: "",
@@ -59,11 +57,6 @@ export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTr
     const update = (name: EditableField) => (e: React.ChangeEvent<HTMLInputElement>) =>
         setDraft((d) => ({ ...d, [name]: e.target.value }));
 
-    const handleBrowseImage = async () => {
-        const selected = await selectImage();
-        if (selected) setDraftImagePath(selected);
-    };
-
     const handleSave = () => {
         if (!track) return;
 
@@ -77,7 +70,7 @@ export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTr
                     bpm: draft.bpm ? Number(draft.bpm) : null,
                     keySignature: draft.keySignature || null,
                     description: draft.description || null,
-                    newCoverPath: draftImagePath,
+                    newCoverPath: coverDraft,
                 },
             },
             {
@@ -85,21 +78,6 @@ export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTr
             },
         );
     };
-
-    const coverAction: CoverAction = (() => {
-        if (draftImagePath) return "clear";
-        if (track?.cover) {
-            return draftImagePath === null ? "restore" : "delete";
-        }
-        return "clear";
-    })();
-
-    const displayImage =
-        draftImagePath === null
-            ? null
-            : draftImagePath === undefined
-              ? trackFileSrc(track?.cover)
-              : toSrc(draftImagePath);
 
     return (
         <Modal
@@ -119,26 +97,14 @@ export const EditTrackModal = ({ trackId, onClose }: ModalComponentProps<"editTr
                 <SpinnerLoader isLoading />
             ) : (
                 <Flex as="form" gap="lg">
-                    <Flex direction="column" gap="md">
-                        <EditableCover
-                            src={displayImage ?? undefined}
-                            alt={draft?.title}
-                            size="xl"
-                            action={t("modal.edit_track.cover.action")}
-                            onEditClick={() => void handleBrowseImage()}
-                        />
-
-                        <Button
-                            variant="secondary"
-                            type="button"
-                            disabled={!track?.cover && !draftImagePath}
-                            onClick={() => {
-                                setDraftImagePath(coverAction === "delete" ? null : undefined);
-                            }}
-                        >
-                            {t("modal.edit_track.cover." + coverAction)}
-                        </Button>
-                    </Flex>
+                    <CoverEditor
+                        imageSrc={track?.image?.fullPath}
+                        value={coverDraft}
+                        onSelect={setCoverDraft}
+                        onClear={() => setCoverDraft(null)}
+                        onRestore={() => setCoverDraft(undefined)}
+                        alt={draft.title}
+                    />
 
                     <Flex direction="column" gap="md" fullWidth>
                         {fields.map((field) => (

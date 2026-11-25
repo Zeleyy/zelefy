@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { PlaylistCard } from "@zelefy/ui";
 import { queryClient } from "@/shared/api";
+import { toSrc } from "@/shared/lib/utils";
 import {
     localPlaylistAllTrackIdsOptions,
     type PlaylistWithFirstTrackId,
@@ -29,7 +30,7 @@ export const PlaylistCardWithTrack = ({ playlist }: { playlist: PlaylistWithFirs
     return (
         <PlaylistCard
             title={playlist.title}
-            coverSrc={track?.coverSrc ?? undefined}
+            coverSrc={toSrc(playlist.coverPath) ?? track?.coverSrc ?? undefined}
             isPlaying={isPlaying && isCurrentPlaylist}
             onPlayClick={() => {
                 if (isCurrentPlaylist) {
